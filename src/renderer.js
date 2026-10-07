@@ -393,28 +393,9 @@ init();
   }
 })();
 
-var THEMES = ['dark','midnight','aurora','sunset','crimson','ocean','grape','forest','amber','rose','graphite'];
-function applyTheme(name) {
-  if (THEMES.indexOf(name) < 0 || name === 'light') name = 'dark';
-  document.body.classList.remove('light');
-  THEMES.forEach(t => { if (t !== 'dark') document.body.classList.remove('theme-' + t); });
-  if (name !== 'dark') document.body.classList.add('theme-' + name);
-  document.querySelectorAll('.theme-card').forEach(c => c.classList.toggle('sel', c.dataset.theme === name));
-}
-function currentTheme() { try { const t = localStorage.getItem('ui-theme'); return (t && t !== 'light') ? t : 'dark'; } catch { return 'dark'; } }
-function setTheme(name) {
-  if (THEMES.indexOf(name) < 0 || name === 'light') name = 'dark';
-  applyTheme(name);
-  try { localStorage.setItem('ui-theme', name); } catch {}
-}
-(function() {
-  let t;
-  try {
-    t = localStorage.getItem('ui-theme');
-    if (!t || t === 'light') t = 'dark';
-  } catch { t = 'dark'; }
-  setTheme(t || 'dark');
-})();
+// Legacy ui-theme system removed — superseded by the Appearance & Themes
+// engine (initTheme/applyTheme) at the bottom of this file. initTheme() is
+// called at the start of continueInit() before any page renders.
 
 
 async function detectRobloxVersion() {
