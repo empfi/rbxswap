@@ -5156,7 +5156,7 @@ const THEME_PRESETS = [
   { id: 'crimson',  name: 'Crimson',  accent: '#e0405c', dark: 80 },
   { id: 'slate',    name: 'Slate',    accent: '#8a94a6', dark: 90 },
 ];
-const DEFAULT_THEME = { preset: 'midnight', accent: '#5c5ce0', dark: 50, radius: 10, scale: 100, glass: false, reduceMotion: false };
+const DEFAULT_THEME = { preset: 'midnight', accent: '#5c5ce0', dark: 50, radius: 10, scale: 100, reduceMotion: false };
 let _theme = { ...DEFAULT_THEME };
 
 function loadTheme() {
@@ -5208,12 +5208,10 @@ function applyTheme() {
   r.style.setProperty('--r', t.radius + 'px');
   r.style.setProperty('--r2', Math.max(0, t.radius - 2) + 'px');
   r.style.fontSize = (t.scale / 100 * 16) + 'px';
-  r.classList.toggle('th-glass', !!t.glass);
   r.classList.toggle('th-no-motion', !!t.reduceMotion);
   const set = (id, v) => { const el = document.getElementById(id); if (el) el.value = v; };
   set('theme-accent', ac); set('theme-accent-hex', ac);
   set('theme-darkness', t.dark); set('theme-radius', t.radius); set('theme-scale', t.scale);
-  const gl = document.getElementById('theme-glass'); if (gl) gl.checked = !!t.glass;
   const rm = document.getElementById('theme-reduce-motion'); if (rm) rm.checked = !!t.reduceMotion;
   const dl = document.getElementById('theme-dark-label'); if (dl) dl.textContent = t.dark < 33 ? 'Deep' : t.dark < 66 ? 'Dark' : 'Soft';
   const rl = document.getElementById('theme-radius-label'); if (rl) rl.textContent = t.radius + 'px';
@@ -5256,7 +5254,6 @@ function onThemeDarkness(v) { _theme.dark = +v; _theme.preset = ''; saveTheme();
 function _thRangeFill(el) { const min = +el.min || 0, max = +el.max || 100; el.style.setProperty('--fill', ((+el.value - min) / (max - min) * 100) + '%'); }
 function onThemeRadius(v) { _theme.radius = +v; saveTheme(); applyTheme(); _thRangeFill(document.getElementById('theme-radius')); }
 function onThemeScale(v) { _theme.scale = +v; saveTheme(); applyTheme(); _thRangeFill(document.getElementById('theme-scale')); }
-function onThemeGlass(on) { _theme.glass = !!on; saveTheme(); applyTheme(); }
 function onThemeReduceMotion(on) { _theme.reduceMotion = !!on; saveTheme(); applyTheme(); }
 function resetTheme() { _theme = { ...DEFAULT_THEME }; saveTheme(); applyTheme(); renderThemePresets(); toast('Theme reset to default', 'ok'); }
 

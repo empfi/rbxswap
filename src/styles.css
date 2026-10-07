@@ -21,7 +21,6 @@ body{
   -webkit-font-smoothing:antialiased;
 }
 
-
 button:focus-visible,button:focus,.nav-item:focus,.nav-item:focus-visible,.tab-btn:focus,.tab-btn:focus-visible{outline:none;}
 
 /* titlebar */
@@ -235,7 +234,6 @@ button:focus-visible,button:focus,.nav-item:focus,.nav-item:focus-visible,.tab-b
    not saved" while otherwise looking like a normal account card. */
 .card.temp-card{border-style:dotted;border-color:var(--bd2)}
 
-
 /* buttons */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:4px;border:none;border-radius:var(--r2);font-family:'Inter',sans-serif;font-size:11.5px;font-weight:500;cursor:pointer;transition:background var(--dur) var(--smooth),color var(--dur) var(--smooth),border-color var(--dur) var(--smooth),opacity var(--dur) var(--smooth),transform 180ms var(--spring),box-shadow var(--dur) var(--smooth)}
 .btn:active{transform:scale(0.95) translateY(0);opacity:.85}
@@ -404,7 +402,6 @@ button:focus-visible,button:focus,.nav-item:focus,.nav-item:focus-visible,.tab-b
 .tab-btn:hover{background:rgba(255,255,255,.05);color:var(--t1);transform:none;border-color:transparent}
 .tab-btn.active{background:var(--s4);color:var(--t1);font-weight:600;border-color:rgba(255,255,255,.08);box-shadow:0 1px 3px rgba(0,0,0,.3)}
 .tab-btn:active{transform:none}
-
 
 /* charts page */
 .charts-inner{flex:1;display:flex;flex-direction:column;overflow:hidden}
@@ -575,7 +572,6 @@ body.theme-forest{--bg:#0a1410;--s1:#0f1d16;--s2:#13251c;--s3:#1a3025;--s4:#2340
 body.theme-amber{--bg:#161106;--s1:#1e170a;--s2:#271e0d;--s3:#332813;--s4:#41331b;--bd:rgba(255,200,110,.1);--bd2:rgba(255,200,110,.2);--ac:#f59e0b;--ac2:rgba(245,158,11,.3);--ac3:rgba(245,158,11,.48)}
 body.theme-rose{--bg:#170b11;--s1:#200f18;--s2:#29131f;--s3:#351a29;--s4:#432235;--bd:rgba(255,150,190,.1);--bd2:rgba(255,150,190,.2);--ac:#fb7185;--ac2:rgba(251,113,133,.3);--ac3:rgba(251,113,133,.48)}
 body.theme-graphite{--bg:#0d0e10;--s1:#131418;--s2:#1a1c21;--s3:#23262d;--s4:#2e323a;--bd:rgba(160,170,190,.1);--bd2:rgba(160,170,190,.2);--ac:#94a3b8;--ac2:rgba(148,163,184,.28);--ac3:rgba(148,163,184,.45)}
-
 
 
 /* ── Context menu ────────────────────────────────────────────────────────── */
@@ -803,7 +799,6 @@ body.light{
 .sr-desc{font-size:11.5px;line-height:1.55;color:var(--t3)}
 .badge{border-radius:var(--r3);font-size:10px;padding:3px 8px}
 
-
 /* 10 — Modals & menus: soft, single shadow */
 .overlay{background:rgba(0,0,0,.6);backdrop-filter:blur(6px)}
 .modal{border-radius:var(--r);border:1px solid var(--bd2);box-shadow:var(--sh-lg);padding:20px}
@@ -985,7 +980,6 @@ body{
 .card,.sc,.exec-card{background:var(--s1);border:1px solid var(--bd);border-radius:12px}
 .exec-card:hover{border-color:var(--bd2)}
 .card-add{border:1px dashed var(--bd2);border-radius:12px}
-
 
 /* Toggle — macOS switch (green when on) */
 .toggle{width:38px;height:22px}
@@ -1347,7 +1341,6 @@ body{
 #m-game-picker ::selection{background:var(--s3);color:var(--t1)}
 
 
-
 /* UX refinements: preserve the original visual language while improving reachability and feedback. */
 button:focus-visible,.nav-item:focus-visible,.tab-btn:focus-visible,.btn:focus-visible,.vt:focus-visible,.toggle:focus-within,.card-add:focus-visible,.search:focus-within,.field input:focus,.sr-input:focus,.pm-input:focus{outline:none}
 .search:focus-within{border-color:var(--ac)}
@@ -1363,19 +1356,9 @@ button:focus-visible,.nav-item:focus-visible,.tab-btn:focus-visible,.btn:focus-v
 html.th-no-motion *,html.th-no-motion *::before,html.th-no-motion *::after{
   transition-duration:0ms !important;animation-duration:0ms !important;
 }
-html.th-glass .overlay{background:rgba(8,8,10,.55);backdrop-filter:blur(22px) saturate(1.3)}
-html.th-glass .modal:not(.tut-modal){backdrop-filter:blur(28px) saturate(1.4);background:color-mix(in srgb,var(--s1) 78%,transparent)}
-html.th-glass .ctx-menu{backdrop-filter:blur(20px);background:color-mix(in srgb,var(--s2) 80%,transparent)}
-html.th-glass .filter-menu,html.th-glass .cdd-menu,html.th-glass .gp-dropdown,html.th-glass .toast{backdrop-filter:blur(20px);background:color-mix(in srgb,var(--s2) 80%,transparent)}
-/* Glass theme surfaces: accent-tinted frosted panels instead of flat fills */
-html.th-glass #sidebar{background:color-mix(in srgb,var(--ac) 6%,color-mix(in srgb,var(--bg) 55%,transparent));backdrop-filter:blur(24px) saturate(1.35)}
-html.th-glass #titlebar{background:color-mix(in srgb,var(--ac) 4%,color-mix(in srgb,var(--bg) 50%,transparent));backdrop-filter:blur(24px) saturate(1.35)}
 /* Base: sidebar & titlebar share the page background so they never look
    like a separate black column — glass only adds frost/tint on top. */
 #sidebar,#titlebar{background:var(--bg)}
-html.th-glass .sc,html.th-glass .card,html.th-glass .chart-card,html.th-glass .pkg-card{background:color-mix(in srgb,var(--ac) 6%,color-mix(in srgb,var(--s1) 68%,transparent));backdrop-filter:blur(14px)}
-html.th-glass .nav-item:hover{background:color-mix(in srgb,var(--ac) 10%,transparent)}
-html.th-glass .nav-item.active{backdrop-filter:blur(8px)}
 
 /* theme preset swatches */
 .th-preset{display:flex;flex-direction:column;align-items:center;gap:6px;padding:8px 4px;background:var(--s2);border:1px solid var(--bd);border-radius:var(--r2);cursor:pointer;transition:border-color var(--dur) var(--smooth),transform 120ms var(--smooth)}
