@@ -5218,6 +5218,10 @@ function applyTheme() {
   const dl = document.getElementById('theme-dark-label'); if (dl) dl.textContent = t.dark < 33 ? 'Deep' : t.dark < 66 ? 'Dark' : 'Soft';
   const rl = document.getElementById('theme-radius-label'); if (rl) rl.textContent = t.radius + 'px';
   const sl = document.getElementById('theme-scale-label'); if (sl) sl.textContent = t.scale + '%';
+  document.querySelectorAll('.th-range').forEach(el => {
+    const min = +el.min || 0, max = +el.max || 100;
+    el.style.setProperty('--fill', ((+el.value - min) / (max - min) * 100) + '%');
+  });
   document.querySelectorAll('.th-preset').forEach(b => b.classList.toggle('active', b.dataset.preset === t.preset));
 }
 
@@ -5249,8 +5253,9 @@ function onThemeAccentHexInput(v) {
   if (/^#[0-9a-fA-F]{6}$/.test(v)) { _theme.accent = v; _theme.preset = ''; saveTheme(); applyTheme(); renderThemePresets(); }
 }
 function onThemeDarkness(v) { _theme.dark = +v; _theme.preset = ''; saveTheme(); applyTheme(); renderThemePresets(); }
-function onThemeRadius(v) { _theme.radius = +v; saveTheme(); applyTheme(); }
-function onThemeScale(v) { _theme.scale = +v; saveTheme(); applyTheme(); }
+function _thRangeFill(el) { const min = +el.min || 0, max = +el.max || 100; el.style.setProperty('--fill', ((+el.value - min) / (max - min) * 100) + '%'); }
+function onThemeRadius(v) { _theme.radius = +v; saveTheme(); applyTheme(); _thRangeFill(document.getElementById('theme-radius')); }
+function onThemeScale(v) { _theme.scale = +v; saveTheme(); applyTheme(); _thRangeFill(document.getElementById('theme-scale')); }
 function onThemeGlass(on) { _theme.glass = !!on; saveTheme(); applyTheme(); }
 function onThemeReduceMotion(on) { _theme.reduceMotion = !!on; saveTheme(); applyTheme(); }
 function resetTheme() { _theme = { ...DEFAULT_THEME }; saveTheme(); applyTheme(); renderThemePresets(); toast('Theme reset to default', 'ok'); }
