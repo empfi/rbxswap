@@ -1360,7 +1360,13 @@ html.th-no-motion *,html.th-no-motion *::before,html.th-no-motion *::after{
 html.th-glass .overlay{background:rgba(8,8,10,.55);backdrop-filter:blur(22px) saturate(1.3)}
 html.th-glass .modal{backdrop-filter:blur(28px) saturate(1.4);background:color-mix(in srgb,var(--s1) 78%,transparent)}
 html.th-glass .ctx-menu{backdrop-filter:blur(20px);background:color-mix(in srgb,var(--s2) 80%,transparent)}
-html.th-glass .filter-menu{backdrop-filter:blur(18px)}
+html.th-glass .filter-menu,html.th-glass .cdd-menu,html.th-glass .gp-dropdown,html.th-glass .toast{backdrop-filter:blur(20px);background:color-mix(in srgb,var(--s2) 80%,transparent)}
+/* Glass theme surfaces: accent-tinted frosted panels instead of flat fills */
+html.th-glass #sidebar{background:color-mix(in srgb,var(--s1) 62%,transparent);backdrop-filter:blur(24px) saturate(1.35)}
+html.th-glass #titlebar{background:color-mix(in srgb,var(--s1) 55%,transparent);backdrop-filter:blur(24px) saturate(1.35)}
+html.th-glass .sc,html.th-glass .card,html.th-glass .chart-card,html.th-glass .pkg-card{background:color-mix(in srgb,var(--ac) 7%,var(--s1) 72%,transparent);backdrop-filter:blur(14px)}
+html.th-glass .nav-item:hover{background:color-mix(in srgb,var(--ac) 10%,transparent)}
+html.th-glass .nav-item.active{backdrop-filter:blur(8px)}
 
 /* theme preset swatches */
 .th-preset{display:flex;flex-direction:column;align-items:center;gap:6px;padding:8px 4px;background:var(--s2);border:1px solid var(--bd);border-radius:var(--r2);cursor:pointer;transition:border-color var(--dur) var(--smooth),transform 120ms var(--smooth)}
@@ -1374,22 +1380,25 @@ html.th-glass .filter-menu{backdrop-filter:blur(18px)}
 /* ═════════════════════════════════════════════════════════════════════════
    ONBOARDING TUTORIAL
    ═════════════════════════════════════════════════════════════════════════ */
-.tut-overlay{background:rgba(6,6,9,.7);backdrop-filter:blur(18px) saturate(1.25);z-index:400}
-.tut-modal{width:420px;padding:0;overflow:hidden;border-radius:18px}
-.tut-visual{position:relative;height:170px;background:linear-gradient(160deg,color-mix(in srgb,var(--ac) 32%,var(--s1)),var(--s1) 78%);display:flex;align-items:center;justify-content:center;overflow:hidden}
-.tut-orb{position:absolute;border-radius:50%;filter:blur(2px);opacity:.5;will-change:transform;animation:tutFloat 7s var(--ease) infinite alternate}
-.tut-orb-1{width:150px;height:150px;left:-40px;top:-50px;background:radial-gradient(circle at 35% 35%,var(--ac),transparent 70%)}
-.tut-orb-2{width:110px;height:110px;right:-25px;top:30px;background:radial-gradient(circle at 40% 40%,var(--ac3),transparent 70%);animation-delay:-2.4s;animation-duration:9s}
-.tut-orb-3{width:80px;height:80px;left:35%;bottom:-45px;background:radial-gradient(circle at 40% 40%,var(--ac2),transparent 70%);animation-delay:-4.8s;animation-duration:11s}
-.tut-glow{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 120%,color-mix(in srgb,var(--ac) 30%,transparent),transparent 65%)}
-@keyframes tutFloat{from{transform:translate(0,0) scale(1)}to{transform:translate(18px,14px) scale(1.12)}}
-.tut-step-icon{position:relative;z-index:2;color:#fff;opacity:0;transform:translateY(8px) scale(.92);transition:opacity 320ms var(--smooth),transform 380ms var(--spring)}
+/* Container-less tutorial: content floats directly on the blurred backdrop,
+   decorative orbs drifting behind the text. No card, no border, no shadow. */
+.tut-overlay{background:rgba(6,6,9,.66);backdrop-filter:blur(22px) saturate(1.3);z-index:400}
+.tut-modal{position:relative;width:480px;padding:0;background:transparent;border:none;box-shadow:none;overflow:visible}
+.tut-visual{position:absolute;inset:-90px -120px;z-index:0;height:auto;background:none;overflow:hidden;pointer-events:none}
+.tut-orb{position:absolute;border-radius:50%;filter:blur(2px);opacity:.45;will-change:transform;animation:tutFloat 7s var(--ease) infinite alternate}
+.tut-orb-1{width:170px;height:170px;left:4%;top:0;background:radial-gradient(circle at 35% 35%,var(--ac),transparent 70%)}
+.tut-orb-2{width:120px;height:120px;right:2%;top:38%;background:radial-gradient(circle at 40% 40%,var(--ac3),transparent 70%);animation-delay:-2.4s;animation-duration:9s}
+.tut-orb-3{width:90px;height:90px;left:38%;bottom:0;background:radial-gradient(circle at 40% 40%,var(--ac2),transparent 70%);animation-delay:-4.8s;animation-duration:11s}
+.tut-glow{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 55%,color-mix(in srgb,var(--ac) 22%,transparent),transparent 62%)}
+@keyframes tutFloat{from{transform:translate(0,0) scale(1)}to{transform:translate(20px,16px) scale(1.14)}}
+.tut-step-icon{position:relative;z-index:2;color:#fff;opacity:0;transform:translateY(8px) scale(.92);transition:opacity 320ms var(--smooth),transform 380ms var(--spring);display:flex;align-items:center;justify-content:center;height:96px;margin-bottom:6px}
 .tut-step-icon.show{opacity:1;transform:translateY(0) scale(1)}
 .tut-step-icon svg{filter:drop-shadow(0 4px 18px rgba(0,0,0,.45))}
-.tut-body{padding:20px 22px 18px}
+.tut-body{position:relative;z-index:2;padding:0 8px;text-align:center}
 .tut-count{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ac);margin-bottom:6px}
 .tut-text{font-size:12.5px;color:var(--t2);line-height:1.65;margin-top:4px;min-height:42px}
-.tut-dots{display:flex;gap:6px;margin:12px 0 2px}
+.tut-dots{display:flex;gap:6px;margin:14px 0 2px;justify-content:center}
 .tut-dot{width:6px;height:6px;border-radius:50%;background:var(--s4);transition:width 260ms var(--spring),background 200ms var(--smooth)}
 .tut-dot.on{width:18px;border-radius:3px;background:var(--ac)}
-.tut-modal .modal-actions{margin-top:14px}
+.tut-modal .modal-actions{margin-top:16px;justify-content:center}
+.tut-modal #tut-skip{position:absolute;left:8px}
