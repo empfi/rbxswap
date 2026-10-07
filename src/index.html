@@ -1,0 +1,1185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://*.rbxcdn.com https://*.roblox.com; connect-src 'self' https://*.roblox.com https://*.rbxcdn.com; object-src 'none'; base-uri 'self'; frame-src 'none'"/>
+<title>rbxSWAP</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="styles.css"/>
+</head>
+<body>
+<div id="titlebar">
+  <div class="tb-brand">
+    <div class="tb-name">rbxSWAP</div>
+    <span class="tb-version" id="tb-roblox-ver">-</span>
+  </div>
+  <div class="tb-drag"></div>
+  <div class="tb-dl" id="tb-dl" style="display:none">
+    <div class="tb-dl-text">
+      <span class="tb-dl-label" id="tb-dl-label">Downloading…</span>
+      <span class="tb-dl-pct" id="tb-dl-pct">0%</span>
+    </div>
+    <div class="tb-dl-track"><div class="tb-dl-bar" id="tb-dl-bar"></div></div>
+  </div>
+  <div class="tb-drag"></div>
+  <div class="tb-controls">
+    <button class="tb-win-btn" onclick="api.minimize()" title="Minimize"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+    <button class="tb-win-btn" onclick="api.maximize()" title="Maximize"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/></svg></button>
+    <button class="tb-win-btn close" onclick="api.close()" title="Close"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+  </div>
+</div>
+
+<div id="layout">
+  <nav id="sidebar">
+    <div class="nav-scroll">
+      <div class="nav-group">
+        <div class="nav-group-title">Manage</div>
+        <button class="nav-item active" id="nav-accounts" onclick="goTo('accounts')">
+          <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Accounts
+        </button>
+        <button class="nav-item" id="nav-packages" onclick="goTo('packages')">
+          <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/><path d="M8 13h8"/><path d="M8 16h5"/></svg>Groups
+        </button>
+        <button class="nav-item" id="nav-mixer" onclick="goTo('mixer')">
+          <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/><line x1="4" x2="20" y1="12" y2="12"/><circle cx="8" cy="6" r="2"/><circle cx="16" cy="12" r="2"/><circle cx="10" cy="18" r="2"/></svg>Mixer
+        </button>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-title">Roblox</div>
+        <button class="nav-item" id="nav-charts" onclick="goTo('charts')">
+          <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="6" x2="10" y1="12" y2="12"/><line x1="8" x2="8" y1="10" y2="14"/><line x1="15" x2="15.01" y1="13" y2="13"/><line x1="18" x2="18.01" y1="11" y2="11"/><path d="M6 8h12a4 4 0 0 1 3.86 5l-1.5 6A2 2 0 0 1 18.42 20H17a2 2 0 0 1-1.79-1.11L14.5 17h-5l-.71 1.89A2 2 0 0 1 7 20H5.58a2 2 0 0 1-1.94-1.52l-1.5-6A4 4 0 0 1 6 8Z"/><path d="M12 8V5"/></svg>Games
+        </button>
+        <button class="nav-item" id="nav-rdd" onclick="goTo('rdd')">
+          <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>RDD
+        </button>
+      </div>
+      <div class="nav-group win-only">
+        <div class="nav-group-title">Advanced</div>
+        <button class="nav-item win-only" id="nav-swap" onclick="goTo('swap')">
+          <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m17 3 4 4-4 4"/><path d="M3 7h18"/><path d="m7 21-4-4 4-4"/><path d="M21 17H3"/></svg>Swap
+        </button>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-title">App</div>
+        <button class="nav-item" id="nav-executor" onclick="goTo('executor')">
+          <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="4 17 10 11 4 5"/><line x1="12" x2="20" y1="19" y2="19"/></svg>Executer
+        </button>
+        <button class="nav-item" id="nav-settings" onclick="goTo('settings')">
+          <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.09a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2Z"/><circle cx="12" cy="12" r="3"/></svg>Settings
+        </button>
+      </div>
+    </div>
+    <div class="nav-spacer"></div>
+    <div class="sb-afk win-only" title="Keep instances past the 20-minute idle kick">
+      <span class="sb-afk-label"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Anti-AFK</span>
+      <label class="toggle"><input type="checkbox" id="sb-antiafk" onchange="toggleAntiAfk('sb')"/><span class="toggle-trk"></span></label>
+    </div>
+  </nav>
+
+  <main id="main">
+    <div class="page-container">
+
+      <!-- accounts page -->
+      <div class="page active" id="page-accounts">
+        <div class="ph accounts-ph">
+          <div class="accounts-title-row">
+            <div>
+              <div class="ph-title">Accounts</div>
+              <div class="ph-sub" id="acct-sub">Loading…</div>
+            </div>
+            <div class="tab-bar">
+              <button class="tab-btn active" id="acct-tab-list" onclick="switchAcctSubTab('list')">My Accounts</button>
+              <button class="tab-btn" id="acct-tab-gen" onclick="switchAcctSubTab('gen')">Bloxgen</button>
+            </div>
+          </div>
+          <div id="acct-controls-wrap" class="acct-controls">
+            <div class="search"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input id="acct-search" aria-label="Search accounts" placeholder="Search accounts..." oninput="onAcctSearch(this.value)"/></div>
+            <div class="filter-wrap">
+              <button class="btn-out" id="filter-btn" aria-label="Filter accounts" aria-expanded="false" aria-controls="filter-menu" onclick="toggleFilterMenu(event)"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>Filter</button>
+              <div class="filter-menu" id="filter-menu">
+                <button class="active" data-f="all" onclick="setAcctFilter('all')">All accounts</button>
+                <button data-f="running" onclick="setAcctFilter('running')">Running</button>
+                <button data-f="idle" onclick="setAcctFilter('idle')">Not running</button>
+                <button data-f="valid-first" onclick="setAcctFilter('valid-first')">Valid first</button>
+                <button data-f="invalid-first" onclick="setAcctFilter('invalid-first')">Invalid first</button>
+              </div>
+            </div>
+            <div class="view-toggle">
+              <button class="vt active" id="vt-grid" onclick="setAcctView('grid')" title="Grid view"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></button>
+              <button class="vt" id="vt-list" onclick="setAcctView('list')" title="List view"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Accounts Grid Tab View -->
+        <div id="acct-subview-list">
+          <div class="grid-wrap">
+            <div class="grid" id="grid"></div>
+            <div class="empty" id="empty" style="display:none">
+              <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="opacity:.35"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+              <div class="empty-title">No accounts</div>
+              <div class="empty-sub">Click "Add account" to sign in with Roblox.</div>
+              <button class="btn btn-primary" style="margin-top:8px;font-size:11.5px;padding:6px 14px" onclick="openLogin()">Add account</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- BloxGen Generator Subview -->
+        <div id="acct-subview-gen" style="display:none; padding:18px">
+          <div style="width:100%; display:flex; flex-direction:column; gap:16px">
+            <div style="background:var(--s1); border:1px solid var(--bd); border-radius:12px; padding:18px; display:flex; flex-direction:column; gap:12px">
+              <div style="font-size:15px; font-weight:700; color:var(--t1); display:flex; align-items:center; gap:8px">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ac)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>BloxGen Account Generator
+              </div>
+              <div style="font-size:12px; color:var(--t2); line-height:1.4">
+                Click below to generate a new Roblox account via BloxGen API. Once generated, an automatic password change modal will pop up.
+              </div>
+              <div style="display:flex; gap:10px; align-items:center">
+                <button class="btn btn-primary" onclick="generateBloxGenAccount()" id="btn-gen-acct">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>Generate Account
+                </button>
+              </div>
+            </div>
+
+            <!-- Recent 5 Generated History -->
+            <div style="background:var(--s1); border:1px solid var(--bd); border-radius:12px; padding:18px; display:flex; flex-direction:column; gap:12px">
+              <div style="font-size:13px; font-weight:700; color:var(--t3); text-transform:uppercase; letter-spacing:.05em">
+                Recently Generated Accounts (Last 5)
+              </div>
+              <div id="gen-history-list" style="display:flex; flex-direction:column; gap:8px"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- packages page -->
+      <div class="page" id="page-packages">
+        <div class="ph" style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+          <div>
+            <div class="ph-title">Groups</div>
+            <div class="ph-sub" id="pkg-sub">Group accounts and launch them together with one click</div>
+          </div>
+          <button class="btn btn-primary" style="font-size:11.5px;padding:7px 12px;flex-shrink:0" onclick="openCreatePackage()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>New group
+          </button>
+        </div>
+        <div class="grid-wrap">
+          <div class="pkg-list" id="pkg-list"></div>
+          <div class="empty" id="pkg-empty" style="display:none">
+            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="opacity:.35"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
+            <div class="empty-title">No groups yet</div>
+            <div class="empty-sub">Create a group to launch several accounts into the same game with one click.</div>
+            <button class="btn btn-primary" style="margin-top:8px;font-size:11.5px;padding:6px 14px" onclick="openCreatePackage()">Create group</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- games page -->
+      <div class="page" id="page-charts">
+        <div class="ph" style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+          <div>
+            <div class="ph-title">Games</div>
+            <div class="ph-sub">Trending &amp; top games on Roblox</div>
+          </div>
+          <button class="btn btn-ghost" style="font-size:11px;padding:7px 10px;flex-shrink:0" onclick="loadCharts()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/></svg>Refresh
+          </button>
+        </div>
+        <div class="charts-inner">
+          <div style="padding:10px 18px 8px;flex-shrink:0">
+            <div class="tab-bar">
+              <button class="tab-btn active" id="ctab-popular" onclick="switchChartTab('popular')">Top Playing Now</button>
+              <button class="tab-btn" id="ctab-trending" onclick="switchChartTab('trending')">Top Rated</button>
+            </div>
+          </div>
+        <div class="chart-search-wrap" style="padding:0 18px 8px; display:flex; flex-direction:column; gap:8px">
+          <div class="search" style="width:100%">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input id="chart-search" type="text" placeholder="Search games…" oninput="filterCharts(this.value)"/>
+          </div>
+          <div id="recent-games-wrap" style="display:none; flex-direction:column; gap:6px; margin-top:4px">
+            <div style="font-size:11px; font-weight:600; color:var(--t3); text-transform:uppercase; letter-spacing:.05em">Recently Searched Games</div>
+            <div id="recent-games-list" class="charts-grid"></div>
+          </div>
+        </div>
+        <div class="charts-scroll">
+          <div id="charts-loading" class="charts-loading" style="margin-top:20px">
+            <div class="spin" style="width:18px;height:18px;border-width:2.5px;color:var(--ac)"></div>
+            <span>Loading games…</span>
+          </div>
+          <div class="charts-grid" id="charts-grid" style="display:none"></div>
+          <div class="empty" id="charts-empty" style="display:none">
+            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="opacity:.35"><line x1="1" y1="1" x2="23" y2="23"/><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"/><path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"/><path d="M10.71 5.05A16 16 0 0 1 22.56 9"/><path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
+            <div class="empty-title">Couldn't load games</div>
+            <div class="empty-sub">Check your connection and press Refresh.</div>
+          </div>
+        </div>
+        </div>
+      </div>
+
+      <!-- mixer page -->
+      <div class="page" id="page-mixer" style="overflow-y:auto">
+        <div class="ph" style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+          <div>
+            <div class="ph-title">Mixer</div>
+            <div class="ph-sub">Graphics, FPS and volume for every instance</div>
+          </div>
+        </div>
+        <div class="sw">
+
+          <!-- Graphics quality -->
+          <div class="sc">
+            <div class="sc-head">Graphics Quality</div>
+            <div class="sr" style="flex-direction:column;align-items:stretch;gap:10px">
+              <div class="sr-left">
+                <div class="sr-label">Render quality level</div>
+                <div class="sr-desc">Forces a fixed quality (1 = lowest, 21 = max). Applies to all instances on next launch.</div>
+              </div>
+              <div class="mix-row">
+                <label class="mix-auto"><span class="toggle sm"><input type="checkbox" id="mix-gfx-auto" onchange="mixGfxAutoToggle()"/><span class="toggle-trk"></span></span> Auto</label>
+                <input type="range" class="fps-slider" id="mix-gfx" min="1" max="21" step="1" value="10"
+                       oninput="mixGfxInput(this.value)" onchange="mixGfxCommit()"/>
+                <span class="fps-val-label" id="mix-gfx-val">10</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- FPS cap -->
+          <div class="sc">
+            <div class="sc-head">FPS Cap</div>
+            <div class="sr" style="flex-direction:column;align-items:stretch;gap:10px">
+              <div class="sr-left">
+                <div class="sr-label">Target framerate</div>
+                <div class="sr-desc">Writes to <code>GlobalBasicSettings_13.xml</code>. Supports low FPS caps below 30.</div>
+              </div>
+              <div class="mix-row">
+                <label class="mix-auto"><span class="toggle sm"><input type="checkbox" id="mix-fps-unl" onchange="mixFpsUnlToggle()"/><span class="toggle-trk"></span></span> Unlimited</label>
+                <input type="range" class="fps-slider" id="mix-fps" min="5" max="360" step="5" value="60"
+                       oninput="mixFpsInput(this.value)" onchange="mixFpsCommit()"/>
+                <span class="fps-val-label" id="mix-fps-val" style="min-width:40px">60</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- RAM Limit -->
+          <div class="sc">
+            <div class="sc-head">RAM Limit</div>
+            <div class="sr" style="flex-direction:column;align-items:stretch;gap:10px">
+              <div class="sr-left">
+                <div class="sr-label">Max RAM per instance</div>
+                <div class="sr-desc">A hard per-instance working-set cap pins Roblox's physical RAM to this size; the rest pages out, so the client keeps running (just slower at very low caps). The account badge shows usage / cap.</div>
+              </div>
+              <div class="mix-row">
+                <label class="mix-auto"><span class="toggle sm"><input type="checkbox" id="mix-ram-unl" onchange="mixRamUnlToggle()"/><span class="toggle-trk"></span></span> Unlimited</label>
+                <input type="range" class="fps-slider" id="mix-ram" min="256" max="8192" step="256" value="2048"
+                       oninput="mixRamInput(this.value)" onchange="mixRamCommit()"/>
+                <span class="fps-val-label" id="mix-ram-val" style="min-width:65px">2048 MB</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Volume -->
+          <div class="sc">
+            <div class="sc-head">Master Volume</div>
+            <div class="sr" style="flex-direction:column;align-items:stretch;gap:10px">
+              <div class="sr-left">
+                <div class="sr-label">Roblox volume <span class="badge g" style="margin-left:6px">Live</span></div>
+                <div class="sr-desc">Adjusts the OS volume of every running Roblox window instantly. Re-applied to new launches.</div>
+              </div>
+              <div class="mix-row">
+                <svg id="vol-mute-btn" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;cursor:pointer" title="Mute" onclick="mixVolToggleMute()"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+                <input type="range" class="fps-slider" id="mix-vol" min="0" max="100" step="1" value="100"
+                       oninput="mixVolInput(this.value)" onchange="mixVolCommit()"/>
+                <span class="fps-val-label" id="mix-vol-val" style="min-width:40px">100%</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Apply / actions -->
+          <div style="display:flex;gap:8px;margin-top:4px;flex-wrap:wrap">
+            <button class="btn btn-primary" style="flex:1;justify-content:center;min-width:140px" onclick="mixSaveSettings()" id="mix-save-btn">
+              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>Save Mixer Settings
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- swap page -->
+      <div class="page win-only" id="page-swap" style="overflow-y:auto">
+        <div class="ph">
+          <div class="ph-title">Swap</div>
+          <div class="ph-sub">Clean Roblox traces &amp; spoof machine identifiers between account swaps</div>
+        </div>
+        <div class="sw">
+
+          <!-- admin warning -->
+          <div class="swap-warn" id="swap-admin-warn" style="display:none;align-items:center">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            <span style="flex:1">Spoofing MAC / hardware IDs needs administrator rights.</span>
+            <button class="btn btn-primary" style="flex-shrink:0;font-size:11.5px;padding:6px 12px" onclick="swapRelaunchAdmin()">Relaunch as admin</button>
+          </div>
+
+          <!-- spoof identity -->
+          <div class="sc">
+            <div class="sc-head">Spoof Identity</div>
+            <div class="sr">
+              <div class="sr-left">
+                <div class="sr-label"><span class="swap-dot" id="swap-backup-dot"></span>Backup status</div>
+                <div class="sr-desc" id="swap-backup-text">Checking…</div>
+              </div>
+              <button class="btn btn-ghost" onclick="swapRefreshBackup()" title="Refresh"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/></svg></button>
+            </div>
+            <div class="sr">
+              <div class="sr-left"><div class="sr-label">MAC address</div><div class="sr-desc">Randomise every network adapter's hardware address.</div></div>
+              <label class="toggle"><input type="checkbox" id="swap-t-mac" checked/><span class="toggle-trk"></span></label>
+            </div>
+            <div class="sr">
+              <div class="sr-left"><div class="sr-label">Machine GUIDs</div><div class="sr-desc">MachineGuid, HwProfileGuid &amp; MachineId registry identifiers.</div></div>
+              <label class="toggle"><input type="checkbox" id="swap-t-hwid" checked/><span class="toggle-trk"></span></label>
+            </div>
+            <div class="sr">
+              <div class="sr-left"><div class="sr-label">Volume serial <span class="badge">reboot</span></div><div class="sr-desc">System-drive boot-sector serial. Applies after a reboot.</div></div>
+              <label class="toggle"><input type="checkbox" id="swap-t-vol"/><span class="toggle-trk"></span></label>
+            </div>
+            <div class="sr">
+              <div class="sr-left"><div class="sr-label">Create restore point first</div><div class="sr-desc">Windows System Restore checkpoint before spoofing.</div></div>
+              <label class="toggle"><input type="checkbox" id="swap-t-rp"/><span class="toggle-trk"></span></label>
+            </div>
+            <div style="display:flex;gap:8px;padding:2px 14px 14px">
+              <button class="btn btn-ghost" style="flex-shrink:0;justify-content:center" id="swap-mac-btn" onclick="swapRunSpoof(true)" title="Randomise every network adapter's hardware address only — ignores the toggles above">
+                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 12h4"/><path d="M14 12h4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="M4.9 19.1 3 21"/><path d="M21 3l-1.9 1.9"/><path d="M19.1 19.1 21 21"/><path d="M3 3l1.9 1.9"/></svg>MAC only
+              </button>
+              <button class="btn btn-primary hold-btn" style="flex:1;justify-content:center;position:relative;overflow:hidden" id="swap-spoof-btn">
+                <div class="hold-progress" id="swap-spoof-hold-bar"></div>
+                <span style="position:relative;z-index:2;display:flex;align-items:center;gap:6px"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 11a2 2 0 0 0-2 2c0 1.1.9 2 2 2s2-.9 2-2a2 2 0 0 0-2-2Z"/><path d="M8.5 8.5A5 5 0 0 1 17 12c0 1.2-.3 2.3-.9 3.2"/><path d="M6.5 6.5A8 8 0 0 1 20 12c0 2.1-.8 4.1-2.1 5.6"/><path d="M4.5 4.5A11 11 0 0 1 23 12c0 3-.9 5.8-2.6 8.1"/><path d="M15.5 8.5A5 5 0 0 0 7 12c0 2.8 1.1 5.1 2.8 6.8"/><path d="M4 12a8 8 0 0 0 3.2 6.4"/><path d="M12 19v3"/></svg>Spoof now</span>
+              </button>
+              <button class="btn btn-ghost" style="flex:1;justify-content:center" onclick="swapRevert()" id="swap-revert-btn"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/></svg>Revert</button>
+            </div>
+          </div>
+
+          <!-- clean traces -->
+          <div class="sc">
+            <div class="sc-head">Clean Traces</div>
+            <div class="sr">
+              <div class="sr-left"><div class="sr-label">Preserve settings</div><div class="sr-desc">Keep GlobalBasicSettings (graphics, FPS) after the wipe.</div></div>
+              <label class="toggle"><input type="checkbox" id="swap-c-settings" checked/><span class="toggle-trk"></span></label>
+            </div>
+            <div class="sr">
+              <div class="sr-left"><div class="sr-label">Preserve Fast Flags</div><div class="sr-desc">Keep Bloxstrap/Fishstrap/Voidstrap ClientAppSettings.</div></div>
+              <label class="toggle"><input type="checkbox" id="swap-c-fflags"/><span class="toggle-trk"></span></label>
+            </div>
+            <div class="sr">
+              <div class="sr-left"><div class="sr-label">Delete Roblox Studio too</div><div class="sr-desc">Off keeps Studio intact.</div></div>
+              <label class="toggle"><input type="checkbox" id="swap-c-studio"/><span class="toggle-trk"></span></label>
+            </div>
+            <div class="sr">
+              <div class="sr-left"><div class="sr-label">Purge auth tokens</div><div class="sr-desc">Delete LocalStorage cookies &amp; HKCU Roblox registry keys.</div></div>
+              <label class="toggle"><input type="checkbox" id="swap-c-auth" checked/><span class="toggle-trk"></span></label>
+            </div>
+            <div style="padding:2px 14px 14px">
+              <button class="btn btn-danger hold-btn" style="width:100%;justify-content:center;position:relative;overflow:hidden" id="swap-clean-btn">
+                <div class="hold-progress" id="swap-clean-hold-bar"></div>
+                <span style="position:relative;z-index:2;display:flex;align-items:center;gap:6px"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>Clean Roblox traces</span>
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- rdd page -->
+      <div class="page" id="page-rdd" style="overflow-y:auto">
+        <div class="ph" style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+          <div>
+            <div class="ph-title">RDD</div>
+            <div class="ph-sub">Roblox Deployment Downloader — view live version hashes &amp; download client/studio builds</div>
+          </div>
+        </div>
+        <div class="sw">
+
+          <!-- WEAO live versions -->
+          <div class="sc">
+            <div class="sc-head" style="display:flex;align-items:center;justify-content:space-between;padding-right:10px">Roblox Versions &middot; WEAO
+              <button class="btn btn-ghost" onclick="rddLoadWeaoVersions()" id="weao-ver-refresh">Refresh</button>
+            </div>
+            <div id="weao-versions" class="weao-versions">
+              <div class="weao-hint" id="weao-ver-hint">Loading current, future &amp; past versions…</div>
+            </div>
+          </div>
+
+          <!-- Installed versions (own container) -->
+          <div class="sc">
+            <div class="sc-head" style="display:flex;align-items:center;justify-content:space-between;padding-right:10px">Installed Versions
+              <button class="btn btn-ghost" onclick="rddLoadInstalledVersions()" id="rdd-ver-refresh" style="font-size:11px;padding:4px 9px"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/></svg>Refresh</button>
+            </div>
+            <div class="sr" style="flex-direction:column;align-items:stretch;gap:10px">
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+                <span id="rdd-disk-summary" style="font-size:11.5px;color:var(--t3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Calculating disk usage…</span>
+                <button class="btn btn-ghost" id="rdd-clean-btn" onclick="rddCleanOldVersions()" style="font-size:11px;padding:4px 9px;flex-shrink:0" title="Remove outdated rbxSWAP-installed versions. Keeps the version your executor needs and Roblox's own installs.">Clean old versions</button>
+              </div>
+              <div class="search" style="width:100%;height:34px">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <input id="rdd-ver-search" type="text" placeholder="Search installed versions…" oninput="rddFilterInstalledVersions(this.value)"/>
+              </div>
+              <div id="rdd-ver-list" style="display:flex;flex-direction:column;gap:6px">
+                <div class="weao-hint">Loading installed versions…</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- deployment selector -->
+          <div class="sc">
+            <div class="sc-head">Deployment</div>
+            <div class="sr">
+              <div class="sr-left"><div class="sr-label">Channel</div><div class="sr-desc">Deployment channel. LIVE is the public production channel.</div></div>
+              <input type="text" class="sr-input" id="rdd-channel" value="LIVE" style="width:160px"/>
+            </div>
+            <div class="sr">
+              <div class="sr-left"><div class="sr-label">Binary type</div><div class="sr-desc">Which Roblox build to look up and download.</div></div>
+              <select class="sr-input" id="rdd-binaryType" style="width:190px" onchange="rddPopulateArch()">
+                <option value="WindowsPlayer">WindowsPlayer</option>
+                <option value="WindowsStudio64">WindowsStudio64</option>
+                <option value="MacPlayer">MacPlayer</option>
+                <option value="MacStudio">MacStudio</option>
+              </select>
+            </div>
+            <div class="sr">
+              <div class="sr-left"><div class="sr-label">Architecture</div></div>
+              <select class="sr-input" id="rdd-arch" style="width:130px"></select>
+            </div>
+            <div class="sr">
+              <div class="sr-left"><div class="sr-label">Version hash</div><div class="sr-desc">Blank = the channel's current version. Or paste a specific <code>version-…</code> hash.</div></div>
+              <input type="text" class="sr-input" id="rdd-version" placeholder="version-…" style="width:230px"/>
+            </div>
+            <div style="display:flex;gap:8px;padding:2px 14px 14px">
+              <button class="btn btn-primary" style="flex:1;justify-content:center;position:relative;overflow:hidden" onclick="rddDownload()" id="rdd-download-btn"><div class="hold-progress" id="rdd-download-bar"></div><span style="position:relative;z-index:2;display:flex;align-items:center;gap:6px"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Download</span></button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+
+
+
+      <!-- settings page -->
+      <div class="page" id="page-settings">
+        <div class="ph">
+          <div class="ph-title">Settings</div>
+          <div class="ph-sub">App preferences</div>
+        </div>
+        <div class="sw">
+
+          <div class="platform-note" id="platform-note">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <span>You're running the <b id="platform-note-os">macOS</b> build. Multi-instance, Anti-AFK, the Swap/spoofer and the trace cleaner are Windows-only and are hidden here. Accounts, RDD downloads, the version tracker and Executors work normally.</span>
+          </div>
+
+          <!-- Appearance & Themes -->
+          <div class="sc">
+            <div class="sc-head">Appearance &amp; Themes</div>
+            <div class="sr" style="flex-direction:column;align-items:flex-start;gap:10px">
+              <div class="sr-left"><div class="sr-label">Theme preset</div><div class="sr-desc">Pick a curated look. Every option below is applied live and saved automatically.</div></div>
+              <div id="theme-preset-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;width:100%"></div>
+            </div>
+            <div class="sr" style="flex-direction:column;align-items:flex-start;gap:8px">
+              <div class="sr-left"><div class="sr-label">Accent color</div><div class="sr-desc">Used for highlights, active nav items and buttons.</div></div>
+              <div style="display:flex;gap:8px;align-items:center;width:100%">
+                <input type="color" id="theme-accent" value="#5c5ce0" oninput="onThemeAccentInput(this.value)" style="width:42px;height:30px;padding:0;border:1px solid var(--bd);border-radius:6px;background:none;cursor:pointer"/>
+                <input type="text" id="theme-accent-hex" class="sr-input" value="#5c5ce0" style="width:110px;font-size:12px;font-family:'JetBrains Mono',monospace" oninput="onThemeAccentHexInput(this.value)"/>
+                <button class="btn btn-ghost" style="font-size:11px;padding:6px 10px" onclick="resetTheme()">Reset all</button>
+              </div>
+            </div>
+            <div class="sr" style="flex-direction:column;align-items:flex-start;gap:10px">
+              <div class="sr-left"><div class="sr-label">Surface brightness</div><div class="sr-desc"><span id="theme-dark-label">Dark</span> background &amp; panels.</div></div>
+              <input type="range" id="theme-darkness" min="0" max="100" value="50" oninput="onThemeDarkness(this.value)" style="width:100%;accent-color:var(--ac)"/>
+            </div>
+            <div class="sr" style="flex-direction:column;align-items:flex-start;gap:8px">
+              <div class="sr-left"><div class="sr-label">Corner radius</div><div class="sr-desc"><span id="theme-radius-label">10px</span> — roundness of cards, buttons and modals.</div></div>
+              <input type="range" id="theme-radius" min="0" max="22" value="10" oninput="onThemeRadius(this.value)" style="width:100%;accent-color:var(--ac)"/>
+            </div>
+            <div class="sr" style="flex-direction:column;align-items:flex-start;gap:8px">
+              <div class="sr-left"><div class="sr-label">Interface scale</div><div class="sr-desc"><span id="theme-scale-label">100%</span> — overall size of text and controls.</div></div>
+              <input type="range" id="theme-scale" min="85" max="125" step="5" value="100" oninput="onThemeScale(this.value)" style="width:100%;accent-color:var(--ac)"/>
+            </div>
+            <div class="sr">
+              <div class="sr-left">
+                <div class="sr-label">Glassmorphism</div>
+                <div class="sr-desc">Frosted blur behind modals and dropdowns.</div>
+              </div>
+              <label class="toggle"><input type="checkbox" id="theme-glass" onchange="onThemeGlass(this.checked)"/><span class="toggle-trk"></span></label>
+            </div>
+            <div class="sr">
+              <div class="sr-left">
+                <div class="sr-label">Reduce motion</div>
+                <div class="sr-desc">Disables hover/transition movement app-wide.</div>
+              </div>
+              <label class="toggle"><input type="checkbox" id="theme-reduce-motion" onchange="onThemeReduceMotion(this.checked)"/><span class="toggle-trk"></span></label>
+            </div>
+          </div>
+
+          <!-- Help / Onboarding -->
+          <div class="sc">
+            <div class="sc-head">Help</div>
+            <div class="sr">
+              <div class="sr-left">
+                <div class="sr-label">Welcome tutorial</div>
+                <div class="sr-desc">Replay the guided introduction to rbxSWAP.</div>
+              </div>
+              <button class="btn btn-ghost" onclick="startTutorial(true)">Replay tutorial</button>
+            </div>
+          </div>
+
+          <!-- Protocol Handler -->
+          <div class="sc win-only">
+            <div class="sc-head">Roblox Protocol Registration</div>
+            <div class="sr">
+              <div class="sr-left">
+                <div class="sr-label">Registration status</div>
+                <div class="sr-desc" id="protocol-status-desc">Checking registration...</div>
+              </div>
+              <span class="badge" id="protocol-status-badge">Checking...</span>
+            </div>
+            <div class="sr">
+              <div class="sr-left">
+                <div class="sr-label">Register / Re-register handler</div>
+                <div class="sr-desc">Set this launcher as the default handler for <code>roblox-player://</code> links.</div>
+              </div>
+              <button class="btn btn-ghost" onclick="registerProtocolHandler()">Register</button>
+            </div>
+            <div class="sr">
+              <div class="sr-left">
+                <div class="sr-label">Remove handler</div>
+                <div class="sr-desc">Remove the <code>roblox-player://</code> protocol handler.</div>
+              </div>
+              <button class="btn btn-ghost" onclick="removeProtocolHandler()">Remove</button>
+            </div>
+          </div>
+
+          <!-- BloxGen Configuration -->
+          <div class="sc">
+            <div class="sc-head">BloxGen Integration</div>
+            <div class="sr" style="flex-direction:column; align-items:flex-start; gap:8px">
+              <div class="sr-left">
+                <div class="sr-label">BloxGen API Key</div>
+                <div class="sr-desc">Used by the Key Generator under Accounts to generate accounts &amp; keys.</div>
+              </div>
+              <div style="display:flex; gap:8px; width:100%">
+                <input type="password" id="setting-bloxgen-api-key" class="sr-input" placeholder="Enter BloxGen API Key..." style="flex:1; font-size:12px" oninput="onSettingsBloxGenKeyInput()"/>
+                <button class="btn btn-primary" id="btn-save-settings-bloxgen-key" onclick="saveSettingsBloxGenApiKey()">Save Key</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Encryption -->
+          <div class="sc">
+            <div class="sc-head">Encryption Key</div>
+            <div class="sr" style="flex-direction:column;align-items:flex-start;gap:8px">
+              <div class="sr-left" style="width:100%"><div class="sr-label">Encryption key</div><div class="sr-desc">Change your encryption key here. You will need to re-enter it on your next launch.</div></div>
+              <div style="width:100%;display:flex;gap:8px;align-items:center">
+                <input type="password" class="sr-input" id="custom-key" placeholder="e.g. SecureKey1234@A#" style="flex:1;width:auto" oninput="onKeyInput()"/>
+                <button class="btn btn-ghost" style="font-size:12px;padding:7px 12px" onclick="toggleKeyVisibility()" title="Show/hide">
+                  <svg id="key-vis-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                </button>
+                <button class="btn btn-primary" style="font-size:12px;padding:7px 12px" onclick="saveKeySettings()" id="btn-save-key">Save</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Privacy -->
+          <div class="sc">
+            <div class="sc-head">Privacy</div>
+            <div class="sr">
+              <div class="sr-left">
+                <div class="sr-label">Streamer Mode</div>
+                <div class="sr-desc">Blur account names and IDs while streaming. Hover a blurred value to reveal it.</div>
+              </div>
+              <label class="toggle">
+                <input type="checkbox" id="setting-streamer-mode" onchange="toggleStreamerMode()"/>
+                <span class="toggle-trk"></span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Data -->
+          <div class="sc">
+            <div class="sc-head">Data &amp; Privacy</div>
+            <div class="sr"><div class="sr-left"><div class="sr-label">Clear all accounts</div><div class="sr-desc">Remove all saved accounts and sign-in data.</div></div><button class="btn btn-danger" onclick="clearAll()">Clear all</button></div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- executer page -->
+      <div class="page" id="page-executor">
+        <div class="ph">
+          <div>
+            <div class="ph-title">Executer</div>
+            <div class="ph-sub">Manage default executors and launch exclusions</div>
+          </div>
+        </div>
+        <div class="sw">
+
+          <!-- Your Executors -->
+          <div class="sc">
+            <div class="sc-head" style="display:flex; align-items:center; justify-content:space-between; padding-right:10px">
+              <span>Your Executors</span>
+              <button class="btn btn-ghost" id="exec-refresh" onclick="executorsLoad()" style="font-size:11px; padding:4px 9px">
+                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/></svg>
+                Refresh
+              </button>
+            </div>
+            <div class="sr" style="flex-direction:column;align-items:flex-start;gap:8px">
+              <div class="sr-left"><div class="sr-desc" id="exec-status" style="font-size:11.5px">Loading executors…</div></div>
+              <div id="exec-list" style="width:100%;display:flex;flex-direction:column;gap:8px"></div>
+            </div>
+          </div>
+
+          <!-- Default Executor & Exclusions -->
+          <div class="sc">
+            <div class="sc-head" style="display:flex; align-items:center; justify-content:space-between; padding-right:10px">
+              <span>Default Executor &amp; Exclusions</span>
+              <div style="display:flex; gap:6px">
+                <button class="btn btn-ghost" style="font-size:11px; padding:4px 8px" onclick="setAllExecutorsEnabled(true)">Select All</button>
+                <button class="btn btn-ghost" style="font-size:11px; padding:4px 8px" onclick="setAllExecutorsEnabled(false)">Select None</button>
+              </div>
+            </div>
+            <div class="sr" style="flex-direction:column;align-items:flex-start;gap:8px">
+              <div class="sr-left"><div class="sr-label">Default Executor</div><div class="sr-desc">Pick your default executor for account launches. Shown as a green badge in the list above.</div></div>
+              <select class="sr-input" id="setting-default-executor" style="width:100%; font-size:12px" onchange="saveExecutorSettings()"></select>
+            </div>
+            <div class="sr" style="flex-direction:column;align-items:flex-start;gap:10px">
+              <div class="sr-left"><div class="sr-label">Managed Exploits &amp; Exclusions</div><div class="sr-desc">Uncheck any exploit to hide it from the list above and the launch filters.</div></div>
+              <div id="setting-executors-list" style="width:100%; display:flex; flex-direction:column; gap:6px; max-height:360px; overflow-y:auto; padding-right:4px"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+    </div>
+  </main>
+</div>
+
+<!-- confirm delete -->
+<div class="overlay" id="m-confirm-delete" data-backdrop-close="true">
+  <div class="modal" onclick="event.stopPropagation()" style="width:320px">
+    <div class="modal-title">Are you sure?</div>
+    <div class="modal-sub" id="m-confirm-delete-msg">This action cannot be undone.</div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('m-confirm-delete')">Cancel</button>
+      <button class="btn btn-danger" id="m-confirm-delete-btn">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- encryption unlock / setup modal -->
+<div class="overlay" id="m-enc" data-backdrop-close="false">
+  <div class="modal" onclick="event.stopPropagation()" style="width:360px">
+    <div class="modal-title" id="enc-title" style="font-size:18px;margin-bottom:6px">Enter your encryption key</div>
+    <div class="modal-sub" id="enc-desc" style="font-size:14px;margin-bottom:0">Enter the key you set to unlock your saved accounts.</div>
+    <input type="password" class="sr-input" id="enc-input" placeholder="e.g. SecureKey1234@A#" style="width:100%;margin:14px 0 2px" onkeydown="if(event.key==='Enter')submitEnc()" autocomplete="off" spellcheck="false"/>
+    <div id="enc-err" style="display:none;color:var(--red);font-size:12px;margin-top:6px"></div>
+    <div class="modal-actions" style="margin-top:16px">
+      <button class="btn btn-primary" id="enc-action" onclick="submitEnc()">Unlock</button>
+    </div>
+  </div>
+</div>
+
+<!-- login modal -->
+<div class="overlay" id="m-login" data-backdrop-close="true">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-title">Add Account</div>
+
+    <!-- Step 1: choose method -->
+    <div id="login-panel-choose">
+      <div class="modal-sub" style="margin-bottom:14px">How would you like to sign in?</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <button class="btn btn-primary" style="justify-content:flex-start;gap:10px;padding:10px 14px" onclick="startBrowserLogin()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
+          <span><span style="font-weight:600">Sign in with Roblox</span><span style="font-weight:400;opacity:.6;margin-left:8px;font-size:11.5px">Opens the Roblox login page</span></span>
+        </button>
+        <button class="btn btn-ghost" style="justify-content:flex-start;gap:10px;padding:10px 14px;border:1px solid var(--bd)" onclick="showCookiePanel()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0 3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+          <span><span style="font-weight:600">Paste Cookie</span><span style="font-weight:400;opacity:.6;margin-left:8px;font-size:11.5px">Use your .ROBLOSECURITY cookie</span></span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Step 2a: browser login waiting -->
+    <div id="login-panel-browser" style="display:none">
+      <!-- Downloading Chrome -->
+      <div id="login-dl" style="display:none">
+        <div style="font-size:13px;font-weight:500;color:var(--t1);margin-bottom:10px">Downloading Chrome…</div>
+        <div style="background:var(--s3);border-radius:4px;height:6px;overflow:hidden;margin-bottom:6px">
+          <div id="dl-bar" style="height:100%;background:var(--ac);width:0%;transition:width .3s;border-radius:4px"></div>
+        </div>
+        <div style="font-size:11px;color:var(--t3)">First time only - <span id="dl-pct">0%</span></div>
+      </div>
+      <!-- Waiting for login -->
+      <div id="login-waiting" class="login-wait" style="display:none">
+        <div class="spin" style="width:18px;height:18px;border-width:2.5px;color:var(--ac)"></div>
+        <p>Waiting for login…<br/><span style="font-size:12px;color:var(--t2);font-weight:500">Sign in on the Chrome window that just opened.</span></p>
+      </div>
+    </div>
+
+    <!-- Step 2b: cookie input -->
+    <div id="login-panel-cookie" style="display:none">
+      <div class="modal-sub" style="margin-bottom:8px">Paste your <code style="font-size:11px;background:var(--s3);padding:1px 5px;border-radius:4px">.ROBLOSECURITY</code> cookie below.</div>
+      <div class="field" style="margin-bottom:4px">
+        <input type="password" id="cookie-input" placeholder="_|WARNING:-DO-NOT-SHARE-THIS--Roblox..." onkeydown="if(event.key==='Enter')addByCookie()"/>
+      </div>
+      <div style="font-size:11px;color:var(--t3)">F12 → Application → Cookies → roblox.com → .ROBLOSECURITY</div>
+    </div>
+
+    <div class="mst hidden" id="login-status"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" id="btn-login-back" style="display:none;margin-right:auto" onclick="backToChoose()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>Back
+      </button>
+      <button class="btn btn-ghost" onclick="cancelLogin()">Cancel</button>
+      <button class="btn btn-primary" id="btn-cookie-add" style="display:none" onclick="addByCookie()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Add Account
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Package modal -->
+<div class="overlay" id="m-package" data-backdrop-close="true">
+  <div class="modal pm" onclick="event.stopPropagation()" style="width:440px;padding:0">
+    <div class="pm-head">
+      <div class="pm-title" id="pkg-modal-title">New group</div>
+      <div class="pm-subtle">Launch the whole set in one click from the Groups tab.</div>
+    </div>
+    <div class="pm-body">
+      <div class="pm-field-label">Group name</div>
+      <input type="text" id="in-pkg-name" class="pm-input" placeholder="e.g. Farm Squad or Trading Alts"/>
+      <div class="pm-section">
+        <span class="pm-field-label" style="margin:0">Accounts</span>
+        <span class="pm-count" id="pkg-count">0 selected</span>
+      </div>
+      <div class="pkg-account-picker" id="pkg-account-picker" onchange="updatePkgCount()"></div>
+
+      <div class="pm-section" style="margin-top:14px">
+        <span class="pm-field-label">Group Performance Settings</span>
+      </div>
+      <div style="background:var(--s2); border:1px solid var(--bd); border-radius:8px; padding:10px 12px; display:flex; flex-direction:column; gap:10px; margin-bottom:12px">
+        <div style="display:flex; align-items:center; justify-content:space-between">
+          <span style="font-size:12px; color:var(--t1)">FPS Cap</span>
+          <div style="display:flex; align-items:center; gap:8px">
+            <input type="range" class="fps-slider" id="pkg-fps" min="5" max="360" step="5" value="60" style="width:140px" oninput="document.getElementById('pkg-fps-val').textContent=this.value"/>
+            <span id="pkg-fps-val" style="font-size:11.5px; font-weight:600; color:var(--t1); min-width:35px">60</span>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; justify-content:space-between">
+          <span style="font-size:12px; color:var(--t1)">Graphics Level</span>
+          <div style="display:flex; align-items:center; gap:8px">
+            <input type="range" class="fps-slider" id="pkg-gfx" min="1" max="21" step="1" value="10" style="width:140px" oninput="document.getElementById('pkg-gfx-val').textContent=this.value"/>
+            <span id="pkg-gfx-val" style="font-size:11.5px; font-weight:600; color:var(--t1); min-width:35px">10</span>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; justify-content:space-between">
+          <span style="font-size:12px; color:var(--t1)">RAM Limit</span>
+          <div style="display:flex; align-items:center; gap:8px">
+            <input type="range" class="fps-slider" id="pkg-ram" min="256" max="8192" step="256" value="2048" style="width:140px" oninput="document.getElementById('pkg-ram-val').textContent=this.value + ' MB'"/>
+            <span id="pkg-ram-val" style="font-size:11.5px; font-weight:600; color:var(--t1); min-width:60px">2048 MB</span>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; justify-content:space-between">
+          <span style="font-size:12px; color:var(--t1)">Start Volume</span>
+          <div style="display:flex; align-items:center; gap:8px">
+            <input type="range" class="fps-slider" id="pkg-vol" min="0" max="100" step="1" value="100" style="width:140px" oninput="document.getElementById('pkg-vol-val').textContent=this.value + '%'"/>
+            <span id="pkg-vol-val" style="font-size:11.5px; font-weight:600; color:var(--t1); min-width:60px">100%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pm-foot">
+      <button class="btn btn-ghost" onclick="closeModal('m-package')">Cancel</button>
+      <button class="btn btn-primary" onclick="savePackageModal()"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>Save group</button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit modal -->
+<!-- Account settings modal -->
+<div class="overlay" id="m-edit" data-backdrop-close="true">
+  <div class="modal account-settings-modal" onclick="event.stopPropagation()">
+    <div class="account-settings-head">
+      <div>
+        <div class="modal-title" id="edit-title">Account settings</div>
+        <div class="modal-sub">Manage this account's alias, saved login credentials, session and password tools.</div>
+      </div>
+      <button class="btn btn-ghost" style="padding:4px 8px;font-size:12px;height:auto" onclick="closeModal('m-edit')" title="Close">✕</button>
+    </div>
+
+    <div class="account-settings-grid">
+      <section class="account-settings-card">
+        <div class="account-settings-card-title">Identity</div>
+        <div class="account-settings-meta">
+          <div><span>Username</span><strong id="edit-username">—</strong></div>
+          <div><span>User ID</span><strong id="edit-userid">—</strong></div>
+        </div>
+        <div class="field" style="margin-bottom:0">
+          <label>Alias</label>
+          <input type="text" id="in-nickname" placeholder="e.g. MainAlt or FarmBot" maxlength="40"/>
+          <div class="field-hint">The alias is shown on the account card. It does not change the Roblox username.</div>
+        </div>
+      </section>
+
+      <section class="account-settings-card">
+        <div class="account-settings-card-title">Login credentials</div>
+        <div class="field" style="margin-bottom:8px">
+          <label>Saved login password</label>
+          <div style="display:flex;gap:8px">
+            <input type="password" id="in-login-password" placeholder="Password used for automatic login" autocomplete="new-password" style="flex:1"/>
+            <button class="btn btn-ghost" type="button" onclick="toggleEditPasswordVisibility()" title="Show/hide password" style="padding:7px 10px">
+              <svg id="edit-password-eye" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="field-hint">This only updates the password rbxSWAP uses to recover a cookie. It does not change the Roblox password.</div>
+        <div class="account-settings-password-state" id="edit-password-state">No saved password — automatic recovery needs a browser login.</div>
+      </section>
+    </div>
+
+    <section class="account-settings-card account-settings-session">
+      <div class="account-settings-card-title">Session &amp; security</div>
+      <div class="account-settings-session-status" id="edit-cookie-status">Cookie status: checking…</div>
+      <div class="account-settings-action-grid">
+        <button class="btn btn-ghost" id="edit-refresh-cookie" onclick="editRefreshCookie()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/></svg>Refresh cookie &amp; profile
+        </button>
+        <button class="btn btn-ghost" id="edit-change-roblox-password" onclick="editChangeRobloxPassword()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>Change Roblox password
+        </button>
+        <button class="btn btn-ghost" id="edit-open-browser" onclick="editOpenBrowser()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" x2="21" y1="14" y2="3"/></svg>Open in browser
+        </button>
+      </div>
+      <div class="field-hint">Changing the Roblox password may revoke the current session. The app will use the saved login password to recover it when Roblox allows automatic login.</div>
+    </section>
+
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('m-edit')">Cancel</button>
+      <button class="btn btn-primary" id="edit-save" onclick="saveEdit()"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2 2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1 2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>Save settings</button>
+    </div>
+  </div>
+</div>
+
+<!-- launch modal -->
+<div class="overlay" id="m-launch" data-backdrop-close="true">
+  <div class="modal" onclick="event.stopPropagation()" style="width:440px">
+    <div class="prev" id="launch-prev"></div>
+    
+    <div style="margin: 14px 0; display:flex; flex-direction:column; gap:10px">
+      <div style="display:flex; justify-content:space-between; align-items:center">
+        <label style="font-size:11px; font-weight:600; color:var(--t2); text-transform:uppercase; letter-spacing:.05em">Exploit / Version Filter</label>
+        <span id="launch-weao-status" style="font-size:11px; color:var(--green)">WEAO Live</span>
+      </div>
+
+      <!-- Exploit Filter -->
+      <select class="sr-input" id="launch-exploit-filter" style="width:100%; font-size:12px" onchange="onLaunchExploitFilterChange()">
+        <option value="all">All Exploits &amp; Official</option>
+      </select>
+
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-top:2px">
+        <label style="font-size:11px; font-weight:600; color:var(--t2); text-transform:uppercase; letter-spacing:.05em">Installed Versions</label>
+        <span id="launch-req-ver-info" style="font-size:11px; color:var(--t3)"></span>
+      </div>
+
+      <!-- Installed Versions Selection List View -->
+      <div class="ver-list" id="launch-ver-list"></div>
+
+      <!-- Install working version banner if missing -->
+      <div id="launch-install-box" style="display:none; background:var(--s2); border:1px solid var(--bd); border-radius:8px; padding:10px 12px; align-items:center; justify-content:space-between; gap:10px">
+        <div style="font-size:12px; color:var(--t1)">
+          <div style="font-weight:600" id="launch-install-title">Working version not installed</div>
+          <div style="font-size:11px; color:var(--t2); margin-top:2px" id="launch-install-sub">Download version automatically via RDD</div>
+        </div>
+        <button class="btn btn-primary" id="btn-install-working" style="font-size:12px; padding:6px 12px; flex-shrink:0" onclick="installWorkingVersionForSelectedExploit()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/><path d="M12 12v9"/><path d="m8 17 4 4 4-4"/></svg>Install Working
+        </button>
+      </div>
+    </div>
+
+    <div class="mst hidden" id="launch-status"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('m-launch')">Cancel</button>
+      <button class="btn btn-primary" id="btn-launch" onclick="doLaunch()">Start</button>
+    </div>
+  </div>
+</div>
+
+<!-- game picker modal (right-click → Launch Game) -->
+<div class="overlay" id="m-game-picker" data-backdrop-close="true">
+  <div class="modal" onclick="event.stopPropagation()" style="width:520px">
+    <div class="modal-title">Launch Game</div>
+    <div class="modal-sub" style="margin-bottom:12px">Search by game name or enter a place ID — your pick is remembered and shared by every account until you change it.</div>
+    <div id="gp-cached" style="display:none;align-items:center;gap:10px;background:var(--s2);border:1px solid var(--bd);border-radius:10px;padding:8px 12px;margin-bottom:12px"></div>
+    <div id="gp-outdated" style="display:none;align-items:center;gap:8px;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.3);border-radius:8px;padding:7px 11px;margin-bottom:12px;font-size:11.5px;color:#fbbf24">
+      <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      <span id="gp-outdated-text" style="min-width:0"></span>
+    </div>
+    <div class="gp-search-wrap">
+      <div class="search" style="width:100%;margin-bottom:0">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input id="gp-search" type="text" placeholder="Search by name or place ID…" oninput="gpSearchInput(this.value)" onkeydown="gpSearchKeydown(event)" autocomplete="off" aria-autocomplete="list" aria-controls="gp-dropdown" aria-expanded="false"/>
+      </div>
+      <div class="gp-dropdown" id="gp-dropdown">
+        <div id="gp-hint" class="gp-hint">Type a game name or a place ID to search.</div>
+        <div id="gp-loading" class="charts-loading" style="display:none;padding:16px 0">
+          <div class="spin" style="width:16px;height:16px;border-width:2.5px;color:var(--ac)"></div>
+          <span>Searching…</span>
+        </div>
+        <div id="gp-list" class="gp-list" role="listbox" aria-label="Game search results"></div>
+        <div id="gp-fav-divider" style="display:none;height:1px;background:var(--bd);margin:8px 0 4px"></div>
+        <div id="gp-fav-header" style="display:none;align-items:center;justify-content:space-between;padding:0 8px 4px">
+          <span style="font-size:10px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--t3)">Favorites</span>
+          <span id="gp-fav-count" style="font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--t3)">0/2</span>
+        </div>
+        <div id="gp-fav-list" style="display:none;flex-direction:column;gap:3px;padding:0 0 4px"></div>
+      </div>
+    </div>
+    <div class="modal-actions gp-actions" style="margin-top:12px">
+      <button class="btn btn-ghost" onclick="closeModal('m-game-picker')">Cancel</button>
+      <button class="btn btn-primary" id="gp-launch-btn" onclick="gpLaunchCached()" disabled><svg class="launch-icon" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polygon points="10,8 16,12 10,16 10,8" fill="currentColor" stroke="none"/></svg>Launch</button>
+    </div>
+  </div>
+</div>
+
+<!-- game info modal -->
+<div class="overlay" id="m-game" data-backdrop-close="true">
+  <div class="modal" onclick="event.stopPropagation()" style="width:380px; padding:18px">
+    <div style="width:100%; height:185px; border-radius:10px; overflow:hidden; background:var(--s2); margin-bottom:14px; border:1px solid var(--bd)">
+      <img id="game-modal-thumb" src="" alt="" style="width:100%; height:100%; object-fit:cover; display:block"/>
+    </div>
+    <div class="modal-title" id="game-modal-name" style="margin-bottom:4px; font-size:17px; font-weight:700">Game</div>
+    <div class="modal-sub" id="game-modal-stat" style="margin-bottom:14px"></div>
+    <div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Place ID</div>
+    <div class="game-id-row" style="margin-bottom:16px">
+      <span class="game-id-val" id="game-modal-id"></span>
+      <button class="btn btn-ghost" style="padding:4px 9px;font-size:11px;flex-shrink:0" onclick="copyGameId()"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copy</button>
+    </div>
+    <div class="modal-actions" style="margin-top:0; display:flex; justify-content:flex-end; gap:8px">
+      <button class="btn btn-ghost" onclick="closeModal('m-game')">Close</button>
+      <button class="btn btn-primary" onclick="gamePageOpen()"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>Game Page</button>
+    </div>
+  </div>
+</div>
+
+<!-- Account Info Modal -->
+<div class="overlay" id="m-acct-info" data-backdrop-close="true">
+  <div class="modal" onclick="event.stopPropagation()" style="width:420px; padding:20px; background:var(--s1); border:1px solid var(--bd); border-radius:14px">
+    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px">
+      <div style="font-size:16px; font-weight:700; color:var(--t1)">Account info</div>
+      <button class="btn btn-ghost" style="padding:4px 8px; font-size:12px; height:auto" onclick="closeModal('m-acct-info')">✕</button>
+    </div>
+
+    <div style="display:flex; align-items:center; gap:14px; margin-bottom:20px">
+      <img id="ai-modal-avatar" src="" alt="" style="width:54px; height:54px; border-radius:50%; background:var(--s2); border:1px solid var(--bd); object-fit:cover"/>
+      <div>
+        <div id="ai-modal-name" style="font-size:17px; font-weight:700; color:var(--t1)">-</div>
+        <div id="ai-modal-handle" style="font-size:12.5px; color:var(--t2)">@-</div>
+        <div id="ai-modal-group" style="font-size:11.5px; color:var(--t3); margin-top:2px">Group: None</div>
+      </div>
+    </div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:18px">
+      <div style="background:var(--s2); border:1px solid var(--bd); border-radius:10px; padding:10px 12px">
+        <div style="font-size:9.5px; font-weight:700; color:var(--t3); text-transform:uppercase; letter-spacing:.06em; margin-bottom:4px">USERNAME</div>
+        <div id="ai-modal-user" style="font-size:13px; font-weight:600; color:var(--t1); white-space:nowrap; overflow:hidden; text-overflow:ellipsis">-</div>
+      </div>
+      <div style="background:var(--s2); border:1px solid var(--bd); border-radius:10px; padding:10px 12px">
+        <div style="font-size:9.5px; font-weight:700; color:var(--t3); text-transform:uppercase; letter-spacing:.06em; margin-bottom:4px">DISPLAY NAME</div>
+        <div id="ai-modal-display" style="font-size:13px; font-weight:600; color:var(--t1); white-space:nowrap; overflow:hidden; text-overflow:ellipsis">-</div>
+      </div>
+      <div style="background:var(--s2); border:1px solid var(--bd); border-radius:10px; padding:10px 12px">
+        <div style="font-size:9.5px; font-weight:700; color:var(--t3); text-transform:uppercase; letter-spacing:.06em; margin-bottom:4px">USER ID</div>
+        <div id="ai-modal-userid" style="font-size:13px; font-weight:600; color:var(--t1)">-</div>
+      </div>
+      <div style="background:var(--s2); border:1px solid var(--bd); border-radius:10px; padding:10px 12px">
+        <div style="font-size:9.5px; font-weight:700; color:var(--t3); text-transform:uppercase; letter-spacing:.06em; margin-bottom:4px">ROBUX</div>
+        <div id="ai-modal-robux" style="font-size:13px; font-weight:600; color:var(--t1)">0</div>
+      </div>
+      <div style="background:var(--s2); border:1px solid var(--bd); border-radius:10px; padding:10px 12px">
+        <div style="font-size:9.5px; font-weight:700; color:var(--t3); text-transform:uppercase; letter-spacing:.06em; margin-bottom:4px">ADDED</div>
+        <div id="ai-modal-added" style="font-size:13px; font-weight:600; color:var(--t1)">-</div>
+      </div>      <div style="background:var(--s2);border:1px solid var(--bd);border-radius:10px;padding:10px 12px">
+        <div style="font-size:9.5px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">ALIAS</div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <div id="ai-modal-alias" onclick="editAliasFromInfo()" title="Click to edit alias" style="flex:1;min-width:0;font-size:13px;font-weight:600;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:text">—</div>
+          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;cursor:pointer" onclick="editAliasFromInfo()"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
+        </div>
+      </div>
+      <div id="ai-modal-pw-box" style="display:none;background:var(--s2);border:1px solid var(--bd);border-radius:10px;padding:10px 12px">
+        <div style="font-size:9.5px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">PASSWORD</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+          <div id="ai-modal-password" style="font-size:12.5px;font-weight:600;color:var(--t1);font-family:'JetBrains Mono',monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="Click to copy">—</div>
+          <button class="btn btn-ghost" style="padding:3px 8px;font-size:10.5px;flex-shrink:0" onclick="copyAccountPassword()">Copy</button>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:8px">
+      <button class="btn btn-ghost" id="ai-btn-copy-cookie" style="justify-content:flex-start; padding:9px 12px; font-size:12.5px" onclick="aiCopyCookie()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px"><path d="M12 2a10 10 0 1 0 10 10c0-.55-.45-1-1-1h-1.5a2.5 2.5 0 0 1-2.5-2.5V7a5 5 0 0 0-5-5Z"/><path d="M8.5 8.5h.01"/><path d="M16 15.5h.01"/><path d="M12 12h.01"/><path d="M11 17h.01"/><path d="M7 14h.01"/></svg>Copy cookie
+      </button>
+      <button class="btn btn-ghost" id="ai-btn-refresh" style="justify-content:flex-start; padding:9px 12px; font-size:12.5px" onclick="aiRefreshProfile()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/></svg>Refresh cookie &amp; profile
+      </button>
+      <button class="btn btn-ghost" id="ai-btn-change-password" style="justify-content:flex-start; padding:9px 12px; font-size:12.5px" onclick="aiChangePassword()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>Change password (random)
+      </button>
+      <button class="btn btn-ghost" id="ai-btn-open-browser" style="justify-content:flex-start; padding:9px 12px; font-size:12.5px" onclick="aiOpenBrowser()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" x2="21" y1="14" y2="3"/></svg>Open in browser
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Generated Account Password Change Modal -->
+<div class="overlay" id="m-gen-pw-change" data-backdrop-close="false">
+  <div class="modal" onclick="event.stopPropagation()" style="width:420px; padding:20px; background:var(--s1); border:1px solid var(--bd); border-radius:14px">
+    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px">
+      <div style="font-size:16px; font-weight:700; color:var(--t1); display:flex; align-items:center; gap:6px">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>Account Generated!
+      </div>
+    </div>
+
+    <div style="display:flex; align-items:center; gap:12px; margin-bottom:16px; background:var(--s2); border:1px solid var(--bd); border-radius:10px; padding:12px">
+      <img id="gen-modal-avatar" src="" alt="" style="width:48px; height:48px; border-radius:50%; background:var(--s3); object-fit:cover"/>
+      <div>
+        <div id="gen-modal-username" style="font-size:15px; font-weight:700; color:var(--t1)">-</div>
+        <div id="gen-modal-userid" style="font-size:12px; color:var(--t2)">ID: -</div>
+      </div>
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:10px; margin-bottom:16px">
+      <div class="field">
+        <label style="font-size:11px; font-weight:600; color:var(--t2)">Current Password</label>
+        <input type="text" id="gen-modal-old-pw" readonly style="font-family:monospace; background:var(--s3)"/>
+      </div>
+      <div class="field">
+        <label style="font-size:11px; font-weight:600; color:var(--t2)">New Password (Automatic)</label>
+        <div style="display:flex; gap:6px">
+          <input type="text" id="gen-modal-new-pw" class="pw-hover-reveal" title="Hover to reveal" style="font-family:monospace; flex:1"/>
+          <button class="btn btn-ghost" style="padding:6px 10px" onclick="genNewRandomPw()">Regenerate</button>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex; justify-content:flex-end; gap:8px">
+      <button class="btn btn-ghost" onclick="closeModal('m-gen-pw-change')">Skip</button>
+      <button class="btn btn-primary" id="btn-change-gen-pw" onclick="doChangeGenPassword()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>Change Password &amp; Save
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- One-time password reveal modal -->
+<div class="overlay" id="m-pw-reveal" data-backdrop-close="true">
+  <div class="modal" onclick="event.stopPropagation()" style="width:420px; padding:20px; background:var(--s1); border:1px solid var(--bd); border-radius:14px">
+    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px">
+      <div style="font-size:16px; font-weight:700; color:var(--t1); display:flex; align-items:center; gap:6px">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        Password Changed!
+      </div>
+    </div>
+
+    <div style="margin-bottom:16px">
+      <div style="font-size:12px; color:var(--t2); margin-bottom:8px">Your new password (copy it now — this won't be shown again):</div>
+      <div style="display:flex; gap:6px; align-items:center">
+        <div id="pw-reveal-value" class="pw-hover-reveal" title="Hover to reveal" style="font-family:'JetBrains Mono',monospace; font-size:14px; font-weight:600; color:var(--t1); background:var(--s3); padding:10px 12px; border-radius:8px; flex:1; word-break:break-all; user-select:all"></div>
+      </div>
+      <div style="font-size:11px; color:var(--t2); margin-top:8px; display:flex; align-items:center; gap:4px">
+        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        Roblox invalidated your session — the app is now refreshing your cookie in the background. If it needs a captcha or a 2-step code, you'll be told what to do.
+      </div>
+    </div>
+
+    <div style="display:flex; justify-content:flex-end; gap:8px">
+      <button class="btn btn-primary" onclick="copyRevealPassword()" style="flex:1">
+        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
+        Copy & Close
+      </button>
+    </div>
+  </div>
+</div>
+<div class="overlay" id="m-anticheat" data-backdrop-close="true">
+  <div class="modal" onclick="event.stopPropagation()" style="width:420px">
+    <div class="modal-title" id="ac-title">Anti-cheat detected</div>
+    <div class="modal-sub" style="margin-bottom:12px">Close it before spoofing — kernel anti-cheats can flag or interfere with identifier changes.</div>
+    <div id="ac-steps" style="display:flex;flex-direction:column;gap:8px;max-height:280px;overflow-y:auto"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('m-anticheat')">Cancel</button>
+      <button class="btn btn-primary" onclick="swapProceedAnticheat()">Spoof anyway</button>
+    </div>
+  </div>
+</div>
+
+<!-- restore identity modal (swap) -->
+<div class="overlay" id="m-restore" data-backdrop-close="true">
+  <div class="modal" onclick="event.stopPropagation()" style="width:360px">
+    <div class="modal-title">Restore original identity</div>
+    <div class="modal-sub" id="restore-when" style="margin-bottom:12px">Backup found.</div>
+    <div style="display:flex;flex-direction:column;gap:2px">
+      <div class="sr" id="restore-row-mac"><div class="sr-left"><div class="sr-label">MAC address</div></div><label class="toggle"><input type="checkbox" id="restore-mac" checked/><span class="toggle-trk"></span></label></div>
+      <div class="sr" id="restore-row-hwid"><div class="sr-left"><div class="sr-label">Machine GUIDs <span id="restore-hwid-hint" style="color:var(--t3);font-size:11px"></span></div></div><label class="toggle"><input type="checkbox" id="restore-hwid" checked/><span class="toggle-trk"></span></label></div>
+      <div class="sr" id="restore-row-vol"><div class="sr-left"><div class="sr-label">Volume serial</div></div><label class="toggle"><input type="checkbox" id="restore-vol" checked/><span class="toggle-trk"></span></label></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('m-restore')">Cancel</button>
+      <button class="btn btn-primary" onclick="swapExecuteRestore()">Restore</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div class="av-tip" id="av-tip">
+  <div class="av-tip-top">
+    <div class="av-tip-av" id="av-tip-av">?</div>
+    <div class="av-tip-id">
+      <div class="av-tip-name" id="av-tip-name">-</div>
+      <div class="av-tip-uname" id="av-tip-uname">-</div>
+    </div>
+  </div>
+  <div class="av-tip-row">
+    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    <span id="av-tip-created">Loading…</span>
+  </div>
+</div>
+
+<!-- Onboarding tutorial -->
+<div class="overlay tut-overlay" id="m-tutorial" data-backdrop-close="false">
+  <div class="modal tut-modal" onclick="event.stopPropagation()">
+    <div class="tut-visual" id="tut-visual">
+      <div class="tut-orb tut-orb-1"></div>
+      <div class="tut-orb tut-orb-2"></div>
+      <div class="tut-orb tut-orb-3"></div>
+      <div class="tut-glow"></div>
+      <div class="tut-step-icon" id="tut-step-icon"></div>
+    </div>
+    <div class="tut-body">
+      <div class="tut-count" id="tut-count">Step 1 of 5</div>
+      <div class="modal-title" id="tut-title">Welcome to rbxSWAP</div>
+      <div class="tut-text" id="tut-text">Your multi-account launcher.</div>
+      <div class="tut-dots" id="tut-dots"></div>
+      <div class="modal-actions" style="justify-content:space-between">
+        <button class="btn btn-ghost" id="tut-skip" onclick="closeTutorial()">Skip</button>
+        <div style="display:flex;gap:7px">
+          <button class="btn btn-ghost" id="tut-back" onclick="tutPrev()" style="display:none">Back</button>
+          <button class="btn btn-primary" id="tut-next" onclick="tutNext()">Get started</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="jszip.min.js"></script>
+<script src="renderer.js"></script>

@@ -1,0 +1,133 @@
+{
+  "name": "rbxswap",
+  "version": "1.0.0",
+  "description": "rbxSWAP",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "electron .",
+    "prebuild": "node scripts/build-native.js",
+    "build": "electron-builder --win --x64",
+    "build:win": "node scripts/build-native.js && electron-builder --win --x64",
+    "build:mac": "electron-builder --mac",
+    "build:fast": "node scripts/build-native.js && electron-builder --win --x64 --dir",
+    "clean:dist": "node scripts/clean-dist.js"
+  },
+  "build": {
+    "appId": "com.rbswap.app",
+    "productName": "rbxSWAP",
+    "icon": "src/icon.ico",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "src/**/*",
+      "!src/RobloxNative.exe",
+      "!src/accounts.json",
+      "node_modules/**/*",
+      "!node_modules/**/test/**",
+      "!node_modules/**/tests/**",
+      "!node_modules/**/__tests__/**",
+      "!node_modules/**/*.md",
+      "!node_modules/**/*.markdown",
+      "!node_modules/**/*.ts",
+      "!node_modules/**/*.d.ts",
+      "!node_modules/**/*.map",
+      "!node_modules/**/*.flow",
+      "!node_modules/**/*.tsbuildinfo",
+      "!node_modules/**/tsconfig*.json",
+      "!node_modules/**/*.yml",
+      "!node_modules/**/*.yaml",
+      "!node_modules/**/README*",
+      "!node_modules/**/CHANGELOG*",
+      "!node_modules/**/AUTHORS*",
+      "!node_modules/**/LICENSE*",
+      "!node_modules/**/LICENCE*",
+      "!node_modules/**/docs/**",
+      "!node_modules/**/example/**",
+      "!node_modules/**/examples/**",
+      "!node_modules/**/.github/**",
+      "!node_modules/**/.bin/**",
+      "!node_modules/**/.editorconfig",
+      "!node_modules/**/.eslintrc*",
+      "!node_modules/**/.prettierrc*",
+      "!node_modules/**/.npmignore",
+      "!node_modules/**/.gitignore",
+      "!node_modules/**/.gitattributes",
+      "!node_modules/**/.travis.yml",
+      "!node_modules/**/benchmark/**",
+      "!node_modules/**/coverage/**",
+      "!node_modules/**/src/**",
+      "!node_modules/**/lib/esm/**",
+      "!node_modules/**/*.spec.js",
+      "!node_modules/**/*.spec.d.ts",
+      "!node_modules/**/*.test.js",
+      "!node_modules/**/*.test.d.ts",
+      "node_modules/debug/**/*"
+    ],
+    "win": {
+      "icon": "src/icon.ico",
+      "target": [
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "requestedExecutionLevel": "asInvoker"
+    },
+    "portable": {
+      "artifactName": "rbxSWAP.exe"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "rbxSWAP",
+      "artifactName": "rbxSWAP-Setup-${version}.${ext}"
+    },
+    "mac": {
+      "target": [
+        "dmg",
+        "zip"
+      ],
+      "category": "public.app-category.utilities",
+      "artifactName": "rbxSWAP-mac-${arch}.${ext}"
+    },
+    "dmg": {
+      "title": "rbxSWAP"
+    },
+    "compression": "maximum",
+    "asar": true,
+    "electronLanguages": [
+      "en-US"
+    ],
+    "extraResources": [
+      {
+        "from": "src",
+        "to": ".",
+        "filter": [
+          "RobloxNative.cs"
+        ]
+      }
+    ],
+    "nodeGypRebuild": false,
+    "buildDependenciesFromSource": false
+  },
+  "devDependencies": {
+    "electron": "^43.3.0",
+    "electron-builder": "^26.15.3"
+  },
+  "dependencies": {
+    "@puppeteer/browsers": "^2.0.0",
+    "puppeteer-core": "^22.0.0"
+  }
+}
