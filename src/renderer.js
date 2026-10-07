@@ -5288,26 +5288,30 @@ function tutRender() {
   const text = document.getElementById('tut-text');
   const icon = document.getElementById('tut-step-icon');
   const dots = document.getElementById('tut-dots');
-  const back = document.getElementById('tut-back');
   const next = document.getElementById('tut-next');
+  const body = document.querySelector('.tut-body');
   if (!title || !icon) return;
-  count.textContent = `Step ${_tutStep + 1} of ${TUT_STEPS.length}`;
-  title.textContent = s.title;
-  text.textContent = s.text;
-  icon.classList.remove('show');
-  setTimeout(() => {
+  // Cross-step transition: fade+drift the content out, swap content, ease back in.
+  const swap = () => {
+    count.textContent = `Step ${_tutStep + 1} of ${TUT_STEPS.length}`;
+    title.textContent = s.title;
+    text.textContent = s.text;
     icon.innerHTML = TUT_ICONS[s.icon] || '';
-    icon.classList.add('show');
-  }, 140);
-  dots.innerHTML = TUT_STEPS.map((_, i) => `<div class="tut-dot${i <= _tutStep ? ' on' : ''}"></div>`).join('');
-  back.style.display = _tutStep > 0 ? '' : 'none';
-  next.textContent = _tutStep === TUT_STEPS.length - 1 ? 'Done' : _tutStep === 0 ? 'Get started' : 'Next';
+    dots.innerHTML = TUT_STEPS.map((_, i) => `<div class="tut-dot${i <= _tutStep ? ' on' : ''}"></div>`).join('');
+    next.textContent = _tutStep === TUT_STEPS.length - 1 ? 'Done' : _tutStep === 0 ? 'Get started' : 'Next';
+    requestAnimationFrame(() => {
+      icon.classList.add('show');
+      body.classList.remove('tut-leaving');
+    });
+  };
+  icon.classList.remove('show');
+  body.classList.add('tut-leaving');
+  setTimeout(swap, 170);
 }
 function tutNext() {
   if (_tutStep < TUT_STEPS.length - 1) { _tutStep++; tutRender(); }
   else closeTutorial(true);
 }
-function tutPrev() { if (_tutStep > 0) { _tutStep--; tutRender(); } }
 function startTutorial() {
   _tutStep = 0;
   tutRender();
