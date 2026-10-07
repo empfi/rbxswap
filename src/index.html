@@ -477,54 +477,6 @@
             <span>You're running the <b id="platform-note-os">macOS</b> build. Multi-instance, Anti-AFK, the Swap/spoofer and the trace cleaner are Windows-only and are hidden here. Accounts, RDD downloads, the version tracker and Executors work normally.</span>
           </div>
 
-          <!-- Appearance & Themes -->
-          <div class="sc">
-            <div class="sc-head">Appearance &amp; Themes</div>
-            <div class="sr" style="flex-direction:column;align-items:flex-start;gap:10px">
-              <div class="sr-left"><div class="sr-label">Theme preset</div><div class="sr-desc">Pick a curated look. Every option below is applied live and saved automatically.</div></div>
-              <div id="theme-preset-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;width:100%"></div>
-            </div>
-            <div class="sr" style="flex-direction:column;align-items:flex-start;gap:8px">
-              <div class="sr-left"><div class="sr-label">Accent color</div><div class="sr-desc">Used for highlights, active nav items and buttons.</div></div>
-              <div style="display:flex;gap:8px;align-items:center;width:100%">
-                <input type="color" id="theme-accent" value="#5c5ce0" oninput="onThemeAccentInput(this.value)" style="width:42px;height:30px;padding:0;border:1px solid var(--bd);border-radius:6px;background:none;cursor:pointer"/>
-                <input type="text" id="theme-accent-hex" class="sr-input" value="#5c5ce0" style="width:110px;font-size:12px;font-family:'JetBrains Mono',monospace" oninput="onThemeAccentHexInput(this.value)"/>
-                <button class="btn btn-ghost" style="font-size:11px;padding:6px 10px" onclick="resetTheme()">Reset all</button>
-              </div>
-            </div>
-            <div class="sr" style="flex-direction:column;align-items:flex-start;gap:10px">
-              <div class="sr-left"><div class="sr-label">Surface brightness</div><div class="sr-desc"><span id="theme-dark-label">Dark</span> background &amp; panels.</div></div>
-              <input type="range" id="theme-darkness" class="th-range" min="0" max="100" value="50" oninput="onThemeDarkness(this.value)" style="width:100%"/>
-            </div>
-            <div class="sr" style="flex-direction:column;align-items:flex-start;gap:8px">
-              <div class="sr-left"><div class="sr-label">Corner radius</div><div class="sr-desc"><span id="theme-radius-label">10px</span> — roundness of cards, buttons and modals.</div></div>
-              <input type="range" id="theme-radius" class="th-range" min="0" max="22" value="10" oninput="onThemeRadius(this.value)" style="width:100%"/>
-            </div>
-            <div class="sr" style="flex-direction:column;align-items:flex-start;gap:8px">
-              <div class="sr-left"><div class="sr-label">Interface scale</div><div class="sr-desc"><span id="theme-scale-label">100%</span> — overall size of text and controls.</div></div>
-              <input type="range" id="theme-scale" class="th-range" min="85" max="125" step="5" value="100" oninput="onThemeScale(this.value)" style="width:100%"/>
-            </div>
-            <div class="sr">
-              <div class="sr-left">
-                <div class="sr-label">Reduce motion</div>
-                <div class="sr-desc">Disables hover/transition movement app-wide.</div>
-              </div>
-              <label class="toggle"><input type="checkbox" id="theme-reduce-motion" onchange="onThemeReduceMotion(this.checked)"/><span class="toggle-trk"></span></label>
-            </div>
-          </div>
-
-          <!-- Help / Onboarding -->
-          <div class="sc">
-            <div class="sc-head">Help</div>
-            <div class="sr">
-              <div class="sr-left">
-                <div class="sr-label">Welcome tutorial</div>
-                <div class="sr-desc">Replay the guided introduction to rbxSWAP.</div>
-              </div>
-              <button class="btn btn-ghost" onclick="startTutorial(true)">Replay tutorial</button>
-            </div>
-          </div>
-
           <!-- Protocol Handler -->
           <div class="sc win-only">
             <div class="sc-head">Roblox Protocol Registration</div>
@@ -593,6 +545,54 @@
                 <input type="checkbox" id="setting-streamer-mode" onchange="toggleStreamerMode()"/>
                 <span class="toggle-trk"></span>
               </label>
+            </div>
+          </div>
+
+          <!-- Appearance & Themes -->
+          <div class="sc">
+            <div class="sc-head">Appearance &amp; Themes</div>
+            <div class="sr" style="flex-direction:column;align-items:flex-start;gap:10px">
+              <div class="sr-left"><div class="sr-label">Theme preset</div><div class="sr-desc">Pick a curated look. Every option below is applied live and saved automatically.</div></div>
+              <div id="theme-preset-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;width:100%"></div>
+            </div>
+            <div class="sr" style="flex-direction:column;align-items:flex-start;gap:8px">
+              <div class="sr-left"><div class="sr-label">Accent color</div><div class="sr-desc">Used for highlights, active nav items and buttons.</div></div>
+              <div style="display:flex;gap:8px;align-items:center;width:100%">
+                <input type="color" id="theme-accent" value="#5c5ce0" oninput="onThemeAccentInput(this.value)" style="width:42px;height:30px;padding:0;border:1px solid var(--bd);border-radius:6px;background:none;cursor:pointer"/>
+                <input type="text" id="theme-accent-hex" class="sr-input" value="#5c5ce0" style="width:110px;font-size:12px;font-family:'JetBrains Mono',monospace" oninput="onThemeAccentHexInput(this.value)"/>
+                <button class="btn btn-ghost" style="font-size:11px;padding:6px 10px" onclick="resetTheme()">Reset all</button>
+              </div>
+            </div>
+            <div class="sr" style="flex-direction:column;align-items:flex-start;gap:10px">
+              <div class="sr-left"><div class="sr-label">Surface brightness</div><div class="sr-desc"><span id="theme-dark-label">Dark</span> background &amp; panels.</div></div>
+              <input type="range" id="theme-darkness" class="th-range" min="0" max="100" value="50" oninput="onThemeDarkness(this.value)" style="width:100%"/>
+            </div>
+            <div class="sr" style="flex-direction:column;align-items:flex-start;gap:8px">
+              <div class="sr-left"><div class="sr-label">Corner radius</div><div class="sr-desc"><span id="theme-radius-label">10px</span> — roundness of cards, buttons and modals.</div></div>
+              <input type="range" id="theme-radius" class="th-range" min="0" max="22" value="10" oninput="onThemeRadius(this.value)" style="width:100%"/>
+            </div>
+            <div class="sr" style="flex-direction:column;align-items:flex-start;gap:8px">
+              <div class="sr-left"><div class="sr-label">Interface scale</div><div class="sr-desc"><span id="theme-scale-label">100%</span> — overall size of text and controls.</div></div>
+              <input type="range" id="theme-scale" class="th-range" min="85" max="125" step="5" value="100" oninput="onThemeScale(this.value)" style="width:100%"/>
+            </div>
+            <div class="sr">
+              <div class="sr-left">
+                <div class="sr-label">Reduce motion</div>
+                <div class="sr-desc">Disables hover/transition movement app-wide.</div>
+              </div>
+              <label class="toggle"><input type="checkbox" id="theme-reduce-motion" onchange="onThemeReduceMotion(this.checked)"/><span class="toggle-trk"></span></label>
+            </div>
+          </div>
+
+          <!-- Help / Onboarding -->
+          <div class="sc">
+            <div class="sc-head">Help</div>
+            <div class="sr">
+              <div class="sr-left">
+                <div class="sr-label">Welcome tutorial</div>
+                <div class="sr-desc">Replay the guided introduction to rbxSWAP.</div>
+              </div>
+              <button class="btn btn-ghost" onclick="startTutorial(true)">Replay tutorial</button>
             </div>
           </div>
 
