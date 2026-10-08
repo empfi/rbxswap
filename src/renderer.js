@@ -5216,7 +5216,7 @@ function applyTheme() {
   const dl = document.getElementById('theme-dark-label'); if (dl) dl.textContent = t.dark < 33 ? 'Deep' : t.dark < 66 ? 'Dark' : 'Soft';
   const rl = document.getElementById('theme-radius-label'); if (rl) rl.textContent = t.radius + 'px';
   const sl = document.getElementById('theme-scale-label'); if (sl) sl.textContent = t.scale + '%';
-  document.querySelectorAll('.th-range').forEach(el => {
+  document.querySelectorAll('.th-range, .pill-range-track').forEach(el => {
     const min = +el.min || 0, max = +el.max || 100;
     el.style.setProperty('--fill', ((+el.value - min) / (max - min) * 100) + '%');
   });
