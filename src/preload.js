@@ -1,6 +1,6 @@
 const { contextBridge, ipcRenderer } = require('electron');
 contextBridge.exposeInMainWorld('api', {
-  platform: process.platform, // 'win32' | 'darwin' | 'linux' — used to filter executors to this device
+  platform: process.platform, 
   relaunchAsAdmin: () => ipcRenderer.invoke('app:relaunchAsAdmin'),
   minimize: () => ipcRenderer.send('window-minimize'),
   maximize: () => ipcRenderer.send('window-maximize'),

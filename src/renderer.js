@@ -1,6 +1,6 @@
 let accounts = [], launchAcc = null, editAcc = null, toastTimer;
 let packages = [], editingPackageId = null;
-// ─── Topbar RDD download status bar ────────────────────────────────────────
+
 let _tbDlHideTimer = null;
 function tbDlShow(label, percent, cls) {
   const box = document.getElementById('tb-dl');
@@ -35,8 +35,8 @@ if (typeof api.onRddDownloadProgress === 'function') {
     if (!data) return;
     if (data.status === 'downloading') {
       tbDlShow(data.label || 'Downloading Roblox version…', typeof data.percent === 'number' ? data.percent : 0, '');
-      // Mirror main-process installer progress into the launch modal while an
-      // RDD pull runs there (modal-driven installs update it directly).
+      
+      
       if (document.getElementById('m-launch')?.classList.contains('open') && !_installStatusOwnedByModal) {
         setStatus('launch-status', 'load', `<div class="spin"></div> ${esc(data.label || 'Downloading version…')} (${data.percent || 0}%)`);
       }
@@ -50,19 +50,19 @@ if (typeof api.onRddDownloadProgress === 'function') {
   });
 }
 
-// ─── Outdated-version detection for launches ────────────────────────────────
-// Non-null when a required executor build is about to be downloaded because
-// what is installed locally is older (or nothing usable is installed):
-//   { currentHash } — the version currently installed (null when none).
-// Called at the start of installRequiredVersion, while _launchRequiredVersionHash
-// still holds the WEAO-required hash that is missing locally.
+
+
+
+
+
+
 function outdatedVersionInfo() {
   try {
     const requiredHash = normalizeVersionHash(_launchRequiredVersionHash);
     if (!requiredHash) return null;
     const current = _installedVersionsList.find(v => v.complete !== false);
     const currentHash = current ? normalizeVersionHash(current.hash) : null;
-    if (currentHash && currentHash === requiredHash) return null; // already up to date
+    if (currentHash && currentHash === requiredHash) return null; 
     return { currentHash, requiredHash };
   } catch { return null; }
 }
@@ -74,18 +74,18 @@ function notifyOutdatedVersionBeforeLaunch(accName) {
   const msg = info.currentHash
     ? `${accName}: installed Roblox ${truncate(info.currentHash, 16)} is not supported by ${executorName} — the latest supported version is fetched automatically.`
     : `${accName}: no usable Roblox version installed — the latest supported version for ${executorName} is fetched automatically.`;
-  // Session log entry only — no popup: the inline notice in the Launch Game
-  // picker and the topbar download bar carry the visible status.
+  
+  
   logEntry('warn', 'launch', msg);
   return info;
 }
 
 const _launchedIds = new Set();
-const _everLaunchedAt = {}; // id -> epoch ms of the most recent launch
-const _presenceResolved = {}; // id -> true once Roblox's presence API returned a state
-const _presencePollTimers = new Map(); // id -> post-launch API polling timer
-let _tempSessions = []; // [{ pid, startedAt }] external Roblox sessions not tied to an added account
-let _tempSig = '';      // signature (sorted pid list) of the last-known temp session set
+const _everLaunchedAt = {}; 
+const _presenceResolved = {}; 
+const _presencePollTimers = new Map(); 
+let _tempSessions = []; 
+let _tempSig = '';      
 
 const _logs = [];
 const MAX_LOGS = 2000;
@@ -94,7 +94,7 @@ const LOG_CATS = { launch: 'launch', crash: 'crash', kill: 'kill', cookie: 'cook
 function logEntry(level, category, message, meta) {
   const entry = { ts: Date.now(), level, category, message, meta: meta || {} };
   _logs.push(entry);
-  if (_logs.length > MAX_LOGS) _logs.shift(); // keep the most-recent tail
+  if (_logs.length > MAX_LOGS) _logs.shift(); 
   if (document.getElementById('page-logs')?.classList.contains('active')) renderLogs();
 }
 
@@ -114,14 +114,14 @@ function renderLogs() {
   const el = document.getElementById('logs-list');
   if (!el) return;
   if (!_logs.length) { el.textContent = 'No log entries yet.'; return; }
-  // Tail behaviour: only auto-scroll to the newest line if already near the end.
+  
   const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 40;
   el.innerHTML = _logs.map(_logLine).join('\n');
   if (atBottom) el.scrollTop = el.scrollHeight;
 }
 
-// Native-style find (Ctrl+F) over the rendered log text. Uses window.find so
-// selection, scroll-to-match and Ctrl+A/Ctrl+C all behave like a normal viewer.
+
+
 function openLogFind() {
   const bar = document.getElementById('log-find');
   const inp = document.getElementById('log-find-input');
@@ -232,8 +232,8 @@ async function skipEnc() {
   await continueInit();
 }
 
-// Apple-style boot loader: fade it out once the UI is ready (or when the
-// encryption prompt takes over). Safety timeout guarantees it never sticks.
+
+
 function hideBoot() {
   const b = document.getElementById('boot-loader');
   if (b) { b.classList.add('hide'); setTimeout(() => { try { b.remove(); } catch {} }, 450); }
@@ -276,7 +276,7 @@ async function continueInit() {
     } catch {}
     try { renderPackages(); } catch {}
     try { applySettings(); if (settings.streamerMode) render(); } catch {}
-    try { initTheme(); } catch {} // re-sync controls now that DOM is ready
+    try { initTheme(); } catch {} 
   } catch (e) {
     console.error('Error during continueInit:', e);
   } finally {
@@ -300,8 +300,8 @@ async function continueInit() {
     api.onRobloxCount(n => { _lastCountPushAt = Date.now(); _mixRunning = n; });
   }
 
-  // External Roblox sessions (browser protocol launches, Roblox started outside
-  // the app) are pushed by main whenever it polls while accounts are watched.
+  
+  
   if (window.api && typeof api.onTempSessions === 'function') {
     api.onTempSessions(list => { applyTempSessions(list); loadTempAvatars(); });
   }
@@ -359,7 +359,7 @@ async function continueInit() {
     if (document.getElementById('page-mixer')?.classList.contains('active')) mixRefreshRunning();
   });
 
-  // Chrome download progress
+  
   api.onChromeProgress(data => {
     const dlDiv = document.getElementById('login-dl');
     const waitDiv = document.getElementById('login-waiting');
@@ -386,23 +386,23 @@ init();
   const osName = p === 'darwin' ? 'macOS' : p === 'win32' ? 'Windows' : 'Linux';
   const osEl = document.getElementById('platform-note-os');
   if (osEl) osEl.textContent = osName;
-  // Safety net: if the app ever opens on a now-hidden Windows-only tab, fall back.
+  
   if (p !== 'win32') {
     const active = document.querySelector('.page.active');
     if (active && active.classList.contains('win-only')) { try { goTo('accounts'); } catch {} }
   }
 })();
 
-// Legacy ui-theme system removed — superseded by the Appearance & Themes
-// engine (initTheme/applyTheme) at the bottom of this file. initTheme() is
-// called at the start of continueInit() before any page renders.
+
+
+
 
 
 async function detectRobloxVersion() {
   try {
     const ver = await api.getRobloxVersion();
     if (ver) {
-      // Show the full hash in the titlebar badge.
+      
       document.getElementById('tb-roblox-ver').textContent = ver;
     } else {
       document.getElementById('tb-roblox-ver').textContent = '-';
@@ -455,7 +455,7 @@ let _searchTimer;
 function onAcctSearch(v) {
   _acctQuery = (v || '').trim().toLowerCase();
   clearTimeout(_searchTimer);
-  _searchTimer = setTimeout(render, 120); // debounce so a long list isn't rebuilt on every keystroke
+  _searchTimer = setTimeout(render, 120); 
 }
 function toggleFilterMenu(e) {
   if (e) e.stopPropagation();
@@ -592,8 +592,8 @@ function watchPresenceAfterLaunch(id) {
     if (!_launchedIds.has(id)) return;
     await refreshPresence(true);
     if (Date.now() >= deadline) {
-      // No response is not the same thing as Offline. Keep the last confirmed
-      // API state if one exists; otherwise show an explicit unavailable state.
+      
+      
       if (!_presence[id]) _presenceUnavailable[id] = true;
       _presenceResolved[id] = true;
     }
@@ -641,7 +641,7 @@ function showCardMenu(id, x, y) {
     <button class="ctx-item" onclick="ctxCopyUser('${id}')"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Copy username</button>
   `;
   document.body.appendChild(menu);
-  // Position: keep on screen
+  
   const r = menu.getBoundingClientRect();
   const vw = window.innerWidth, vh = window.innerHeight;
   menu.style.left = Math.min(x, vw - 200) + 'px';
@@ -651,8 +651,8 @@ function showCardMenu(id, x, y) {
 function closeCardMenu() { const m = document.getElementById('card-ctx-menu'); if (m) m.remove(); _ctxMenuId = null; }
 async function ctxKill(id) { closeCardMenu(); await killOne(id); }
 function ctxLaunch(id) { closeCardMenu(); const a = accounts.find(x => x.id === id); if (a) openLaunch(a.id); }
-// "Launch Game" — pick a game in a modal, cache the pick globally (shared by
-// every account until changed) and launch this account into it immediately.
+
+
 function ctxLaunchGame(id) { closeCardMenu(); const a = accounts.find(x => x.id === id); if (a) { launchAcc = a; openGamePicker(); } }
 function ctxEdit(id) { closeCardMenu(); openEdit(id); }
 function ctxCopyId(id) { closeCardMenu(); const a = accounts.find(x => x.id === id); if (a?.userId) navigator.clipboard.writeText(a.userId).then(() => toast('User ID copied', 'ok')); else toast('No user ID', 'err'); }
@@ -1648,13 +1648,13 @@ async function finishLogin(res) {
   setStatus('login-status', 'ok', '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;flex-shrink:0"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>Signed in as ' + esc(res.username));
   const existing = res.userId != null ? accounts.find(x => String(x.userId) === String(res.userId)) : undefined;
   if (existing) {
-    // Re-login of an existing account: refresh its cookie in place instead of
-    // creating a duplicate entry (cookies expire and force re-login).
+    
+    
     existing.username = res.username;
     existing.cookie = res.cookie;
     const upd = { username: res.username, cookie: res.cookie };
-    // Browser login captures the typed password automatically, so a later
-    // "Change password (random)" doesn't need it again. Stored encrypted.
+    
+    
     if (res.password) upd.password = res.password;
     await api.updateAccount(existing.id, upd);
   } else {
@@ -1766,7 +1766,7 @@ async function editOpenBrowser() {
 function confirmAction(message, onConfirm) {
   document.getElementById('m-confirm-delete-msg').textContent = message;
   const btn = document.getElementById('m-confirm-delete-btn');
-  const newBtn = btn.cloneNode(true); // clone to remove old listeners
+  const newBtn = btn.cloneNode(true); 
   btn.parentNode.replaceChild(newBtn, btn);
   newBtn.addEventListener('click', () => { closeModal('m-confirm-delete'); onConfirm(); });
   openModal('m-confirm-delete');
@@ -1775,7 +1775,7 @@ function confirmAction(message, onConfirm) {
 async function removeAcc(id) {
   const a = accounts.find(x => x.id === id);
   if (!a) return;
-  // Clean up any pending auto-rejoin state for a removed account.
+  
   if (_rejoinTimers[id]) { clearTimeout(_rejoinTimers[id]); delete _rejoinTimers[id]; }
   delete _lastInGamePlace[id]; delete _rejoinAttempts[id];
   confirmAction('Remove "' + a.username + '"? This cannot be undone.', async () => {
@@ -1824,9 +1824,9 @@ async function loadWeaoForLaunch() {
 
   if (filterSel && !_weaoExploitsData) filterSel.innerHTML = '<option value="all">Loading WEAO exploits…</option>';
   try {
-    // Always re-fetch so the launch modal (and the Executors tab, which
-    // renders from the same data) shows the latest WEAO list, never a
-    // session-stale cache.
+    
+    
+    
     const [expRes, verRes] = await Promise.all([
       api.weaoExploits(),
       api.weaoVersions('current')
@@ -1851,13 +1851,13 @@ let _disabledExecutors = [];
 try { _disabledExecutors = JSON.parse(localStorage.getItem('rblx_disabled_executors') || '[]'); } catch {}
 let _defaultExecutor = localStorage.getItem('rblx_default_executor') || '';
 
-// Executors the user has already seen. Anything new from the WEAO list is
-// auto-disabled on first appearance; the user opts in explicitly.
+
+
 let _seenExecutors = [];
 try { _seenExecutors = JSON.parse(localStorage.getItem('rblx_seen_executors') || '[]'); } catch {}
 let _seedSeenExecutors = !localStorage.getItem('rblx_seen_executors');
 
-// Register any new executors from the WEAO list and disable them by default.
+
 function _syncSeenExecutors() {
   if (!Array.isArray(_weaoExploitsData)) return;
   const seed = _seedSeenExecutors;
@@ -1866,8 +1866,8 @@ function _syncSeenExecutors() {
     const name = exp.title || exp.name || exp.exploit || 'Exploit';
     if (!_seenExecutors.includes(name)) {
       _seenExecutors.push(name);
-      // First run after this feature ships: keep existing executors enabled.
-      // Afterwards, any newly appearing executor is disabled by default.
+      
+      
       if (!seed && !_disabledExecutors.includes(name)) _disabledExecutors.push(name);
     }
   });
@@ -1920,7 +1920,7 @@ window.renderExecutorSettings = function() {
     return;
   }
 
-  // New executors that appeared since the last check default to disabled.
+  
   _syncSeenExecutors();
 
   const opts = [];
@@ -1953,8 +1953,8 @@ window.saveExecutorSettings = function() {
   if (defSel) {
     _defaultExecutor = defSel.value;
     localStorage.setItem('rblx_default_executor', _defaultExecutor);
-    // Mirror into app settings so the main process can resolve the executor's
-    // synced Roblox build for browser (protocol) launches too.
+    
+    
     api.saveSettings({ defaultExecutor: _defaultExecutor }).catch(() => {});
   }
   populateLaunchExploitFilter();
@@ -2013,8 +2013,8 @@ function onLaunchExploitFilterChange() {
 
   const items = [];
   _installedVersionsList.forEach(v => {
-    // Partial/interrupted installs can't launch — keep them out of the picker
-    // (they stay visible in the RDD Installed Versions list, badged).
+    
+    
     if (v.complete === false) return;
     const isCompat = (filterVal === 'all') || (requiredVersionHash ? normalizeVersionHash(v.hash) === requiredVersionHash : true);
     items.push({
@@ -2025,8 +2025,8 @@ function onLaunchExploitFilterChange() {
     });
   });
 
-  // A selected executor owns the Roblox build used for launch. Do not keep a
-  // previous manual choice or silently fall back to another installed build.
+  
+  
   _launchRequiredVersionHash = requiredVersionHash || null;
   if (requiredVersionHash) {
     const installedVersion = _installedVersionsList.find(v => normalizeVersionHash(v.hash) === requiredVersionHash);
@@ -2087,8 +2087,8 @@ function renderInstalledVersionsListView(items) {
 }
 
 function selectLaunchVersionItem(val) {
-  // Executor sync is automatic; manual version clicks only apply when no
-  // executor version is currently required.
+  
+  
   if (_launchRequiredVersionHash) return;
   _selectedVersionHash = val;
   onLaunchExploitFilterChange();
@@ -2104,11 +2104,11 @@ async function installWorkingVersionForSelectedExploit() {
 const _MST_OK_SVG = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;flex-shrink:0"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>';
 const _MST_ERR_SVG = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>';
 
-// Download a required executor-synced Roblox build via RDD (used by the launch
-// modal banner AND the shared launch preflight, which runs with the modal
-// closed). Returns the installed version hash, or null on failure.
-let _installStatusOwnedByModal = false; // modal-driven installs keep their own status text
-let _outdatedNoticeLabel = null; // label override for the outdated-version notice (e.g. group launches)
+
+
+
+let _installStatusOwnedByModal = false; 
+let _outdatedNoticeLabel = null; 
 async function installRequiredVersion(requiredVer, opts = {}) {
   const { viaButton = false } = opts;
   const norm = normalizeVersionHash(requiredVer);
@@ -2117,8 +2117,8 @@ async function installRequiredVersion(requiredVer, opts = {}) {
   const showStatus = (type, html) => { if (launchModalOpen) setStatus('launch-status', type, html); };
 
   if (viaButton && btnInstall) { btnInstall.disabled = true; btnInstall.innerHTML = '<div class="spin"></div> Installing...'; }
-  // Outdated/not-supported build on launch → tell the user the latest
-  // supported version is being fetched automatically (no action needed).
+  
+  
   const label = _outdatedNoticeLabel || (launchAcc ? (launchAcc.username || 'This account') : 'Launch');
   const outdated = notifyOutdatedVersionBeforeLaunch(label);
   const dlLabel = outdated
@@ -2155,13 +2155,13 @@ async function installRequiredVersion(requiredVer, opts = {}) {
   }
 }
 
-// ─── Unified launch workflow ────────────────────────────────────────────────
-// Every launch entry point (account Start modal, context-menu Launch/
-// Relaunch, Launch Game picker, group launches) goes through the same steps:
-//   1. Sync WEAO exploit data + installed versions (executor version check).
-//   2. Resolve the Roblox build the selected executor requires.
-//   3. Auto-install that build via RDD when it is missing.
-//   4. Launch with the synced build hash.
+
+
+
+
+
+
+
 
 function resetLaunchModalUI() {
   const btn = document.getElementById('btn-launch');
@@ -2171,9 +2171,9 @@ function resetLaunchModalUI() {
   _launchRequiredVersionHash = null;
 }
 
-// Shared preflight. Resolves to the Roblox version hash to launch with
-// ('auto' when no executor version is pinned), or null when the executor's
-// required build could not be installed and the launch must not proceed.
+
+
+
 async function ensureLaunchVersionSynced(opts = {}) {
   const { silent = false } = opts;
   try { await loadWeaoForLaunch(); } catch {}
@@ -2197,8 +2197,8 @@ async function ensureLaunchVersionSynced(opts = {}) {
   return _launchRequiredVersionHash || _selectedVersionHash || 'auto';
 }
 
-let _launchGameOverride = null; // one-shot game picker selection for doLaunch
-let _launchBusy = false; // guards against double-launching the same account
+let _launchGameOverride = null; 
+let _launchBusy = false; 
 
 function openLaunch(id) {
   launchAcc = accounts.find(a => a.id === id); if (!launchAcc) return;
@@ -2208,7 +2208,7 @@ function openLaunch(id) {
   p.innerHTML = '<div class="prev-av" id="prev-av">' + esc((launchAcc.username || '?')[0].toUpperCase()) + '</div>' +
     '<div><div class="prev-name' + (settings.streamerMode ? ' streamer-mask' : '') + '" title="' + (settings.streamerMode ? 'Hover to reveal' : '') + '">' + esc(launchAcc.username) + '</div>' +
     '<div class="prev-uid">' + esc(gameName || 'Opens home screen') + '</div></div>';
-  // Avatar
+  
   if (launchAcc.userId) {
     fetch('https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=' + launchAcc.userId + '&size=48x48&format=Png')
       .then(r => r.json()).then(d => {
@@ -2217,9 +2217,9 @@ function openLaunch(id) {
       }).catch(() => {});
   }
 
-  // Same reset for every path into this modal (card Start button, context-menu
-  // Launch, context-menu Relaunch on an already-running instance) so a stale
-  // "Launching\u2026" state can never stick.
+  
+  
+  
   resetLaunchModalUI();
   loadWeaoForLaunch();
   openModal('m-launch');
@@ -2235,9 +2235,9 @@ function collectLaunchOptions() {
   if (ramVal && !document.getElementById('mix-ram-unl')?.checked) {
     options.ramLimitMb = parseInt(ramVal, 10);
   } else if (launchAcc) {
-    // Direct launches fall back to the account's group RAM cap so a limit
-    // configured on a group still applies when the account is started from
-    // its card instead of through the group.
+    
+    
+    
     const pkg = packages.find(p => Array.isArray(p.accountIds) && p.accountIds.includes(launchAcc.id) && typeof p.ramLimitMb === 'number');
     if (pkg) options.ramLimitMb = pkg.ramLimitMb;
   }
@@ -2246,15 +2246,15 @@ function collectLaunchOptions() {
 
 async function doLaunch() {
   if (!launchAcc) return;
-  const acc = launchAcc; // capture: later launches must not mutate this run
+  const acc = launchAcc; 
   const btn = document.getElementById('btn-launch');
   const launchModalOpen = !!(document.getElementById('m-launch')?.classList.contains('open'));
   if (launchModalOpen && btn && btn.disabled) return;
   if (_launchBusy) return;
   _launchBusy = true;
 
-  // When an executor is selected, always pass its synced build hash. This
-  // prevents a stale/manual version selection from launching the wrong build.
+  
+  
   const chosenVer = _launchRequiredVersionHash || _selectedVersionHash || 'auto';
 
   if (btn) { btn.disabled = true; btn.innerHTML = '<div class="spin"></div>Launching\u2026'; }
@@ -2274,8 +2274,8 @@ async function doLaunch() {
   } catch (e) {
     res = { success: false, error: e?.message || 'Launch request failed' };
   } finally {
-    // One-shot: never leak the game-picker selection into a later launch,
-    // even if the IPC call rejects.
+    
+    
     _launchGameOverride = null;
     _launchBusy = false;
   }
@@ -2299,8 +2299,8 @@ async function doLaunch() {
   setStatus('launch-status', 'ok', _MST_OK_SVG + 'Launched as ' + acc.username);
   logEntry('ok', 'launch', `Roblox launched successfully as ${acc.username || acc.id}`, { accountId: acc.id, username: acc.username, userId: acc.userId });
   toast('Launched as ' + acc.username, 'ok');
-  // Keep Start clickable so an already-running instance can be relaunched;
-  // every entry point resets the modal state itself (resetLaunchModalUI).
+  
+  
   if (btn) { btn.disabled = false; btn.innerHTML = 'Start'; }
 }
 
@@ -2487,7 +2487,7 @@ async function loadPackageIcon(id) {
   if (!pid) { img.style.display = 'none'; svg.style.display = ''; return; }
   const url = await fetchGameIconUrl(pid);
   if (!img || !svg) return;
-  if (parsePlaceId(input.value) !== pid) return; // stale response, link changed
+  if (parsePlaceId(input.value) !== pid) return; 
   if (url) { img.src = url; img.style.display = 'block'; svg.style.display = 'none'; }
   else { img.style.display = 'none'; svg.style.display = ''; }
 }
@@ -2513,13 +2513,13 @@ async function launchPackage(id) {
       </span>`).join('');
   }
 
-  // Unified launch workflow for groups too: sync WEAO + installed versions
-  // and auto-install the executor's required build before launching anyone.
+  
+  
   let groupVer = 'auto';
   const prevLaunchAcc = launchAcc;
   const prevOverride = _launchGameOverride;
-  // Name the group in the outdated-version notice; installRequiredVersion
-  // falls back to launchAcc's username when no label override is set.
+  
+  
   _outdatedNoticeLabel = `Group "${p.name}"`;
   _launchGameOverride = null;
   try {
@@ -2546,7 +2546,7 @@ async function launchPackage(id) {
     volume: typeof p.startVolume === 'number' ? p.startVolume : undefined
   };
   let okCount = 0;
-  // Launch members sequentially so Roblox bootstrap handoffs never overlap.
+  
   for (const m of members) {
     const target = link || m.gameTarget || null;
     logEntry('info', 'launch', `Launching Roblox for ${m.username || m.id} (package)...`, { accountId: m.id, username: m.username || null, userId: m.userId || null, target: target || 'Roblox home', versionHash: groupVer });
@@ -2695,18 +2695,18 @@ async function generateBloxGenAccount() {
       nickname: '',
       userId: uid,
       cookie: cookie,
-      password: oldPw || '', // current password, stored so a later change is automatic
+      password: oldPw || '', 
       addedAt: new Date().toISOString(),
       gameTarget: '',
       thumbUrl: ''
     };
 
-    // Save generated account to list
+    
     accounts.push(acctObj);
     api.saveAccounts(accounts);
     render();
 
-    // Fetch avatar
+    
     try {
       const avatarRes = await fetch(`https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=${uid}&size=150x150&format=Png&isCircular=false`);
       if (avatarRes.ok) {
@@ -2721,7 +2721,7 @@ async function generateBloxGenAccount() {
     saveGenHistoryItem(acctObj);
     _currentGenAccount = { acctObj, oldPw };
 
-    // Pop up Automatic Password Change Modal
+    
     document.getElementById('gen-modal-username').textContent = uname;
     document.getElementById('gen-modal-userid').textContent = 'ID: ' + uid;
     document.getElementById('gen-modal-old-pw').value = oldPw;
@@ -2742,8 +2742,8 @@ async function generateBloxGenAccount() {
   }
 }
 
-// Secure random password that meets Roblox's rules (8-128 chars, letter +
-// number, no spaces) and never contains the username. Regenerates if needed.
+
+
 function genSecurePassword(username) {
   const lower = 'abcdefghijklmnopqrstuvwxyz';
   const upper = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -2795,8 +2795,8 @@ async function applyPasswordChange(a, cookie, currentPw, requestedPassword, opti
     if (res && res.ok) {
       a.password = newPw;
       if (res.cookie) {
-        // Roblox may rotate the session directly in the password-change response.
-        // Keep that verified cookie instead of starting another login flow.
+        
+        
         a.cookie = res.cookie;
         try { await api.updateAccount(a.id, { password: newPw, cookie: res.cookie }); } catch {}
         _cookieStatus[a.id] = 'ok';
@@ -2806,8 +2806,8 @@ async function applyPasswordChange(a, cookie, currentPw, requestedPassword, opti
         if (reveal) showPwRevealModal(newPw);
         if (announce) toast('Password changed — session cookie kept active', 'ok');
       } else {
-        // If Roblox did not rotate a cookie in the response, obtain a new one
-        // through the saved credentials/challenge flow.
+        
+        
         try { await api.updateAccount(a.id, { password: newPw }); } catch {}
         beginPostPasswordChangeRefresh(a);
         if (reveal) showPwRevealModal(newPw);
@@ -2856,8 +2856,8 @@ async function refreshCookieInVisibleBrowser(a) {
   if (!a || !a.userId) return false;
   const targetUserId = String(a.userId);
   try {
-    // The hidden browser may be blocked by a captcha/2FA. Reuse the normal
-    // browser-login flow so Roblox can display that challenge to the user.
+    
+    
     closeModal('m-acct-info');
     openLogin();
     await startBrowserLogin(a.username && a.password ? { username: a.username, password: a.password } : null);
@@ -2895,8 +2895,8 @@ async function refreshAccountCookieForAction(a, { silent = false, validateCurren
   if (await adoptCookieFromStoreAfterRefresh(a)) return true;
   const ok = await refreshCookieInBackground(a, !silent, silent);
   if (ok) return true;
-  // Explicit actions may fall back to a visible login for captcha/2FA. Health
-  // checks pass silent:true and never open a browser unexpectedly.
+  
+  
   if (!silent && await refreshCookieInVisibleBrowser(a)) return true;
   if (_cookieStatus[a.id] === 'refreshing') {
     _cookieStatus[a.id] = 'dead';
@@ -2908,8 +2908,8 @@ async function refreshAccountCookieForAction(a, { silent = false, validateCurren
 async function refreshCookieInBackground(a, manual, silent = false) {
   if (!a || !a.username || !a.password) {
     if (manual) toast('No stored password for this account — add it once via "Sign in with Roblox" or paste a fresh cookie', 'warn');
-    // Can't re-login automatically, so a post-password-change account is
-    // genuinely dead until the user re-adds it.
+    
+    
     if (_cookieStatus[a.id] === 'refreshing') { _cookieStatus[a.id] = 'dead'; applyCookieStatus(a.id); }
     return false;
   }
@@ -2920,7 +2920,7 @@ async function refreshCookieInBackground(a, manual, silent = false) {
   _backgroundRefreshBusy.add(a.id);
   try {
     if (!silent) toast('Refreshing cookie in the background…', 'ok');
-    // Renderer-side cap so the busy flag can never stick even if the IPC hangs.
+    
     const res = await Promise.race([
       api.reloginHeadless(a.username, a.password),
       new Promise(r => setTimeout(() => r({ ok: false, error: 'Background login timed out' }), 75000)),
@@ -2941,15 +2941,15 @@ async function refreshCookieInBackground(a, manual, silent = false) {
         if (!silent) toast('Cookie refresh failed: ' + ((res && res.error) || 'unknown error'), 'warn');
         logEntry('err', 'cookie', `Cookie refresh failed for ${a.username || a.id}: ${res && res.error}`, { accountId: a.id });
       }
-      // The re-login is definitively over and the old cookie is dead — surface
-      // the expired state now instead of leaving the account stuck mid-refresh.
+      
+      
       if (_cookieStatus[a.id] === 'refreshing') { _cookieStatus[a.id] = 'dead'; applyCookieStatus(a.id); }
       return false;
     }
     a.cookie = res.cookie;
     if (res.username && res.username !== a.username) a.username = res.username;
     try { await api.updateAccount(a.id, { cookie: res.cookie, username: a.username }); } catch {}
-    _cookieStatus[a.id] = 'ok'; // the fresh cookie just authenticated — keep the badge off
+    _cookieStatus[a.id] = 'ok'; 
     applyCookieStatus(a.id);
     render();
     if (!silent) toast('Cookie refreshed automatically — account is live again', 'ok');
@@ -3006,7 +3006,7 @@ function openAccountInfoModal(id) {
   setStreamerText('ai-modal-handle', '@' + uname);
   setStreamerText('ai-modal-group', 'Group: ' + groupName);
   setStreamerText('ai-modal-user', uname);
-  // `nickname` is this app's alias, not the Roblox display name.
+  
   setStreamerText('ai-modal-display', a.displayName || uname);
   if (a.userId) {
     loadUserInfo(a.userId, info => {
@@ -3017,15 +3017,15 @@ function openAccountInfoModal(id) {
     });
   }
   setStreamerText('ai-modal-userid', uid);
-  // Robux balance and the app-local alias are not account identifiers, so they
-  // stay readable in Streamer Mode (only username/display/ID get masked).
+  
+  
   const robuxEl = document.getElementById('ai-modal-robux');
   if (robuxEl) { robuxEl.textContent = '0'; robuxEl.classList.remove('streamer-mask'); robuxEl.title = ''; }
   setStreamerText('ai-modal-added', dateStr);
   const aliasEl = document.getElementById('ai-modal-alias');
   if (aliasEl) { aliasEl.textContent = nickname || '—'; aliasEl.classList.remove('streamer-mask'); aliasEl.title = ''; }
-  // Password is NOT displayed in the info modal — it's only shown in the
-  // one-time reveal modal after a change.
+  
+  
 
   const avatarEl = document.getElementById('ai-modal-avatar');
   const thumb = a.thumbUrl || (a.userId ? _avatarCache[a.userId] : null);
@@ -3137,8 +3137,8 @@ async function aiOpenBrowser() {
   });
 }
 
-// Inline alias (nickname) editor inside the Account info modal. Clicking the
-// ALIAS value swaps it for a text input; Enter/blur saves, Escape cancels.
+
+
 let _aiAliasEditing = false;
 function editAliasFromInfo() {
   const a = _aiAccount;
@@ -3204,13 +3204,13 @@ async function saveKeySettings() {
   _saveKeyTimer = setTimeout(async () => {
     try {
       await api.saveSettings({ encryptionType: selectedEnc });
-      // enc:setKey changes the key and re-encrypts accounts in one step.
+      
       const r = await api.encSetKey(keyVal);
       if (!r || !r.ok) throw new Error(r && r.error ? r.error : 'could not update key');
       if (!keyVal.trim()) throw new Error('Encryption key cannot be empty.');
       settings.encryptionType = selectedEnc; settings.keySet = true;
       document.getElementById('custom-key').value = '';
-      // Reload accounts so the renderer holds cookies under the new key.
+      
       try { accounts = await api.loadAccounts(); render(); } catch {}
       toast('Encryption key updated', 'ok');
       applySettings();
@@ -3309,11 +3309,11 @@ document.querySelectorAll('.overlay').forEach(o => {
   });
 });
 document.addEventListener('keydown', e => {
-  // Ctrl/Cmd+F opens native-style find on the logs page.
+  
   if ((e.ctrlKey || e.metaKey) && (e.key === 'f' || e.key === 'F') && document.getElementById('page-logs')?.classList.contains('active')) {
     e.preventDefault(); openLogFind(); return;
   }
-  // Find-bar keys: Enter = next, Shift+Enter = previous, Esc = close.
+  
   if (e.target && e.target.id === 'log-find-input') {
     if (e.key === 'Enter') { e.preventDefault(); logFind(e.shiftKey); return; }
     if (e.key === 'Escape') { e.preventDefault(); closeLogFind(); return; }
@@ -3328,7 +3328,7 @@ document.addEventListener('keydown', e => {
     } else document.querySelectorAll('.overlay.open').forEach(m => closeModal(m.id));
   }
   if ((e.ctrlKey || e.metaKey) && e.key === 'n') { e.preventDefault(); openLogin(); }
-  // "/" focuses the account search (when not already typing in a field).
+  
   if (e.key === '/' && document.getElementById('page-accounts')?.classList.contains('active')
       && !/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement?.tagName || '')) {
     e.preventDefault();
@@ -3360,7 +3360,7 @@ async function loadCharts() {
   grid.style.display = 'none'; empty.style.display = 'none'; loading.style.display = 'flex';
 
   try {
-    // Use official Roblox explore-api with a random sessionId per load
+    
     const [popular, trending] = await Promise.all([
       fetchRobloxGames('top-playing-now'),
       fetchRobloxGames('top-rated'),
@@ -3385,18 +3385,18 @@ function randomGuid() {
 }
 
 async function fetchRobloxGames(sortId) {
-  // Official Roblox explore API
+  
   const sessionId = randomGuid();
   const url = `https://apis.roblox.com/explore-api/v1/get-sort-content?sessionId=${sessionId}&sortId=${sortId}&device=computer&country=all`;
   const r = await fetch(url, { headers: { 'Accept': 'application/json' } });
   if (!r.ok) throw new Error(`HTTP ${r.status}`);
   const d = await r.json();
 
-  // Response shape: { sorts: [{ games: [...] }] } or { games: [...] }
+  
   const games = d.games || (d.sorts && d.sorts[0] && d.sorts[0].games) || [];
   if (!games.length) throw new Error('No games in response');
 
-  // Fetch thumbnails for all universeIds
+  
   let thumbMap = {};
   try {
     const universeIds = games.map(g => g.universeId).filter(Boolean).join(',');
@@ -3460,7 +3460,7 @@ async function searchRobloxGames(query) {
   if (!r.ok) throw new Error(`HTTP ${r.status}`);
   const d = await r.json();
 
-  // Extract game universe IDs from omni-search results
+  
   const contents = d.searchResults || [];
   const gameSection = contents.find(s => s.contentGroupType === 'Game') || contents[0];
   if (!gameSection || !gameSection.contents) return [];
@@ -3468,13 +3468,13 @@ async function searchRobloxGames(query) {
   const universeIds = gameSection.contents.map(c => c.contentId).filter(Boolean);
   if (!universeIds.length) return [];
 
-  // Fetch full game details
+  
   const detailsRes = await fetch(`https://games.roblox.com/v1/games?universeIds=${universeIds.join(',')}`);
   const details = detailsRes.ok ? await detailsRes.json() : { data: [] };
   const detailMap = {};
   (details.data || []).forEach(g => { detailMap[g.id] = g; });
 
-  // Fetch thumbnails
+  
   let thumbMap = {};
   try {
     const thumbRes = await fetch(
@@ -3501,13 +3501,13 @@ async function searchRobloxGames(query) {
 async function resolvePlaceId(placeId) {
   const id = String(placeId).trim();
   if (!/^\d+$/.test(id)) return null;
-  // Place -> universe
+  
   const u = await fetch(`https://apis.roblox.com/universes/v1/places/${id}/universe`);
   if (!u.ok) throw new Error(`HTTP ${u.status}`);
   const ud = await u.json();
   if (!ud || !ud.universeId) return null;
   const uni = ud.universeId;
-  // Universe -> game details (name, player count)
+  
   const r = await fetch(`https://games.roblox.com/v1/games?universeIds=${uni}`);
   if (!r.ok) throw new Error(`HTTP ${r.status}`);
   const d = await r.json();
@@ -3522,7 +3522,7 @@ async function resolvePlaceId(placeId) {
     }
   } catch {}
   return {
-    placeId: id, // launch into exactly what the user typed
+    placeId: id, 
     universeId: uni,
     name: det.name,
     playerCount: typeof det.playing === 'number' ? det.playing : undefined,
@@ -3536,9 +3536,9 @@ try { _cachedLaunchGame = JSON.parse(localStorage.getItem(_gamePickerCacheKey) |
 function _saveCachedLaunchGame(g) { _cachedLaunchGame = g; try { localStorage.setItem(_gamePickerCacheKey, JSON.stringify(g)); } catch {} }
 let _gpQuery = '', _gpDebounce = null, _gpMap = {};
 
-// ─── Favorite games (max 2) ──────────────────────────────────────────────────
-// Starred from the Launch Game picker search results; shown below the results
-// under a divider, capped at 2 entries.
+
+
+
 const GP_FAV_KEY = 'rblx_favorite_games';
 const GP_FAV_MAX = 2;
 let _gpFavorites = [];
@@ -3569,7 +3569,7 @@ function gpFavToggle(placeId) {
   gpRerenderResultStars();
 }
 
-// Re-star the currently rendered search results after a toggle.
+
 function gpRerenderResultStars() {
   const list = document.getElementById('gp-list');
   if (!list) return;
@@ -3578,7 +3578,7 @@ function gpRerenderResultStars() {
   });
 }
 
-// Favorites strip rendered below the search results, separated by a divider.
+
 function renderGamePickerFavorites() {
   const favList = document.getElementById('gp-fav-list');
   const divider = document.getElementById('gp-fav-divider');
@@ -3608,7 +3608,7 @@ function renderGamePickerFavorites() {
     </div>`).join('');
 }
 
-// Hide the search results dropdown and mirror the aria-expanded state.
+
 function gpHideDropdown() {
   const dropdown = document.getElementById('gp-dropdown');
   const inp = document.getElementById('gp-search');
@@ -3616,9 +3616,9 @@ function gpHideDropdown() {
   if (inp) inp.setAttribute('aria-expanded', 'false');
 }
 
-// Close the dropdown whenever the user presses anywhere outside the search
-// box area. Presses inside the wrapper (including on result cards and the
-// favorite strip) are left alone so their click handlers still fire.
+
+
+
 document.addEventListener('pointerdown', (e) => {
   const t = e.target;
   if (t && typeof t.closest === 'function' && t.closest('.gp-search-wrap')) return;
@@ -3635,12 +3635,12 @@ function openGamePicker() {
   renderGamePickerCached();
   renderGamePickerOutdatedNotice();
   renderGamePickerFavorites();
-  // Refresh WEAO in the background so the outdated notice reflects reality
-  // even if executor data went stale since the last open.
+  
+  
   loadWeaoForLaunch().then(() => renderGamePickerOutdatedNotice()).catch(() => {});
   const list = document.getElementById('gp-list');
   const hint = document.getElementById('gp-hint');
-  // With a cached selection, Enter already launches \u2014 the hint would be wrong.
+  
   if (hint) hint.style.display = (launchAcc && launchAcc.gameTarget) ? 'none' : '';
   if (list) list.innerHTML = '';
   const launchBtn = document.getElementById('gp-launch-btn');
@@ -3652,9 +3652,9 @@ function openGamePicker() {
   openModal('m-game-picker');
 }
 
-// Small inline notice in the game picker: shown when the installed Roblox
-// build does not match the selected executor's required WEAO version (or no
-// usable version is installed). No popup \u2014 purely informational.
+
+
+
 function renderGamePickerOutdatedNotice() {
   const box = document.getElementById('gp-outdated');
   const txt = document.getElementById('gp-outdated-text');
@@ -3689,14 +3689,14 @@ async function _gpLaunch() {
   _gpLaunching = true;
   try {
     // Same unified workflow as every other launch path: sync WEAO + installed
-    // versions, then auto-install the executor's required build if missing.
+    
     const chosenVer = await ensureLaunchVersionSynced();
     if (!chosenVer) {
       toast('Selected executor needs a version install first', 'err');
       logEntry('warn', 'launch', 'Launch Game skipped: required Roblox version could not be installed');
       return;
     }
-    // Pin the resolved build so doLaunch() cannot fall back to another hash.
+    
     _launchRequiredVersionHash = chosenVer === 'auto' ? null : chosenVer;
     if (chosenVer !== 'auto') _selectedVersionHash = chosenVer;
     await doLaunch();
@@ -3705,14 +3705,14 @@ async function _gpLaunch() {
 
 function gpLaunchCached() {
   if (!_cachedLaunchGame || !_cachedLaunchGame.placeId) return;
-  saveRecentGame(_cachedLaunchGame); // remember the game being launched
+  saveRecentGame(_cachedLaunchGame); 
   _launchGameOverride = { placeId: _cachedLaunchGame.placeId, name: _cachedLaunchGame.name };
   closeModal('m-game-picker');
   _gpLaunch();
 }
 
 function gpSelectIndex(i) {
-  // 'fav_<n>' selects from the favorites strip below the results.
+  
   if (typeof i === 'string' && i.startsWith('fav_')) {
     const fav = _gpFavorites[parseInt(i.slice(4), 10)];
     if (fav) gpSelectGame(fav);
@@ -3743,10 +3743,10 @@ function gpSelectGame(g) {
   if (launchBtn) launchBtn.disabled = false;
 }
 
-// Enter picks the first result; a numeric query is resolved as a place ID
-// immediately instead of waiting for the search debounce. When the search
-// returns exactly one result, Enter launches straight into it. When nothing
-// matches but a cached game is selected, Enter launches that instead.
+
+
+
+
 async function gpSearchKeydown(e) {
   if (e.key !== 'Enter') return;
   e.preventDefault();
@@ -3757,13 +3757,13 @@ async function gpSearchKeydown(e) {
     let g = null;
     try { g = await resolvePlaceId(q); } catch {}
     if (g) {
-      // A place ID resolves to exactly one game \u2014 launch it directly.
+      
       gpSelectGame(g);
       closeModal('m-game-picker');
       _gpLaunch();
       return;
     }
-    // fallthrough renders nothing extra: favorites stay visible below
+    
     const loading = document.getElementById('gp-loading');
     if (loading) loading.style.display = 'none';
     const list = document.getElementById('gp-list');
@@ -3771,7 +3771,7 @@ async function gpSearchKeydown(e) {
     return;
   }
   if (_gpMap[0]) {
-    // Exactly one hit \u2014 Enter launches into it without an extra click.
+    
     if (!_gpMap[1]) {
       gpSelectIndex(0);
       closeModal('m-game-picker');
@@ -3781,7 +3781,7 @@ async function gpSearchKeydown(e) {
     gpSelectIndex(0);
     return;
   }
-  // No live results: fall back to the cached selection if one is set.
+  
   if (_cachedLaunchGame && _cachedLaunchGame.placeId) {
     closeModal('m-game-picker');
     _gpLaunch();
@@ -3816,7 +3816,7 @@ function gpSearchInput(v) {
       const isPlaceId = /^\d+$/.test(query);
       let results;
       if (isPlaceId) {
-        // A pure-number query is treated as a place ID and resolved directly.
+        
         const g = await resolvePlaceId(query);
         results = g ? [g] : [];
       } else {
@@ -3824,12 +3824,12 @@ function gpSearchInput(v) {
       }
       if (document.getElementById('gp-search')?.value.trim() !== query) return;
       if (loading) loading.style.display = 'none';
-      // Drop stale hits so Enter can never launch a game from a previous query.
+      
       _gpMap = {};
       if (!results.length) { if (list) list.innerHTML = `<div style="grid-column:1/-1;text-align:center;color:var(--t3);font-size:12px;padding:24px 0">${isPlaceId ? `No game found for place ID ${esc(query)}.` : 'No games found.'}</div>`; return; }
       list.innerHTML = results.map((g, i) => {
         _gpMap[i] = g;
-        if (g.placeId) _gpMap[String(g.placeId)] = g; // placeId lookup for starring
+        if (g.placeId) _gpMap[String(g.placeId)] = g; 
         const players = typeof g.playerCount === 'number' ? Number(g.playerCount).toLocaleString() + ' playing' : '';
         const isFav = g.placeId ? gpFavIsFavorite(g.placeId) : false;
         const thumb = g.thumbUrl
@@ -4002,11 +4002,11 @@ async function syncFpsControls() {
 }
 
 async function mixInit() {
-  // Pull current values from saved Fast Flags + settings.
+  
   let flags = {};
   try { flags = (await api.readFFlags()) || {}; } catch {}
 
-  // Graphics
+  
   const gfxRaw = flags[FF_GFX];
   const gfxAuto = (gfxRaw === undefined || gfxRaw === null || gfxRaw === '');
   document.getElementById('mix-gfx-auto').checked = gfxAuto;
@@ -4015,10 +4015,10 @@ async function mixInit() {
   document.getElementById('mix-gfx-val').textContent = gfxAuto ? 'Auto' : gfxVal;
   document.getElementById('mix-gfx').disabled = gfxAuto;
 
-  // FPS - synced from saved app settings with XML fallback (see syncFpsControls).
+  
   await syncFpsControls();
 
-  // RAM Limit
+  
   let savedRam = null;
   try { savedRam = localStorage.getItem('mix-ram-limit'); } catch {}
   const ramUnl = (savedRam === null || savedRam === undefined || savedRam === '');
@@ -4034,7 +4034,7 @@ async function mixInit() {
     updateSliderFill(ramEl);
   }
 
-  // Volume
+  
   _volMuted = false;
   _volPrevLevel = null;
   const vol = (typeof settings.masterVolume === 'number') ? settings.masterVolume : 100;
@@ -4048,7 +4048,7 @@ async function mixInit() {
   mixRefreshRunning();
 }
 
-// FPS
+
 function mixFpsInput(v) {
   document.getElementById('mix-fps-val').textContent = v;
   updateSliderFill(document.getElementById('mix-fps'));
@@ -4081,7 +4081,7 @@ async function mixFpsCommit() {
   document.getElementById('mix-fps-val').textContent = v;
   settings.fpsCap = v;
   settings.fpsUnlimited = false;
-  // fps:write persists the preference in AppData and updates Roblox XML.
+  
   let result;
   try { result = await api.writeFpsCap(v); } catch { result = null; }
   if (!result || !result.ok) {
@@ -4097,19 +4097,19 @@ function clampInt(v, min, max, dflt) {
   return Math.max(min, Math.min(max, n));
 }
 
-// Lightweight global poll so the running count stays current off the Mixer
-// page too. Cheap (tasklist under the hood); 3s cadence matches the rest of UI.
+
+
 let _runningPoll = null;
 let _lastCountPushAt = 0;
 async function pollRunningCount() {
-  // main pushes the count every ~5s while watching; skip our own tasklist
-  // call if one of those landed recently (it also pushes temp sessions then).
+  
+  
   if (Date.now() - _lastCountPushAt < 6500) return;
   let n = 0;
   try { n = await api.getRunningCount(); } catch { n = 0; }
   _mixRunning = n;
-  // When nothing is being watched there are no pushes, so detect external
-  // sessions here on the existing idle poll cadence.
+  
+  
   await fetchTempSessions();
 }
 function scheduleRunningPoll() {
@@ -4136,7 +4136,7 @@ async function mixRefreshRunning() {
 
 }
 
-// Merge a single key into the on-disk Fast Flags without disturbing others.
+
 async function mixWriteFlag(key, value) {
   let flags = {};
   try { flags = (await api.readFFlags()) || {}; } catch {}
@@ -4145,7 +4145,7 @@ async function mixWriteFlag(key, value) {
   try { await api.writeFFlags(flags); } catch {}
 }
 
-// Smoothly fill the slider track up to the current value.
+
 function updateSliderFill(el) {
   if (!el) return;
   const min = parseFloat(el.min) || 0, max = parseFloat(el.max) || 100, v = parseFloat(el.value);
@@ -4153,7 +4153,7 @@ function updateSliderFill(el) {
   el.style.background = 'linear-gradient(90deg, var(--ac) ' + pct + '%, var(--s4) ' + pct + '%)';
 }
 
-// Graphics
+
 function mixGfxInput(v) {
   document.getElementById('mix-gfx-val').textContent = v;
   updateSliderFill(document.getElementById('mix-gfx'));
@@ -4192,7 +4192,7 @@ function mixVolToggleMute() {
   const slider = document.getElementById('mix-vol');
   if (!slider) return;
   if (_volMuted) {
-    // Unmute: restore the exact level that was set before muting.
+    
     _volMuted = false;
     const level = (typeof _volPrevLevel === 'number') ? _volPrevLevel : 100;
     _volPrevLevel = null;
@@ -4207,7 +4207,7 @@ function mixVolToggleMute() {
       if (res && res.ok) toast('Volume ' + level + '%', 'ok');
     }, 60);
   } else {
-    // Mute: remember the level, zero the slider, silence every session live.
+    
     _volMuted = true;
     _volPrevLevel = parseInt(slider.value, 10) || 100;
     slider.value = 0;
@@ -4220,8 +4220,8 @@ function mixVolToggleMute() {
   updateVolMuteIcon();
 }
 
-// Volume - applies live while dragging (debounced so we don't spawn the helper
-// on every drag tick), and saves + confirms on release.
+
+
 function mixVolInput(v) {
   if (_volMuted) { _volMuted = false; _volPrevLevel = null; updateVolMuteIcon(); }
   document.getElementById('mix-vol-val').textContent = v + '%';
@@ -4247,7 +4247,7 @@ function mixVolCommit() {
   }, 60);
 }
 
-// RAM limit
+
 function mixRamInput(v) {
   document.getElementById('mix-ram-val').textContent = v + ' MB';
   updateSliderFill(document.getElementById('mix-ram'));
@@ -4282,7 +4282,7 @@ async function mixSaveSettings() {
   const ramVal = parseInt(document.getElementById('mix-ram')?.value, 10) || 2048;
   const volVal = parseInt(document.getElementById('mix-vol')?.value, 10) || 100;
 
-  // Save FastFlags & Global Settings
+  
   if (gfxAuto) mixWriteFlag(FF_GFX, null);
   else mixWriteFlag(FF_GFX, gfxVal);
 
@@ -4417,7 +4417,7 @@ async function swapRefreshBackup() {
   }
 }
 
-// Locally-administered random MAC (mirrors the source adapter's OUI when known).
+
 function swapRandomMac(adapter) {
   const lbit = ['2', '6', 'A', 'E'];
   const hx = () => '0123456789ABCDEF'[Math.floor(Math.random() * 16)];
@@ -4445,15 +4445,15 @@ async function swapRelaunchAdmin() {
 }
 
 async function swapRunSpoof(macOnly) {
-  // macOnly=true (the "MAC only" button) randomises network adapters only,
-  // regardless of the toggles. The hold button spoofs whatever is ticked.
+  
+  
   const doMac = macOnly || document.getElementById('swap-t-mac').checked;
   const doHwid = !macOnly && document.getElementById('swap-t-hwid').checked;
   const doVol = !macOnly && document.getElementById('swap-t-vol').checked;
   if (!doMac && !doHwid && !doVol) { swapLog('Nothing selected to spoof. Pick at least one option.', 'err'); return; }
 
-  // Spoofing writes to HKLM and the raw boot sector — needs administrator rights.
-  // If we're not elevated, offer to relaunch as admin (UAC) instead of failing.
+  
+  
   try {
     const elevated = await api.hwidIsElevated();
     if (!elevated) {
@@ -4467,7 +4467,7 @@ async function swapRunSpoof(macOnly) {
     }
   } catch {}
 
-  // Warn on live kernel anti-cheats — they can flag or interfere with id changes.
+  
   try {
     const acs = await api.detectAnticheat();
     if (acs && acs.length > 0) {
@@ -4490,7 +4490,7 @@ async function swapPerformSpoof(doMac, doHwid, doVol) {
       swapLog(rp.ok ? 'Restore point created.' : `Restore point skipped: ${rp.message}`, rp.ok ? 'ok' : 'warn');
     }
 
-    await api.backupHwid(); // snapshot real originals before touching anything
+    await api.backupHwid(); 
     let errs = 0;
 
     if (doMac) {
@@ -4655,7 +4655,7 @@ async function swapRunClean() {
   await api.runSwap(opts);
 }
 
-// One-time registration of the swap main-process event forwarders.
+
 (function swapWireEvents() {
   if (_swapInited || !window.api) return;
   _swapInited = true;
@@ -4684,7 +4684,7 @@ async function swapRunClean() {
 })();
 
 (function () {
-  const HOST = 'https://setup-aws.rbxcdn.com'; // only the AWS mirror has CORS configured
+  const HOST = 'https://setup-aws.rbxcdn.com'; 
 
   const EXTRACT_ROOTS = {
     player: {
@@ -4767,15 +4767,15 @@ async function swapRunClean() {
 
   let _installedRddVersions = [];
   let _rddRemoveArmed = {};
-  let _rddUsage = {};            // hash -> bytes on disk (null while calculating)
+  let _rddUsage = {};            
   let _rddUsageKnown = false;
   let _rddCleanArmed = false;
-  let _rddWeaoCurrentHash = '';  // WEAO "current" Windows build, fallback keep-hash
+  let _rddWeaoCurrentHash = '';  
 
   const rddStripVer = (h) => String(h || '').replace(/^version-/, '');
 
-  // Hashes the cleaner must never remove: the executor-synced build (or the
-  // current WEAO build when no executor is configured) plus Roblox's own installs.
+  
+  
   function rddProtectedHashes() {
     const set = new Set();
     for (const v of _installedRddVersions) {
@@ -4850,9 +4850,9 @@ async function swapRunClean() {
     const cleanBtn = el('rdd-clean-btn');
     if (cleanBtn) { cleanBtn.disabled = true; cleanBtn.textContent = 'Cleaning…'; }
     const candidates = rddCleanCandidates();
-    // Safety net: only hashes NOT selected for removal are passed as keep-list,
-    // so the main-side handler never deletes anything the renderer didn't
-    // explicitly mark as old.
+    
+    
+    
     const keep = _installedRddVersions
       .filter(v => !candidates.some(c => c.hash === v.hash))
       .map(v => v.hash);
@@ -4895,15 +4895,15 @@ async function swapRunClean() {
     window.rddRenderInstalledVersions((val || '').trim().toLowerCase());
   };
 
-  // Inline handlers can't reach closure `let`s, so arming goes through this.
+  
   window.rddArmRemove = function (hash) {
-    _rddRemoveArmed = {}; // only one inline confirm armed at a time
+    _rddRemoveArmed = {}; 
     _rddRemoveArmed[hash] = true;
     window.rddRenderInstalledVersions((el('rdd-ver-search') ? el('rdd-ver-search').value : '').trim().toLowerCase());
   };
 
-  // Clicking anywhere outside the armed Confirm buttons (or the clean button)
-  // disarms every pending confirmation again.
+  
+  
   document.addEventListener('pointerdown', (e) => {
     const t = e.target;
     if (t && typeof t.closest === 'function' && (t.closest('.rdd-ver-del') || t.closest('#rdd-clean-btn'))) return;
@@ -4944,7 +4944,7 @@ async function swapRunClean() {
         <div class="rdd-ver-actions">${openHtml}${btnHtml}</div>
       </div>`;
     }).join('');
-    // Anything not rendered stops being armed (keeps the map small).
+    
     for (const h of Object.keys(_rddRemoveArmed)) {
       if (!list.some(v => v.hash === h)) delete _rddRemoveArmed[h];
     }
@@ -4955,7 +4955,7 @@ async function swapRunClean() {
     const result = await api.openRobloxVersionDirectory(hash);
     if (result && result.ok) return;
     toast(result?.error || 'Could not open the install directory', 'err');
-    // Re-scan immediately if the folder was deleted outside the app.
+    
     window.rddLoadInstalledVersions();
   };
 
@@ -4965,7 +4965,7 @@ async function swapRunClean() {
     const r = await api.removeRobloxVersion(hash);
     if (r && r.ok) {
       delete _rddRemoveArmed[hash];
-      // Just drop the removed version from the local list — no full re-scan.
+      
       _installedRddVersions = _installedRddVersions.filter(v => v.hash !== hash);
       toast(`Removed ${truncate(hash, 18)}`, 'ok');
       logEntry('ok', 'rdd', `Removed installed Roblox version ${hash}`);
@@ -5021,7 +5021,7 @@ async function swapRunClean() {
     }
   };
 
-  // Load a WEAO version hash straight into the deployment downloader below.
+  
   window.rddUseWeaoVer = function (binaryType, hash) {
     if (!hash) return;
     el('rdd-channel').value = 'LIVE';
@@ -5047,12 +5047,12 @@ async function swapRunClean() {
   }
 
   function rddUpdateProgress(text, pct) {
-    // The download process lives inside the Download button: fill its bar and
-    // block it while a transfer is running (label text never changes).
+    
+    
     const dlBar = el('rdd-download-bar');
     if (dlBar) dlBar.style.width = Math.max(0, Math.min(100, Math.round(pct))) + '%';
-    // Mirror into the topbar status bar so a renderer-side RDD download is
-    // visible from any tab (main-process installs push the same channel).
+    
+    
     if (typeof window.tbDlShow === 'function') {
       if (pct >= 100) {
         window.tbDlShow(text || 'Installation complete!', 100, 'done');
@@ -5078,7 +5078,7 @@ async function swapRunClean() {
 
     rddUpdateProgress(`Downloading packages for ${truncate(version, 14)}…`, 10);
 
-    // Save AppSettings.xml
+    
     const appSettingsB64 = btoa('<?xml version="1.0" encoding="UTF-8"?>\n<Settings>\n\t<ContentFolder>content</ContentFolder>\n\t<BaseUrl>http://www.roblox.com</BaseUrl>\n</Settings>\n');
     await api.rddSaveExtractedFile(version, 'AppSettings.xml', appSettingsB64);
 
@@ -5236,7 +5236,7 @@ async function swapRunClean() {
     if (!wired) {
       const list = el('exec-list');
       if (list) {
-        // Delegated open-link handler — keeps third-party URLs out of inline onclick.
+        
         list.addEventListener('click', (ev) => {
           const btn = ev.target.closest('.exec-link');
           if (btn && btn.dataset.url) api.openExternal(btn.dataset.url);
@@ -5260,8 +5260,8 @@ async function swapRunClean() {
       }
       data = (res.data || []).filter((e) => !e.hidden);
       loaded = true;
-      // Keep the shared WEAO cache in sync so the launch modal's exploit
-      // filter and the Settings executor list always match this latest data.
+      
+      
       _weaoExploitsData = res.data;
       populateLaunchExploitFilter();
       if (typeof window.renderExecutorSettings === 'function') window.renderExecutorSettings();
@@ -5290,7 +5290,7 @@ async function swapRunClean() {
     const links = [];
     if (e.websitelink) links.push(`<button class="btn btn-ghost exec-link" data-url="${esc(e.websitelink)}" title="Website"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>Website</button>`);
     if (e.discordlink) links.push(`<button class="btn btn-ghost exec-link" data-url="${esc(e.discordlink)}" title="Discord"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-6-6 6 6 0 0 0-6 6c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>Discord</button>`);
-    // No Purchase button — user requested.
+    
 
     const stats = [];
     if (typeof e.suncPercentage === 'number') stats.push(`<span>sUNC: <b>${e.suncPercentage}%</b></span>`);
@@ -5457,9 +5457,9 @@ function initTheme() {
   renderThemePresets();
 }
 
-/* ═════════════════════════════════════════════════════════════════════════
-   ONBOARDING TUTORIAL
-   ═════════════════════════════════════════════════════════════════════════ */
+
+
+
 const TUTORIAL_KEY = 'rblx_tutorial_done';
 const TUT_STEPS = [
   { title: 'Welcome to rbxSWAP', text: 'Your multi-account Roblox launcher. Add accounts once, switch and launch them in seconds — sessions, spoofing and version management all live here.', icon: 'rocket' },
@@ -5487,7 +5487,7 @@ function tutRender() {
   const next = document.getElementById('tut-next');
   const body = document.querySelector('.tut-body');
   if (!title || !icon) return;
-  // Cross-step transition: fade+drift the content out, swap content, ease back in.
+  
   const swap = () => {
     count.textContent = `Step ${_tutStep + 1} of ${TUT_STEPS.length}`;
     title.textContent = s.title;

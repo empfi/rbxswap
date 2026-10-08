@@ -20,7 +20,7 @@ const Module = require('module');
 
 const execFileAsync = promisify(execFile);
 const fsPromises = fs.promises;
-const hwid = require('./hwid'); // hardware id backup / spoof / restore engine (ported from rblxswap)
+const hwid = require('./hwid'); 
 
 process.on('uncaughtException', (err) => { console.error('Uncaught:', err); });
 process.on('unhandledRejection', (reason) => { console.error('Unhandled rejection:', reason); });
@@ -29,13 +29,13 @@ let _antiAfkProc = null;
 let _mutexProc = null;
 let _mutexReady = false;
 let _mutexReadyPromise = null;
-const _accountPids = new Map(); // accountId -> pid of the RobloxPlayerBeta process we spawned for it
-// Monotonic lifecycle tokens prevent delayed watcher callbacks from an older
-// launch (or an intentional kill) from changing the state of a newer launch.
-const _launchGenerations = new Map(); // accountId -> current lifecycle token
-const _watchGenerations = new Map(); // accountId -> token captured by its watcher
-const _launchVolumeTimers = new Map(); // accountId -> delayed launch-volume timer
-const _launchVolumeGenerations = new Map(); // accountId -> cancellation token
+const _accountPids = new Map(); 
+
+
+const _launchGenerations = new Map(); 
+const _watchGenerations = new Map(); 
+const _launchVolumeTimers = new Map(); 
+const _launchVolumeGenerations = new Map(); 
 
 let _nativeHelperPromise = null;
 
@@ -51,7 +51,7 @@ function pruneStaleNativeHelpers(keepName) {
     const base = app.getPath('userData');
     for (const name of fs.readdirSync(base)) {
       const isHashed = /^RobloxNative-[0-9a-f]{16}\.exe$/.test(name);
-      const isPlainLegacy = name === 'RobloxNative.exe'; // leftover from older builds
+      const isPlainLegacy = name === 'RobloxNative.exe'; 
       if ((isHashed || isPlainLegacy) && name !== keepName) {
         try { fs.unlinkSync(path.join(base, name)); } catch {}
       }
@@ -86,8 +86,8 @@ function findCsc() {
   return null;
 }
 
-// Resolves to the path of a usable RobloxNative.exe, or null if none could be
-// produced. Memoized for the session.
+
+
 function ensureNativeHelper() {
   if (process.platform !== 'win32') return Promise.resolve(null);
   if (_nativeHelperPromise) return _nativeHelperPromise;
@@ -97,11 +97,11 @@ function ensureNativeHelper() {
     try {
       sourceVersion = crypto.createHash('sha256').update(fs.readFileSync(src)).digest('hex').slice(0, 16);
     } catch {}
-    // Compile the bundled source once into userData and cache it by source hash.
+    
     try { if (!fs.existsSync(src)) return null; } catch { return null; }
     const outExe = path.join(app.getPath('userData'), `RobloxNative-${sourceVersion}.exe`);
     try {
-      // Reuse a cached build if it's at least as new as the source.
+      
       if (fs.existsSync(outExe) && fs.statSync(outExe).mtimeMs >= fs.statSync(src).mtimeMs) {
         pruneStaleNativeHelpers(path.basename(outExe));
         return outExe;
@@ -180,8 +180,8 @@ async function restartMutexHolder() {
 
 function stopStaleNativeHelpers() {
   if (process.platform !== 'win32') return Promise.resolve();
-  // taskkill /IM does not support wildcards, so kill by exact name first, then
-  // use wmic to catch any RobloxNative-<hash>.exe variants.
+  
+  
   return new Promise((resolve) => {
     try {
       const cmd = 'taskkill /F /IM RobloxNative.exe /T 2>nul & ' +
@@ -201,7 +201,7 @@ async function startAntiAfk() {
   if (!nativeExe) { console.error('[antiafk] native helper unavailable; cannot run anti-AFK'); return; }
   const s = loadSettings();
   let deadline = parseInt(s.antiAfkInterval, 10);
-  if (!Number.isFinite(deadline) || deadline < 60) deadline = 19 * 60; // 19 min, under the ~20-min kick
+  if (!Number.isFinite(deadline) || deadline < 60) deadline = 19 * 60; 
   try {
     _antiAfkProc = spawn(nativeExe, ['antiafk', String(deadline)], { stdio: ['ignore', 'pipe', 'pipe'], windowsHide: true });
     sendLog('ok', 'afk', `Anti-AFK started (interval: ${Math.round(deadline/60)} min)`, { intervalSec: deadline });
@@ -253,8 +253,8 @@ function waitForRobloxFullyClosed(maxWaitMs = 5000) {
   });
 }
 
-// Confirms a PID still belongs to the Roblox client before a delayed launch
-// volume write. This closes the small PID-reuse window after a process exits.
+
+
 function isRobloxPlayerPid(pid) {
   if (process.platform !== 'win32' || !Number.isInteger(pid) || pid <= 0) return false;
   return new Promise((resolve) => {
@@ -288,12 +288,12 @@ function scheduleLaunchVolume(accountId, requestedVolume, launchStartedAt, launc
       if (Number.isInteger(currentPid) && currentPid > 0) {
         result = await setRobloxVolume(requestedVolume, [currentPid]);
       } else {
-        // Protocol fallback has no tracked PID, so retain the timestamp path.
+        
         result = await setRobloxVolumeAfter(requestedVolume, launchStartedAt);
       }
       if (result && result.count > 0 && Number.isInteger(currentPid)) {
-        // The target process tree was found and updated; keep bounded retries
-        // because Roblox can recreate its audio session during startup.
+        
+        
       }
     } catch (e) {
       console.error('[volume] launch retry failed:', e.message);
@@ -347,7 +347,7 @@ async function setRobloxVolume(percent, pids) {
         const m = out.match(/SET:(\d+)/);
         resolve({ ok: true, count: m ? parseInt(m[1], 10) : 0 });
       });
-      // safety timeout
+      
       setTimeout(() => { try { proc.kill(); } catch {} resolve({ ok: true, count: 0 }); }, 12000);
     } catch (e) {
       resolve({ ok: false, count: 0, error: e.message });
@@ -374,8 +374,8 @@ function applyRamLimit(accountId, pid, mb, launchStartedAt) {
   }
   const since = Number.isFinite(Number(launchStartedAt)) ? Math.round(Number(launchStartedAt)) : Date.now();
   return ensureNativeHelper().then((nativeExe) => new Promise((resolve) => {
-    // The account may have been killed or relaunched while the native helper
-    // was compiling. Never attach a delayed helper to a newer launch.
+    
+    
     if (!nativeExe || _launchTimes.get(accountId) !== launchStartedAt || _accountPids.get(accountId) !== pid) {
       resolve({ ok: false, error: 'native helper unavailable or launch was superseded' });
       return;
@@ -391,8 +391,8 @@ function applyRamLimit(accountId, pid, mb, launchStartedAt) {
       resolve(result);
     };
     try {
-      // The native helper waits for Roblox's bootstrap handoff, assigns the
-      // resulting client to a Job Object, then stays alive to hold that job.
+      
+      
       proc = spawn(nativeExe, ['setram', String(pid), String(limit), String(since)], { stdio: ['ignore', 'pipe', 'pipe'], windowsHide: true });
       _ramLimitProcs.set(accountId, proc);
       if (proc.stdout) proc.stdout.on('data', d => {
@@ -415,8 +415,8 @@ function applyRamLimit(accountId, pid, mb, launchStartedAt) {
         if (_ramLimitProcs.get(accountId) === proc) _ramLimitProcs.delete(accountId);
         finish({ ok: false, error: `native helper failed: ${err.message}` });
       });
-      // RunSetRam has a bounded startup wait. Keep the parent-side timeout just
-      // beyond it so a stuck helper cannot remain in the map forever.
+      
+      
       timeout = setTimeout(() => {
         if (!settled) {
           try { proc.kill(); } catch {}
@@ -488,12 +488,12 @@ function spawnRamLimitedRoblox(nativeExe, robloxExe, robloxCwd, robloxUri, mb) {
   });
 }
 
-// Count running Roblox clients (used to gate / inform the UI).
+
 function countRobloxProcesses() {
   return new Promise((resolve) => {
     let out = '';
     if (process.platform !== 'win32') {
-      // macOS/Linux: the Roblox client process is "RobloxPlayer" (no .exe).
+      
       try {
         const proc = spawn('pgrep', ['-x', 'RobloxPlayer']);
         proc.stdout.on('data', d => { out += d.toString(); });
@@ -538,7 +538,7 @@ function getRobloxProcessList() {
   });
 }
 
-const _tempIdentityCache = new Map(); // pid -> { startedAt, userId, username }
+const _tempIdentityCache = new Map(); 
 
 function robloxLogsDir() {
   return path.join(process.env.LOCALAPPDATA || '', 'Roblox', 'logs');
@@ -552,7 +552,7 @@ function parseLogTimestamp(s) {
 
 const TEMP_IDENTITY_RETRY_MS = 5000;
 
-let _cookieStoreIdentity = null; // { at, userId, username }
+let _cookieStoreIdentity = null; 
 
 async function getCookieStoreIdentity() {
   const COOKIE_STORE_TTL = 30000;
@@ -573,7 +573,7 @@ async function resolveTempSessionIdentity(pid, startedAtMs) {
   try {
     const cached = _tempIdentityCache.get(pid);
     if (cached && cached.startedAt === startedAtMs) {
-      // Fully resolved, or an unresolved attempt that is still fresh.
+      
       if (cached.userId || (Date.now() - (cached.attemptedAt || 0)) < TEMP_IDENTITY_RETRY_MS) return cached;
     }
     let userId = null, username = null;
@@ -590,11 +590,11 @@ async function resolveTempSessionIdentity(pid, startedAtMs) {
         const diff = Math.abs(t - startedAtMs);
         if (diff < bestDiff) { bestDiff = diff; bestFile = f; }
       }
-      // 15s window: the log timestamp is the original session start while the
-      // live PID may be a re-parented client that started a few seconds later.
+      
+      
       if (bestFile && bestDiff <= 15000) {
         const text = await fsPromises.readFile(path.join(logsDir, bestFile), 'utf8');
-        // Prefer the join line's userid; fall back to the first one in the log.
+        
         const uidMatch = /game_join_loadtime:[^\n]*?userid:(\d+)/.exec(text) || /userid:(\d+)/.exec(text);
         if (uidMatch) {
           userId = parseInt(uidMatch[1], 10);
@@ -629,8 +629,8 @@ async function enrichTempSessions(temp, alivePids) {
       if (accountId) {
         const current = _accountPids.get(accountId);
         const currentAlive = current != null && alivePids && alivePids.has(current);
-        // Only claim when the account has no live claimed process, so an
-        // app-launched instance is never displaced by a concurrent external one.
+        
+        
         if (!currentAlive) {
           _accountPids.set(accountId, s.pid);
           continue;
@@ -674,7 +674,7 @@ function readRobloxCookieStore() {
       proc.stdout.on('data', d => { out += d.toString(); });
       proc.on('error', () => resolve(null));
       proc.on('close', () => {
-        // Cookies are tab-separated; records are joined by "; " on one line.
+        
         const idx = out.indexOf('.ROBLOSECURITY\t');
         if (idx < 0) { resolve(null); return; }
         let value = out.slice(idx + '.ROBLOSECURITY\t'.length);
@@ -702,13 +702,13 @@ function pushTempSessionsNow(delayMs = 4000) {
   }, delayMs);
 }
 
-// Terminates every Roblox client. Clears all watchers and notifies the renderer
-// so every account dot resets to "not launched".
+
+
 function killAllRoblox() {
   return new Promise((resolve) => {
     const watchedIds = Array.from(_watchedAccounts.keys());
-    // Include launches that have spawned a PID but have not reached watcher
-    // registration yet. This closes the small start/kill race window.
+    
+    
     const lifecycleIds = new Set([
       ...watchedIds,
       ..._accountPids.keys(),
@@ -734,7 +734,7 @@ function killAllRoblox() {
     };
 
     if (process.platform !== 'win32') {
-      // macOS/Linux: no mutex holder to manage; just terminate the clients.
+      
       _accountPids.clear();
       for (const timer of _launchVolumeTimers.values()) clearTimeout(timer);
       _launchVolumeTimers.clear();
@@ -765,8 +765,8 @@ function killAllRoblox() {
       const finishUp = async () => {
         if (settled) return;
         settled = true;
-        // Don't trust taskkill's return alone -- confirm the processes are
-        // actually gone before doing anything else.
+        
+        
         await waitForRobloxFullyClosed();
         if (hadRunning) { try { await restartMutexHolder(); } catch {} }
         else { try { await startMutexHolder(); } catch {} }
@@ -782,8 +782,8 @@ function killAllRoblox() {
   });
 }
 
-// Terminates just the Roblox instance launched for one account (by PID), and
-// notifies the renderer so only that account's dot resets.
+
+
 function killAccountRoblox(accountId) {
   return new Promise((resolve) => {
     let pid = _accountPids.get(accountId);
@@ -851,8 +851,8 @@ function safeStorageReady() {
   try { return !!(safeStorage && safeStorage.isEncryptionAvailable()); } catch { return false; }
 }
 
-// Kept only so accounts encrypted by older builds (random key stored in
-// settings.json) still decrypt. New writes never use this path.
+
+
 function getOrCreateDeviceKey() {
   const s = loadSettings();
   if (s._deviceKey && s._deviceKey.length === 64) {
@@ -917,8 +917,8 @@ function readSessionKey() {
 }
 function clearSessionKey() { try { fs.unlinkSync(sessionPath); } catch {} }
 
-// Runs once at startup: migrate older key formats to the verifier model, then try
-// to restore the key from this boot's session cache (silent unlock).
+
+
 function initEncryption() {
   try {
     const s = loadSettings();
@@ -929,7 +929,7 @@ function initEncryption() {
       if (legacy) {
         const { customKey, customKeyEnc, ...rest } = s;
         saveSettings({ ...rest, keyVerifier: makeVerifier(legacy) });
-        _sessionPass = legacy; writeSessionKey(legacy); // unlocked this boot; prompt after reboot
+        _sessionPass = legacy; writeSessionKey(legacy); 
         return;
       }
     }
@@ -941,20 +941,20 @@ function initEncryption() {
 }
 function getStoredPassphrase() { return _sessionPass; }
 
-// Primary key: scrypt-derived passphrase key (when unlocked), or the OS/device
-// key in machine-bound mode. Returns null when passphrase mode is locked.
+
+
 function getEncryptionKey() {
   if (_cachedKey) return _cachedKey;
   if (_sessionPass) { _cachedKey = deriveScryptKey(_sessionPass); return _cachedKey; }
   if (!passphraseMode()) { _cachedKey = getOrCreateDeviceKey(); return _cachedKey; }
-  return null; // locked
+  return null; 
 }
-// Legacy PBKDF2 key, derived lazily only when an old gcm:/cbc: record is read.
+
 function getLegacyKey() {
   if (_cachedLegacyKey) return _cachedLegacyKey;
   if (_sessionPass) { _cachedLegacyKey = deriveLegacyKey(_sessionPass); return _cachedLegacyKey; }
   if (!passphraseMode()) { _cachedLegacyKey = getOrCreateDeviceKey(); return _cachedLegacyKey; }
-  return null; // locked
+  return null; 
 }
 function invalidateKeyCache() { _cachedKey = null; _cachedLegacyKey = null; }
 
@@ -967,8 +967,8 @@ function prewarmKey() {
   } catch {}
 }
 
-// AES-256-GCM. `tag` carries the prefix so the reader knows which KDF produced
-// the key: gs: = scrypt (current), gcm: = legacy PBKDF2.
+
+
 function encryptGCM(p, k, tag) {
   const iv = crypto.randomBytes(12), c = crypto.createCipheriv('aes-256-gcm', k, iv);
   const enc = Buffer.concat([c.update(p, 'utf8'), c.final()]);
@@ -981,8 +981,8 @@ function decryptGCM(ct, k, tag) {
   return d.update(data, undefined, 'utf8') + d.final('utf8');
 }
 
-// Legacy CBC reader -- unauthenticated, no longer produced. Kept so existing
-// cbc: values from older builds still decrypt and migrate forward on next save.
+
+
 function decryptCBC(ct, k) {
   const s = ct.replace(/^cbc:/, '').split(':'); if (s.length < 2) return null;
   const iv = Buffer.from(s[0], 'base64'), data = Buffer.from(s[1], 'base64');
@@ -991,10 +991,10 @@ function decryptCBC(ct, k) {
 }
 
 function encryptField(p) {
-  if (_sessionPass) return encryptGCM(p, getEncryptionKey(), 'gs'); // unlocked passphrase
-  if (passphraseMode()) throw new Error('locked'); // never write with the wrong key
+  if (_sessionPass) return encryptGCM(p, getEncryptionKey(), 'gs'); 
+  if (passphraseMode()) throw new Error('locked'); 
   if (safeStorageReady()) return 'safe:' + safeStorage.encryptString(p).toString('base64');
-  return encryptGCM(p, getEncryptionKey(), 'gs'); // machine-bound, no keychain
+  return encryptGCM(p, getEncryptionKey(), 'gs'); 
 }
 function decryptField(ct) {
   try {
@@ -1016,7 +1016,7 @@ function isEncrypted(v) {
 function encryptAccount(a) {
   const o = { ...a };
   if (o.cookie && !isEncrypted(o.cookie)) o.cookie = encryptField(o.cookie);
-  // Passwords are as sensitive as cookies, so store them encrypted too.
+  
   if (o.password && !isEncrypted(o.password)) o.password = encryptField(o.password);
   o._enc = true;
   return o;
@@ -1036,18 +1036,18 @@ function saveAccounts(a) { fs.writeFileSync(dataPath, JSON.stringify(a.map(encry
 
 function migrateAccountEncryptionToKeychain() {
   try {
-    if (passphraseMode()) return; // passphrase user: never touch (avoids wrong-key writes)
+    if (passphraseMode()) return; 
     if (!safeStorageReady()) return;
     if (!fs.existsSync(dataPath)) return;
     const raw = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
     const needs = raw.some(a => a.cookie && (a.cookie.startsWith('gcm:') || a.cookie.startsWith('cbc:')));
     if (!needs) return;
     const plain = raw.map(decryptAccount);
-    // Safety: if anything that had a cookie now reads empty, decryption failed.
+    
     for (let i = 0; i < raw.length; i++) {
       if (raw[i].cookie && !plain[i].cookie) { console.error('[migrate] decrypt failed; leaving accounts untouched'); return; }
     }
-    saveAccounts(plain); // re-encrypts via encryptField -> safe:
+    saveAccounts(plain); 
     console.log('[migrate] upgraded account encryption to OS keychain');
   } catch (e) { console.error('[migrate] skipped:', e.message); }
 }
@@ -1062,8 +1062,8 @@ let win;
 let tray = null;
 let _closeToTray = true;
 
-// Rebuild the tray menu so the quick-launch submenu always reflects the
-// current account list. Called after any accounts change.
+
+
 function refreshTrayMenu() {
   if (!tray) return;
   try {
@@ -1084,9 +1084,9 @@ function refreshTrayMenu() {
   } catch (e) { console.error('[tray] menu refresh failed:', e.message); }
 }
 
-// Launch an account straight from the tray using its stored game target
-// (or the Roblox home screen when it has none). Runs through the same
-// queue as in-app launches so volume/fps caps and process watching apply.
+
+
+
 async function trayLaunchAccount(accountId) {
   const acct = loadAccounts().find(a => a.id === accountId);
   if (!acct) return;
@@ -1102,8 +1102,8 @@ async function trayLaunchAccount(accountId) {
   }
 }
 
-// Short label for a stored game target in the tray menu (main-side copy of
-// the renderer's extractTargetLabel — the renderer module isn't reachable here).
+
+
 function extractTargetLabelMain(target) {
   const t = String(target || '').trim();
   if (!t) return '';
@@ -1126,7 +1126,7 @@ function createTray() {
       { type: 'separator' },
       { label: 'Quit', click: () => { _closeToTray = false; app.quit(); } }
     ]));
-    refreshTrayMenu(); // fill in the quick-launch submenu
+    refreshTrayMenu(); 
     tray.on('click', () => {
       if (!win) return;
       if (win.isVisible()) win.hide();
@@ -1164,13 +1164,13 @@ function createWindow({ startHiddenInTray = false } = {}) {
   win.once('ready-to-show', () => {
     if (startHiddenInTray) { createTray(); } else { win.show(); }
   });
-  // Closing the window hides the app into the system tray instead of quitting.
-  // A real quit (tray menu, app.quit) clears the flag first via before-quit.
+  
+  
   win.on('close', (e) => {
     if (_closeToTray) { e.preventDefault(); hideToTray(); }
   });
 }
-// WEAO — Roblox version tracker + executor status
+
 function weaoGet(apiPath) {
   return new Promise((resolve) => {
     const req = https.get('https://weao.xyz' + apiPath, {
@@ -1191,8 +1191,8 @@ function normalizeRobloxVersionHash(hash) {
   return value.startsWith('version-') ? value : 'version-' + value;
 }
 
-// Roblox build the default executor currently requires (WEAO), or null when no
-// usable default executor is configured. Shared by every launch workflow.
+
+
 async function getExecutorVersionHash() {
   const s = loadSettings();
   const defaultExec = s.defaultExecutor || '';
@@ -1212,9 +1212,9 @@ async function getExecutorVersionHash() {
   } catch { return null; }
 }
 
-// Keep browser (protocol) launches on the executor-synced Roblox build: ask
-// before replacing an outdated install, and auto-install when nothing usable
-// is present. Returns null when the user declined (launch must not proceed).
+
+
+
 async function ensureProtocolVersionUpToDate(requiredHash) {
   if (!requiredHash) return true;
   let win = null;
@@ -1260,8 +1260,8 @@ async function ensureProtocolVersionUpToDate(requiredHash) {
 function handleProtocolUrl(url) {
   if (!url || (!url.startsWith('roblox-player:') && !url.startsWith('roblox:'))) return false;
   try {
-    // Unified launch workflow: resolve the executor-synced Roblox build first,
-    // offer an upgrade when the installed one is outdated, then launch.
+    
+    
     handleProtocolUrlAsync(url).catch((e) => console.error('[protocol] launch failed:', e.message));
     return true;
   } catch (e) {
@@ -1302,47 +1302,47 @@ async function handleProtocolUrlAsync(url) {
   const child = spawn(robloxExe, [url], { detached: true, stdio: 'ignore', windowsHide: false });
   child.unref();
   scheduleLaunchVolume(`protocol-${launchStartedAt}`, 100, launchStartedAt, child.pid);
-  // Browser launches aren't tied to an added account; surface the new
-  // session as a temp account card as soon as its process appears.
+  
+  
   pushTempSessionsNow(5000);
 }
 
-// Prevent a second Electron instance from opening when a protocol URL fires
-// while the app is already running – instead forward the URL in this instance.
+
+
 const gotLock = app.requestSingleInstanceLock();
 if (!gotLock) {
-  // Another instance is already running; that instance will handle the URL via
-  // the second-instance event. Quit this launcher-only invocation silently.
+  
+  
   app.quit();
 }
 
 app.on('second-instance', (event, argv) => {
-  // argv = [..., 'roblox-player:1+launchmode:play+...']
+  
   const url = argv.find(a => a.startsWith('roblox-player:') || a.startsWith('roblox:'));
   if (url) {
-    // Browser triggered a protocol URL – forward it to Roblox but don't
-    // steal foreground from the user.
+    
+    
     handleProtocolUrl(url);
   } else {
-    // User manually re-opened the app (e.g. Start menu shortcut).  Show it.
+    
     if (win) { if (win.isMinimized()) win.restore(); if (!win.isVisible()) win.show(); win.focus(); }
   }
 });
 
 app.whenReady().then(async () => {
-  pruneChromiumCaches(); // clear stale profile caches before the window opens
+  pruneChromiumCaches(); 
   const protocolUrl = process.argv.slice(1).find(a => a.startsWith('roblox-player:') || a.startsWith('roblox:'));
   if (protocolUrl) {
     handleProtocolUrl(protocolUrl);
   }
 
   if (process.platform === 'win32') app.setAppUserModelId('com.rbswap.app');
-  initEncryption(); // migrate key formats + restore this boot's session key (silent unlock)
-  prewarmKey(); // non-blocking; derives the passphrase key off the main thread
-  // Upgrade any legacy-encrypted accounts to OS-keychain storage (no-op if none).
+  initEncryption(); 
+  prewarmKey(); 
+  
   migrateAccountEncryptionToKeychain();
-  // If the app was opened via a protocol URL (browser launch), start
-  // minimised to the system tray so the user's focus stays on their browser.
+  
+  
   createWindow({ startHiddenInTray: !!protocolUrl });
   if (process.platform === 'win32') {
     await stopStaleNativeHelpers();
@@ -1354,7 +1354,7 @@ app.whenReady().then(async () => {
 app.on('window-all-closed', () => { if (process.platform !== 'darwin') app.quit(); });
 app.on('before-quit', () => { _closeToTray = false; });
 app.on('will-quit', () => { destroyTray(); stopMutexHolder(); stopAntiAfk(); for (const proc of _ramLimitProcs.values()) { try { proc.kill(); } catch {} } _ramLimitProcs.clear(); });
-// macOS: protocol URLs arrive via open-url event
+
 app.on('open-url', (event, url) => { event.preventDefault(); handleProtocolUrl(url); });
 
 
@@ -1372,7 +1372,7 @@ ipcMain.handle('app:relaunchAsAdmin', async () => {
       const exe = process.env.PORTABLE_EXECUTABLE_FILE || process.execPath;
       inner = `Start-Process -FilePath '${psq(exe)}' -Verb RunAs`;
     } else {
-      // Dev run (electron .): relaunch electron with the app directory, elevated.
+      
       inner = `Start-Process -FilePath '${psq(process.execPath)}' -ArgumentList '${psq(app.getAppPath())}' -Verb RunAs`;
     }
     const script = `$ErrorActionPreference='Stop'; try { ${inner}; Write-Output 'OK' } catch { Write-Output 'CANCEL' }`;
@@ -1389,8 +1389,8 @@ ipcMain.handle('app:relaunchAsAdmin', async () => {
 
 ipcMain.handle('enc:status', () => {
   if (!passphraseMode()) {
-    // No key configured yet. Offer the one-time setup popup until dismissed.
-    return { mode: 'setup' }; // Always force key setup, no device-bound mode
+    
+    return { mode: 'setup' }; 
   }
   return { mode: _sessionPass ? 'unlocked' : 'locked' };
 });
@@ -1399,8 +1399,8 @@ ipcMain.handle('enc:unlock', (_, pass) => {
   _sessionPass = pass; invalidateKeyCache(); writeSessionKey(pass);
   return { ok: true };
 });
-// Set, change, or clear the passphrase. Re-encrypts existing accounts with the
-// new key in one step. Empty pass -> machine-bound mode.
+
+
 ipcMain.handle('enc:setKey', (_, pass) => {
   try {
     const np = (pass || '').trim();
@@ -1421,21 +1421,21 @@ ipcMain.handle('enc:setKey', (_, pass) => {
       clearSessionKey();
     }
     invalidateKeyCache();
-    saveAccounts(accts); // re-encrypt with the new key (or machine-bound)
+    saveAccounts(accts); 
     return { ok: true };
   } catch (e) { return { ok: false, error: e.message }; }
 });
 
 ipcMain.handle('settings:load', () => {
-  // Never expose key material to the renderer. The passphrase is entered via the
-  // unlock/setup popup, not prefilled. Report whether a key is configured instead.
+  
+  
   const s = loadSettings();
   const { customKeyEnc, customKey, keyVerifier, _deviceKey, ...rest } = s;
   return { ...rest, keySet: passphraseMode() };
 });
 ipcMain.handle('settings:save', (_, data) => {
-  // Key changes go through enc:setKey (handles re-encryption + verifier). Strip any
-  // key field here so a plain settings write can never persist or wipe a key.
+  
+  
   const { customKey, customKeyEnc, keyVerifier, ...rest } = data;
   saveSettings({ ...loadSettings(), ...rest });
   if ('encryptionType' in data) invalidateKeyCache();
@@ -1447,7 +1447,7 @@ ipcMain.handle('settings:save', (_, data) => {
     if (data.antiAfk) startAntiAfk();
     else stopAntiAfk();
   } else if ('antiAfkInterval' in data && _antiAfkProc) {
-    // Interval changed while running -> restart with the new value.
+    
     stopAntiAfk(); startAntiAfk();
   }
   return true;
@@ -1485,8 +1485,8 @@ function registerProtocolHandlers() {
     if (!robloxExe) return { ok: false, error: 'Roblox not found. Install a version first.' };
 
     const exe = process.env.PORTABLE_EXECUTABLE_FILE || process.execPath;
-    // Dev runs (electron .) need the app path as an argument or electron would
-    // open its default window instead of rbxSWAP.
+    
+    
     const cmd = app.isPackaged
       ? `"${exe}" "%1"`
       : `"${exe}" "${app.getAppPath()}" "%1"`;
@@ -1590,8 +1590,8 @@ function generateBloxGenAccount(apiKey) {
           finish({ ok: false, status, data, error: data.error || data.message || 'BloxGen rejected the request' });
           return;
         }
-        // BloxGen wraps the generated account in `data`; normalize it for
-        // the renderer, which already handles the account object directly.
+        
+        
         const account = data?.data || data;
         if (!account || !account.username || !account.password || !account.cookie || (!account.id && !account.userId)) {
           finish({ ok: false, status, data, error: 'BloxGen returned an incomplete account response' });
@@ -1679,13 +1679,13 @@ async function verifiedResponseCookie(headers) {
 }
 
 const _csrfCache = new Map();
-const CSRF_TTL = 5 * 60_000; // 5 min -- tokens stay valid much longer than 90s
+const CSRF_TTL = 5 * 60_000; 
 
-const _ticketRequestAt = new Map(); // cookie -> last ticket-request timestamp
+const _ticketRequestAt = new Map(); 
 const TICKET_MIN_GAP = 8_000;
 
-// Serializing launch queue -- prevents concurrent launches from all hammering
-// auth.roblox.com at once and triggering 429s.
+
+
 let _launchQueue = Promise.resolve();
 let _lastLaunchTs = 0;
 const LAUNCH_STAGGER = 1500;
@@ -1714,8 +1714,8 @@ async function getAuthTicket(cookie, csrfToken) {
   const now = Date.now();
   const lastRequest = _ticketRequestAt.get(cookie) || 0;
 
-  // Roblox rate-limits repeated ticket requests, but a ticket itself must never
-  // be reused: it is redeemed by the client during one launch only.
+  
+  
   if (now - lastRequest < TICKET_MIN_GAP) {
     await sleep(TICKET_MIN_GAP - (now - lastRequest));
   }
@@ -1844,8 +1844,8 @@ ipcMain.handle('roblox:addTempSession', async (_, pid) => {
     if (!cookie) return { ok: false, error: 'Could not read the Roblox cookie store. Start the game once from the browser and try again.' };
     const info = await fetchUserInfo(cookie);
     if (!info || !info.ok) return { ok: false, error: 'The cookie from the Roblox store could not be validated.' };
-    // Safety check for multi-session setups: if this temp session already
-    // resolved to a different user, the cookie store belongs to another session.
+    
+    
     const list = await getRobloxProcessList();
     const session = list.find(p => p.pid === numericPid);
     const identity = session ? await resolveTempSessionIdentity(numericPid, session.startedAt) : null;
@@ -1865,8 +1865,8 @@ ipcMain.handle('roblox:addTempSession', async (_, pid) => {
       accounts.push(account);
       saveAccounts(accounts);
     }
-    // Claim the PID so this session stops showing as a temp card; it is now a
-    // real saved account and the presence API keeps its card live.
+    
+    
     _accountPids.set(account.id, numericPid);
     sendLog('ok', 'add', `Captured external session as ${info.username} (auth ticket redeemed)`, { accountId: account.id, username: info.username, userId: info.userId });
     return { ok: true, account };
@@ -1954,8 +1954,8 @@ ipcMain.handle('roblox:changePassword', async (_, accountId, cookie, currentPass
       new Promise(r => setTimeout(() => r({ status: 0, headers: {}, body: '', error: 'timeout' }), 15000)),
     ]);
     if (res.status === 403 && res.headers['x-csrf-token'] && !/challenge/i.test(robloxErrorText(res.body) || '')) {
-      // CSRF rotated between fetch and use; retry once with the fresh token.
-      // (A 403 with "challenge required" is the captcha wall, not a rotation.)
+      
+      
       const retry = await postPasswordChange(ck, res.headers['x-csrf-token'], currentPassword || '', newPassword);
       if (retry.status >= 200 && retry.status < 300) {
         const rotatedCookie = await verifiedResponseCookie(retry.headers);
@@ -1983,7 +1983,7 @@ ipcMain.handle('roblox:presence', async (_e, userIds) => {
     const out = [];
     let any = false;
 
-    // Retrieve saved accounts to map userId -> cookie for authenticated requests
+    
     let firstValidCookie = null;
     const cookieByUserId = new Map();
     try {
@@ -2014,8 +2014,8 @@ ipcMain.handle('roblox:presence', async (_e, userIds) => {
         headers['Cookie'] = '.ROBLOSECURITY=' + cVal;
       }
 
-      // Best-effort with a hard timeout: a hung connection must never wedge
-      // the renderer's refresh loop (the running flag would stay set forever).
+      
+      
       const res = await Promise.race([
         httpsPost('presence.roblox.com', '/v1/presence/users',
           headers, { userIds: chunk }),
@@ -2027,8 +2027,8 @@ ipcMain.handle('roblox:presence', async (_e, userIds) => {
           if (Array.isArray(j.userPresences)) { out.push(...j.userPresences); any = true; }
         } catch {}
       }
-      // A 403 on a batch usually means one user restricts presence visibility
-      // — keep going so the remaining accounts still resolve.
+      
+      
     }
     return any ? { ok: true, data: out } : { ok: false, error: 'presence unavailable' };
   } catch (e) {
@@ -2061,8 +2061,8 @@ function loadPackagedModule(name) {
       tried.push(`${root}: ${e.code || e.message}`);
     }
   }
-  // createRequire handles an ASAR package root more reliably on Electron
-  // versions where require.resolve(..., { paths }) does not inspect it.
+  
+  
   for (const root of roots) {
     try {
       const scopedRequire = Module.createRequire(path.join(root, 'package.json'));
@@ -2254,7 +2254,7 @@ async function puppeteerLogin(chromePath, prefill) {
         ignoreDefaultArgs: ['--enable-automation', '--enable-blink-features=IdleDetection'],
       });
 
-      // Use the default page that Chrome opens -- reuse it instead of opening a second one
+      
       const defaultPages = await browser.pages();
       const page = defaultPages.length > 0 ? defaultPages[0] : await browser.newPage();
 
@@ -2331,7 +2331,7 @@ async function puppeteerLogin(chromePath, prefill) {
         }
       };
 
-      const LOGIN_TIMEOUT_MS = 5 * 60 * 1000; // hard cap -- never hang forever
+      const LOGIN_TIMEOUT_MS = 5 * 60 * 1000; 
       const startedAt = Date.now();
       let loginTimer = null;
 
@@ -2351,7 +2351,7 @@ async function puppeteerLogin(chromePath, prefill) {
           const rbxCookie = await tryGetCookie();
           if (rbxCookie) { await finishOk(rbxCookie); return; }
         } catch (e) {
-          // Recreated next tick on a freshly resolved page -- just surface why.
+          
           console.error('login poll error (will retry):', e.message);
         }
       }, 1500);
@@ -2494,7 +2494,7 @@ async function headlessRelogin(username, password) {
           const info = await fetchUserInfo(ck.value);
           await cleanup();
           if (!info.ok) return finish({ ok: false, error: info.reason || 'Could not verify the fresh session.' });
-          _reloginBlockedAt.delete(username); // success means the flag cleared
+          _reloginBlockedAt.delete(username); 
           sendLog('ok', 'cookie', `Background re-login succeeded for ${username}`);
           return finish({ ok: true, cookie: ck.value, username: info.username, userId: info.userId });
         }
@@ -2522,8 +2522,8 @@ async function headlessRelogin(username, password) {
   });
 }
 
-const _reloginBlockedAt = new Map(); // username -> ts when blocked
-const RELOGIN_BLOCK_MS = 20 * 60 * 1000; // 20 min cooldown
+const _reloginBlockedAt = new Map(); 
+const RELOGIN_BLOCK_MS = 20 * 60 * 1000; 
 
 function _reloginBlockRemainingMs(username) {
   const ts = _reloginBlockedAt.get(username);
@@ -2561,8 +2561,8 @@ function isCompleteRobloxVersion(dirPath) {
     for (const name of ['content', 'content-roblox']) {
       try {
         const p = path.join(dirPath, name);
-        // Must be a populated content payload — a dir left by an interrupted
-        // extraction is just as broken as a missing one.
+        
+        
         if (fs.existsSync(p) && fs.readdirSync(p).length > 0) return true;
       } catch {}
     }
@@ -2646,7 +2646,7 @@ function getGlobalSettingsPaths() {
   const dir = getGlobalSettingsDir();
   try {
     const names = fs.readdirSync(dir).filter(n => /^GlobalBasicSettings_\d+\.xml$/i.test(n));
-    names.sort(); // lowest suffix first — usually the oldest/current base settings
+    names.sort(); 
     return names.map(n => path.join(dir, n));
   } catch { return []; }
 }
@@ -2685,8 +2685,8 @@ ipcMain.handle('fps:read', () => {
       const m = xml.match(/<int\s+name="FramerateCap"\s*>(-?\d+)<\/int>/i);
       if (m) {
         const value = Math.max(0, parseInt(m[1], 10));
-        // Migrate an existing Roblox preference into the app's AppData store
-        // the first time it is discovered.
+        
+        
         saveSettings({ ...saved, fpsCap: value, fpsUnlimited: value === 0 });
         return value;
       }
@@ -2701,8 +2701,8 @@ ipcMain.handle('fps:write', (_, cap) => {
     if (!Number.isFinite(numericCap)) return { ok: false, error: 'Invalid FPS cap' };
     const value = Math.max(0, Math.round(numericCap));
     const current = loadSettings();
-    // Persist through the main process as well as writing Roblox's XML. This
-    // makes FPS storage authoritative and independent of renderer timing.
+    
+    
     saveSettings({ ...current, fpsCap: value, fpsUnlimited: value === 0 });
     const paths = getGlobalSettingsPaths();
     if (paths.length) writeGlobalSettingsInt(paths, 'FramerateCap', value);
@@ -2713,7 +2713,7 @@ ipcMain.handle('fps:write', (_, cap) => {
 async function resolveShareLink(shareCode, cookie, csrfToken) {
 
   const makeRequest = (csrf) => new Promise((resolve) => {
-    // Try first payload shape, fall back to the second if needed.
+    
     const tryPayload = (payloadStr, csrfHeader, cb) => {
       const req = https.request({
         hostname: 'apis.roblox.com',
@@ -2755,7 +2755,7 @@ async function resolveShareLink(shareCode, cookie, csrfToken) {
           }
         }
         if (status === 403 && headers['x-csrf-token']) {
-          // Retry same payload with fresh CSRF from response
+          
           tryPayload(payloads[i], headers['x-csrf-token'], (status2, headers2, body2) => {
             if (status2 === 200) {
               const pidM = body2.match(/"placeId"\s*:\s*(\d+)/);
@@ -2795,10 +2795,10 @@ async function followRedirect(url) {
   });
 }
 
-// Resolves the accessCode for a private server linkCode using the sharelinks API.
-// This is the correct method -- linkCode != accessCode, they are different tokens.
+
+
 async function getAccessCode(placeId, linkCode, cookie, csrfToken) {
-  // Primary: sharelinks resolve API
+  
   try {
     const bodyStr = JSON.stringify({ shareCode: linkCode, shareType: 'Server' });
     const req = net.request({
@@ -2838,7 +2838,7 @@ async function getAccessCode(placeId, linkCode, cookie, csrfToken) {
     if (result) return result;
   } catch {}
 
-  // Fallback: redirect scrape
+  
   return new Promise((resolve) => {
     const req = https.request({
       hostname: 'www.roblox.com',
@@ -2864,10 +2864,10 @@ async function getAccessCode(placeId, linkCode, cookie, csrfToken) {
 
 ipcMain.handle('roblox:getGameName', async (_, placeIdOrTarget, cookie) => {
   try {
-    // If given a full URL/link, extract placeId first
+    
     let placeId = placeIdOrTarget;
     if (!/^\d+$/.test(String(placeIdOrTarget).trim())) {
-      // Try to extract placeId from URL
+      
       try {
         const u = new URL(placeIdOrTarget.startsWith('http') ? placeIdOrTarget : 'https://' + placeIdOrTarget);
         const parts = u.pathname.split('/').filter(Boolean);
@@ -2936,7 +2936,7 @@ ipcMain.handle('roblox:getGameName', async (_, placeIdOrTarget, cookie) => {
 function getInstalledRobloxVersions() {
   const list = [];
 
-  // 1. Primary custom installation directory: C:\Users\<user>\AppData\Roaming\rblxswap\core\roblox
+  
   try {
     const customBase = getCustomRobloxVersionsDir();
     if (fs.existsSync(customBase)) {
@@ -2952,7 +2952,7 @@ function getInstalledRobloxVersions() {
     }
   } catch {}
 
-  // 2. Official Roblox installations: %LOCALAPPDATA%\Roblox\Versions
+  
   try {
     const versionsBase = path.join(os.homedir(), 'AppData', 'Local', 'Roblox', 'Versions');
     if (fs.existsSync(versionsBase)) {
@@ -2970,7 +2970,7 @@ function getInstalledRobloxVersions() {
     }
   } catch {}
 
-  // 3. App Data user folder
+  
   try {
     const rddBase = path.join(app.getPath('userData'), 'Versions');
     if (fs.existsSync(rddBase)) {
@@ -3025,9 +3025,9 @@ ipcMain.handle('roblox:removeVersion', async (_, hash) => {
   }
 });
 
-// ─── Disk usage & cleanup for installed Roblox versions ────────────────────
-// Sums every file below a version directory (iterative walk, no recursion
-// limits). Missing/unreadable entries count as 0.
+
+
+
 function dirSizeBytes(dir) {
   let total = 0;
   const stack = [dir];
@@ -3057,7 +3057,7 @@ ipcMain.handle('roblox:getVersionsDiskUsage', async () => {
         location: v.location || 'Installed',
         mtime: v.mtime || 0,
         bytes,
-        // Roblox's own managed installs are never "old" — the cleaner skips them.
+        
         protected: v.location === 'Official Roblox',
       };
     });
@@ -3067,10 +3067,10 @@ ipcMain.handle('roblox:getVersionsDiskUsage', async () => {
   }
 });
 
-// Removes every installed version NOT in keepHashes. Safety rails:
-// - "Official Roblox" installs are always kept (Roblox updates those itself)
-// - only directories under the app-managed or official version roots are touched
-// - a running client locks its install dir; those failures are reported per-hash
+
+
+
+
 ipcMain.handle('roblox:cleanOldVersions', async (_e, keepHashes) => {
   const removed = [];
   const failed = [];
@@ -3112,19 +3112,19 @@ ipcMain.handle('roblox:launch', async (_, accountId, cookie, target, versionHash
   return result;
 });
 
-const _watchedAccounts = new Map(); // accountId -> readyAt (epoch ms; not evaluated until then)
-const _accountRamLimits = new Map(); // accountId -> MB limit
-const _ramLimitProcs = new Map();   // accountId -> native setram helper process (holds the job)
-const _launchTimes = new Map();      // accountId -> timestamp of the most recent launch
-const _missCounts = new Map();      // consecutive "not found" counts per account
-const _everSeen = new Set();       // accountIds whose Roblox process was observed alive at least once
-const _pidLostAt = new Map();      // accountId -> when its claimed PID disappeared
-const MISS_THRESHOLD = 2;      // require 2 consecutive misses (~4s) before declaring closed
-const LAUNCH_VERIFY_MS = 15000; // if Roblox dies within this window after launch, surface a warning
-const POLL_INTERVAL = 2000;    // how often the watch poll runs
-const LAUNCH_DELAY = 0;        // grace after launch before first evaluation (launcher->game gap)
+const _watchedAccounts = new Map(); 
+const _accountRamLimits = new Map(); 
+const _ramLimitProcs = new Map();   
+const _launchTimes = new Map();      
+const _missCounts = new Map();      
+const _everSeen = new Set();       
+const _pidLostAt = new Map();      
+const MISS_THRESHOLD = 2;      
+const LAUNCH_VERIFY_MS = 15000; 
+const POLL_INTERVAL = 2000;    
+const LAUNCH_DELAY = 0;        
 const LAUNCH_STARTUP_GRACE = 90000;
-const PROCESS_REATTACH_GRACE = 20000; // allow Roblox to re-parent/replace a claimed PID
+const PROCESS_REATTACH_GRACE = 20000; 
 let _watchTimer = null;
 
 function applyLaunchPerformanceSettings(robloxExePath, options) {
@@ -3197,8 +3197,8 @@ function claimRobloxPids(alivePids, pidStartMap, anyRunning, now) {
         claimedPids.add(candidates[0]);
         running = true;
         _pidLostAt.delete(accountId);
-        // If Roblox replaced its bootstrap process with a PID that escaped the
-        // original job, move the cap to the reattached client immediately.
+        
+        
         const ramLimit = _accountRamLimits.get(accountId);
         const launchGeneration = _launchGenerations.get(accountId) || 0;
         if (ramLimit !== undefined && !_ramLimitProcs.has(accountId)) {
@@ -3209,7 +3209,7 @@ function claimRobloxPids(alivePids, pidStartMap, anyRunning, now) {
         _pidLostAt.set(accountId, lostAt);
         if (now - lostAt < PROCESS_REATTACH_GRACE) {
           _missCounts.set(accountId, 0);
-          runningMap.set(accountId, true); // treated as alive during the handoff window
+          runningMap.set(accountId, true); 
           continue;
         }
       }
@@ -3265,8 +3265,8 @@ function _watchTick() {
       anyRunning = out.trim().length > 0;
     }
 
-    // The RAM limit itself is enforced by the native Job Object helper
-    // (applyRamLimit), spawned once at launch. Here we only report live usage.
+    
+    
 
     const accountRamMap = {};
     for (const [accId, pid] of _accountPids) {
@@ -3362,8 +3362,8 @@ function closeSingletonHandlesOnly() {
 
 async function closeSingletonAndHoldMutex() {
   if (process.platform === 'win32') await startMutexHolder();
-  // Then close any singleton-event handles on currently-running Roblox
-  // processes so the new instance won't get redirected into an existing one.
+  
+  
   await closeSingletonHandlesOnly();
 }
 
@@ -3373,8 +3373,8 @@ async function _doLaunch(accountId, cookie, target, versionHash, options) {
     _launchGenerations.set(accountId, launchGeneration);
     _watchGenerations.delete(accountId);
 
-    // A new launch supersedes any delayed volume write from this account,
-    // including when the new launch uses the default 100% volume.
+    
+    
     const oldVolumeTimer = _launchVolumeTimers.get(accountId);
     if (oldVolumeTimer) clearTimeout(oldVolumeTimer);
     _launchVolumeTimers.delete(accountId);
@@ -3453,7 +3453,7 @@ async function _doLaunch(accountId, cookie, target, versionHash, options) {
       robloxUri = `roblox-player:1+launchmode:app+gameinfo:${ticket}+launchtime:${launchTime}+browsertrackerid:${browserId}+robloxLocale:en_us+gameLocale:en_us`;
     }
 
-    // Resolve target RobloxPlayerBeta.exe
+    
     let robloxExe = null;
     if (versionHash && versionHash !== 'auto') {
       const installed = getInstalledRobloxVersions();
@@ -3521,8 +3521,8 @@ async function _doLaunch(accountId, cookie, target, versionHash, options) {
           };
           child.once('spawn', () => finish(null));
           child.once('error', err => finish(err));
-          // `spawn` is normally emitted immediately, but don't leave a launch
-          // hanging forever if Windows refuses to create the process.
+          
+          
           timeout = setTimeout(() => finish(null), 10000);
         });
         if (spawnFailure) {
@@ -3574,13 +3574,13 @@ async function _doLaunch(accountId, cookie, target, versionHash, options) {
 
     setTimeout(() => {
       try {
-        if (!_watchedAccounts.has(accountId)) return; // already closed / killed
+        if (!_watchedAccounts.has(accountId)) return; 
         countRobloxProcesses().then((count) => { if (count > 0) hideToTray(); });
       } catch {}
     }, 4000);
 
-    // Apply volume only to this launch after its audio session has spun up.
-    // Passing the PID prevents a new group launch from muting existing accounts.
+    
+    
     try {
       const requestedVolume = options && Number.isFinite(options.volume)
         ? Math.max(0, Math.min(100, Math.round(options.volume)))
@@ -3594,16 +3594,16 @@ async function _doLaunch(accountId, cookie, target, versionHash, options) {
   }
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
-// Swap / Ban-evasion engine (ported from rblxswap)
+
+
 
 let _swapBypassRunning = false;
 
-// Swap progress/log are pushed on dedicated channels the Swap page listens on,
-// and every log line is also mirrored into the shared session log.
+
+
 function emitSwapLog(level, message) {
   if (win && !win.isDestroyed()) win.webContents.send('swap:log', { level, message, timestamp: Date.now() });
-  const mapped = level === 'success' ? 'ok' : level === 'error' ? 'err' : level; // info/warn pass through
+  const mapped = level === 'success' ? 'ok' : level === 'error' ? 'err' : level; 
   sendLog(mapped, 'swap', message);
 }
 function emitSwapStatus(status, progress) {
@@ -3757,8 +3757,8 @@ async function swapRemoveProgramData() {
   await swapRemoveDirectory(path.join(programData, 'Roblox'), 'ProgramData Roblox');
 }
 
-// Options come from the Swap page: { preserveSettings, preserveFastflags,
-// deleteStudio, purgeAuth }.
+
+
 async function runSwapCleaner(opts = {}) {
   const localAppData = process.env.LOCALAPPDATA;
   const appData = process.env.APPDATA;
@@ -4029,11 +4029,11 @@ ipcMain.handle('hwid:purgeRoblox', async () => {
   catch (error) { return { success: false, message: error.message }; }
 });
 
-// ═══════════════════════════════════════════════════════════════════════════
-// RDD — Roblox Deployment version lookup
 
-// Package → extract-root map for Windows player deployments (mirrors the
-// renderer's RDD downloader so both produce identical install layouts).
+
+
+
+
 const RDD_PLAYER_PKG_ROOTS = {
   'RobloxApp.zip': '', 'redist.zip': '', 'shaders.zip': 'shaders/', 'ssl.zip': 'ssl/',
   'WebView2.zip': '', 'WebView2RuntimeInstaller.zip': 'WebView2RuntimeInstaller/',
@@ -4057,8 +4057,8 @@ function httpsGetBinary(url, onChunk) {
         httpsGetBinary(new URL(res.headers.location, url).href, onChunk).then(resolve, () => resolve({ status: 0, body: null, headers: {} }));
         return;
       }
-      // Second arg of the chunk callback is the declared content length
-      // (0 when the server sends a chunked/unknown-size response).
+      
+      
       const totalBytes = Number(res.headers['content-length']) || 0;
       const chunks = [];
       res.on('data', (c) => { chunks.push(c); if (onChunk) try { onChunk(c.length, totalBytes); } catch {} });
@@ -4069,7 +4069,7 @@ function httpsGetBinary(url, onChunk) {
   });
 }
 
-// Push RDD download progress to the topbar status bar in the renderer.
+
 function sendRddProgress(payload) {
   if (win && !win.isDestroyed()) win.webContents.send('rdd:download-progress', payload);
 }
@@ -4101,9 +4101,9 @@ function extractZipArchive(zipPath, destDir) {
   });
 }
 
-// Main-process mirror of the renderer's automated RDD installation so launch
-// workflows that live in main (browser/protocol launches) can pull a missing
-// or outdated executor-synced Roblox build on their own.
+
+
+
 async function installRobloxVersionFromRobloxDeployment(versionHash, log) {
   const version = normalizeRobloxVersionHash(versionHash);
   const hosts = [
@@ -4138,7 +4138,7 @@ async function installRobloxVersionFromRobloxDeployment(versionHash, log) {
     const packages = lines.filter((l) => l.endsWith('.zip'));
 
     fs.mkdirSync(targetDir, { recursive: true });
-    // Same AppSettings.xml the renderer's downloader writes.
+    
     const appSettings = '<?xml version="1.0" encoding="UTF-8"?>\n<Settings>\n\t<ContentFolder>content</ContentFolder>\n\t<BaseUrl>http://www.roblox.com</BaseUrl>\n</Settings>\n';
     fs.writeFileSync(path.join(targetDir, 'AppSettings.xml'), appSettings);
 
@@ -4244,9 +4244,9 @@ ipcMain.handle('rdd:getVersion', async (_e, channel, binaryType) => {
   }
 });
 
-// ═══════════════════════════════════════════════════════════════════════════
-// WEAO — Roblox version tracker + executor status (weaoGet lives near the
-// protocol launch flow so every launch workflow shares one implementation)
+
+
+
 ipcMain.handle('weao:versions', async (_e, which) => {
   const kind = ['current', 'future', 'past'].includes(which) ? which : 'current';
   const r = await weaoGet('/api/versions/' + kind);
@@ -4268,8 +4268,8 @@ ipcMain.handle('weao:exploits', async () => {
   }
 });
 
-// ═══════════════════════════════════════════════════════════════════════════
-// File manager — browse the current Roblox version folder (Finder-style UI)
+
+
 function fmVersionRoot() {
   const latest = getLatestRobloxVersionDir();
   return latest ? latest.dir : null;
@@ -4277,7 +4277,7 @@ function fmVersionRoot() {
 function fmSafeJoin(root, rel) {
   const target = path.resolve(root, rel || '');
   const base = path.resolve(root);
-  if (target !== base && !target.startsWith(base + path.sep)) return null; // escape attempt
+  if (target !== base && !target.startsWith(base + path.sep)) return null; 
   return target;
 }
 

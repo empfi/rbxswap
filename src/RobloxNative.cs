@@ -1,24 +1,24 @@
-// RobloxNative.exe -- precompiled native helper that replaces the three
-// PowerShell scripts (mutex.ps1, closehandles.ps1, audiovol.ps1).
-//
-// Why: every PowerShell invocation paid for powershell.exe startup AND an
-// Add-Type C# compile on each call. Closing singleton handles runs before
-// *every* launch and setting volume runs on every slider change, so that
-// overhead was felt constantly. This is the same C# compiled once, ahead of
-// time, and spawned directly -- no PowerShell, no per-call JIT/compile.
-//
-// Subcommands:
-//   RobloxNative.exe mutex          -> passively hold ROBLOX_singletonMutex for
-//                                      the session; prints MUTEX_HELD then blocks.
-//   RobloxNative.exe closehandles   -> isolate ROBLOX_singletonEvent handles on
-//                                      running Roblox immediately before a launch;
-//                                      prints HANDLES_DONE.
-//   RobloxNative.exe volume <0-100> [pid ...] -> set OS volume on every Roblox
-//                                      audio session, or only the supplied Roblox
-//                                      process IDs; prints SET:<count>.
-//
-// Build (done once, by the app or build.bat) with the .NET Framework compiler:
-//   csc /nologo /optimize+ /platform:x64 /target:exe /out:RobloxNative.exe RobloxNative.cs
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 using System;
 using System.Diagnostics;
@@ -50,23 +50,23 @@ internal static class RobloxNative
         }
         catch (Exception ex)
         {
-            // Never crash silently -- the parent process reads stderr.
+            
             Console.Error.WriteLine("RobloxNative fatal: " + ex);
             return 1;
         }
     }
 
-    // ── Persistent mutex holder ────────────────────────────────────────────
-    // Hold ROBLOX_singletonMutex first (cheap, and the object Roblox's singleton
-    // check keys off), signal readiness, THEN do the slow handle scan. The Mutex
-    // objects are rooted in static fields so GC can't finalize them and silently
-    // drop the hold.
+    
+    
+    
+    
+    
     private static Mutex _singletonMutex;
     private static Mutex _singletonEventMutex;
 
     private static int RunMutex()
     {
-        // Step 1: own the singleton mutex immediately.
+        
         try
         {
             bool created;
@@ -75,12 +75,12 @@ internal static class RobloxNative
         }
         catch (Exception ex) { Console.Error.WriteLine("HoldMutex: " + ex.Message); }
 
-        // Step 2: signal readiness NOW, before the slow scan, so the app never
-        // lets the first launch race an unheld mutex.
+        
+        
         Console.Out.WriteLine("MUTEX_HELD");
         Console.Out.Flush();
 
-        // Step 3: slow part -- close existing event handles, then hold that name.
+        
         try { HandleCloser.CloseRobloxSingletonHandles(); }
         catch (Exception ex) { Console.Error.WriteLine("CloseHandles(mutex): " + ex.Message); }
 
@@ -92,12 +92,12 @@ internal static class RobloxNative
         }
         catch (Exception ex) { Console.Error.WriteLine("HoldEventMutex: " + ex.Message); }
 
-        // Keep alive (and keep the owning thread + static refs alive) forever.
+        
         Thread.Sleep(Timeout.Infinite);
         return 0;
     }
 
-    // ── One-shot handle closer ─────────────────────────────────────────────
+    
     private static int RunCloseHandles()
     {
         try { HandleCloser.CloseRobloxSingletonHandles(); }
@@ -107,7 +107,7 @@ internal static class RobloxNative
         return 0;
     }
 
-    // ── Volume ─────────────────────────────────────────────────────────────
+    
     private static int RunVolume(string[] args)
     {
         int pct = 0;
@@ -116,9 +116,9 @@ internal static class RobloxNative
         if (pct > 100) pct = 100;
         float level = pct / 100.0f;
 
-        // No PID arguments means the Mixer/global operation: target every
-        // Roblox session. Supplied PIDs are launch-scoped and protect existing
-        // accounts from a group volume setting.
+        
+        
+        
         int[] pids;
         if (args.Length > 2)
         {
@@ -174,10 +174,10 @@ internal static class RobloxNative
                 try
                 {
                     long started = (long)(p.StartTime.ToUniversalTime() - new DateTime(1970, 1, 1)).TotalMilliseconds;
-                    // Include every Roblox process created by this launch. A
-                    // bootstrapper can hand off to a separate client/audio
-                    // process, so selecting only the earliest PID leaves the
-                    // real session inheriting a previous group's mute state.
+                    
+                    
+                    
+                    
                     if (started >= sinceMs) selected.Add(p.Id);
                 }
                 catch { }
@@ -194,22 +194,22 @@ internal static class RobloxNative
         return 0;
     }
 
-    // ── Anti-AFK ───────────────────────────────────────────────────────────
-    // Roblox only registers input while a window is focused, so keeping every
-    // instance alive means briefly focusing it and tapping a key. Each instance
-    // gets its OWN deadline timer (see AntiAfk.RunLoop): the moment one reaches
-    // the deadline it's tapped, others are untouched, and an instance you're
-    // actively playing in the foreground is never tapped. Default deadline is
-    // 18 min -- safely under Roblox's ~20-minute idle kick.
+    
+    
+    
+    
+    
+    
+    
     private static int RunAntiAfk(string[] args)
     {
-        int deadlineSec = 18 * 60; // tap each instance once it hits 18 min
+        int deadlineSec = 18 * 60; 
         if (args.Length > 1) { int d; if (int.TryParse(args[1], out d)) deadlineSec = d; }
         if (deadlineSec < 60)   deadlineSec = 60;
-        if (deadlineSec > 1140) deadlineSec = 1140; // never let it exceed 19 min (kick is ~20)
+        if (deadlineSec > 1140) deadlineSec = 1140; 
 
-        // Optional virtual-key override (decimal). Default 0x10 = VK_SHIFT
-        // (registers as input, moves nothing, opens no chat).
+        
+        
         int vk = 0x10;
         if (args.Length > 2) { int v; if (int.TryParse(args[2], out v) && v > 0 && v < 256) vk = v; }
 
@@ -219,14 +219,14 @@ internal static class RobloxNative
         return 0;
     }
 
-    // ── Per-account RAM limit (Job Object) ─────────────────────────────────
-    // Assigns the launched Roblox process to a Job Object with hard commit,
-    // aggregate-job, and working-set limits. The helper stays alive holding the
-    // job handle for the life of the process; the app kills it when the account
-    // closes or quits.
+    
+    
+    
+    
+    
     private static int RunSetRam(string[] args)
     {
-        // args: setram <bootstrapPid> <mb> [launchStartUnixMs]
+        
         int bootstrapPid = 0, mb = 0;
         long sinceMs = 0;
         if (args.Length < 3 || !int.TryParse(args[1], out bootstrapPid) || !int.TryParse(args[2], out mb) || bootstrapPid <= 0 || mb <= 0)
@@ -241,11 +241,11 @@ internal static class RobloxNative
         IntPtr hProc = IntPtr.Zero;
         try
         {
-            // Wait briefly for the bootstrapper to hand off to the persistent
-            // RobloxPlayerBeta process. We prefer the original PID when it is
-            // already the real client, otherwise select the earliest client
-            // created after this launch. This avoids applying the cap to a
-            // short-lived launcher and leaving the actual game uncapped.
+            
+            
+            
+            
+            
             int targetPid = WaitForRobloxTarget(bootstrapPid, sinceMs, 90000);
             if (targetPid <= 0)
             {
@@ -262,12 +262,12 @@ internal static class RobloxNative
             ApplyWorkingSetLimit(hProc, mb);
             Console.Out.WriteLine("RAM_SET:" + targetPid + ":" + mb);
             Console.Out.Flush();
-            // Hand off to the permanent WatchRamLimit watchdog. Roblox
-            // sometimes replaces the bootstrap process with a child created
-            // using breakaway semantics; the watchdog walks the parent-PID
-            // ancestry tree every cycle so any handoff child (named
-            // RobloxPlayerBeta or otherwise) is still capped, and it re-pins
-            // the working-set maximum every second for the whole helper life.
+            
+            
+            
+            
+            
+            
             CloseHandle(hProc);
             hProc = IntPtr.Zero;
             WatchRamLimit(hJob, targetPid, mb);
@@ -281,16 +281,16 @@ internal static class RobloxNative
         finally
         {
             if (hProc != IntPtr.Zero) CloseHandle(hProc);
-            // hJob intentionally remains open while this helper is alive.
+            
         }
     }
 
-    // Starts Roblox suspended, assigns it to the RAM-limited job, and only
-    // then resumes its first thread. Assigning after Roblox has already
-    // started is unreliable because Roblox may place itself in another job.
+    
+    
+    
     private static int RunLaunchRam(string[] args)
     {
-        // args: launchram <exe> <cwd> <mb> <uri>
+        
         int mb = 0;
         if (args.Length < 5 || !int.TryParse(args[3], out mb) || mb <= 0 || String.IsNullOrEmpty(args[1]) || String.IsNullOrEmpty(args[4]))
         {
@@ -306,8 +306,8 @@ internal static class RobloxNative
         {
             STARTUPINFO si = new STARTUPINFO();
             si.cb = Marshal.SizeOf(typeof(STARTUPINFO));
-            // Executable paths and Roblox protocol URIs cannot contain quote
-            // characters, so the simple quoted command line is sufficient.
+            
+            
             char quote = (char)34;
             string command = quote + args[1] + quote + " " + quote + args[4] + quote;
             StringBuilder commandLine = new StringBuilder(command);
@@ -356,8 +356,8 @@ internal static class RobloxNative
             Console.Out.Flush();
             CloseHandle(pi.hThread);
             CloseHandle(pi.hProcess);
-            // Hand off to the permanent watchdog (it owns the job handle and
-            // never returns for the life of the helper).
+            
+            
             WatchRamLimit(hJob, pid, mb);
             return 0;
         }
@@ -380,88 +380,88 @@ internal static class RobloxNative
             return IntPtr.Zero;
         }
 
-        // Deliberately no JOB_OBJECT_LIMIT_PROCESS_MEMORY / JOB_OBJECT_LIMIT_JOB_MEMORY.
-        // Those are *commit* limits: the moment Roblox commits more than the cap it
-        // fails its next allocation and dies with an out-of-memory error (the
-        // "Roblox encountered an unexpected error" dialog). Roblox needs far more
-        // commit than the working-set cap just to boot, so a commit cap at 512 MB
-        // kills the client instead of limiting it.
-        //
-        // The actual RAM limit is the hard working-set maximum applied per process
-        // in ApplyWorkingSetLimit (SetProcessWorkingSetSizeEx with
-        // QUOTA_LIMITS_HARDWS_MAX_ENABLE). Hard-max enforcement is a tendency
-        // rather than an iron gate: Windows can briefly let WorkingSet64 climb
-        // above the cap between allocations and the trimmer's next pass. The
-        // active pressure that keeps WorkingSet64 near the cap is the
-        // permanent WatchRamLimit watchdog started in RunSetRam / RunLaunchRam:
-        // every ~1 s it re-pins SetProcessWorkingSetSizeEx on every tracked
-        // descendant and calls EmptyWorkingSet64 whenever the live workset
-        // has clearly exceeded the cap. The job itself is still created (and
-        // assigned) so the whole process tree stays grouped and any handoff
-        // child that breaks away can be re-attached by the watchdog.
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
         return hJob;
     }
 
-    /*
-        if (value == null) return "\"\"";
-        var sb = new StringBuilder("\"");
-        int slashes = 0;
-        foreach (char ch in value)
-        {
-            if (ch == '\\\\') { slashes++; continue; }
-            if (ch == '\"')
-            {
-                sb.Append('\\\\', slashes * 2 + 1);
-                sb.Append('\"');
-                slashes = 0;
-                continue;
-            }
-            if (slashes > 0) { sb.Append('\\\\', slashes); slashes = 0; }
-            sb.Append(ch);
-        }
-        if (slashes > 0) sb.Append('\\\\', slashes * 2);
-        sb.Append('\"');
-        return sb.ToString();
-    */
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     private static bool ApplyWorkingSetLimit(IntPtr hProcess, int mb)
     {
         ulong bytes = (ulong)mb * 1024UL * 1024UL;
-        // Windows rejects a zero minimum even when only the hard maximum flag
-        // is requested. Keep the minimum at the documented 20-page floor and
-        // enforce the requested maximum as a hard working-set limit.
+        
+        
+        
         UIntPtr minimum = (UIntPtr)(20UL * 4096UL);
         bool ok = SetProcessWorkingSetSizeEx(hProcess, minimum, (UIntPtr)bytes, QUOTA_LIMITS_HARDWS_MAX_ENABLE);
         if (!ok) Console.Error.WriteLine("ram: SetProcessWorkingSetSizeEx failed " + Marshal.GetLastWin32Error());
         return ok;
     }
 
-    // Permanent watchdog that keeps the per-account RAM cap enforced for the
-    // whole life of the launched process tree, not just the 30-second
-    // post-handoff window of the original Monitor. THREE problems the old
-    // monitor did not address:
-    //   1. QUOTA_LIMITS_HARDWS_MAX_ENABLE is a *tendency*, not an iron-clad
-    //      gate: Windows can briefly let WorkingSet64 climb above the hard
-    //      max between allocations and the trimmer's next pass (peak ~2x
-    //      cap is common), and the live UI workset readout will sit above
-    //      the cap until something forces a trim.
-    //   2. The old monitor only matched processes named "RobloxPlayerBeta",
-    //      so Roblox's supporting helpers (audio, GPU, crash handler, etc.)
-    //      inherited the job automatically but were never re-capped:
-    //      GetProcessesByName NEVER sees them, so they were pinned to the
-    //      original 512 only by inheritance (which can be undone).
-    //   3. After 30 seconds the helper slept forever with the job handle
-    //      but exerted NO active pressure on the tree, so any late
-    //      breakout or unreset cap was never caught.
-    // Fix: every ~1 second walk the entire process list, build a parent-PID
-    // map, and treat every descendant of rootPid (regardless of process
-    // name) as part of the cap. For each tracked process, re-apply
-    // SetProcessWorkingSetSizeEx to re-pin the hard max, then call
-    // EmptyWorkingSet64 only when the live WorkingSetSize has clearly blown
-    // past the cap (we tolerate a 12.5% overshoot so we don't thrash pages
-    // during a brief allocation burst that the trimmer is already
-    // recovering from). The watchdog never returns -- the helper thread
-    // owns the job handle for the whole launch.
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     private static void WatchRamLimit(IntPtr hJob, int rootPid, int mb)
     {
         var tracked = new HashSet<int>();
@@ -469,15 +469,15 @@ internal static class RobloxNative
         var parentMap = new Dictionary<int, int>(256);
         var dead = new List<int>();
         var fresh = new List<int>();
-        int heartbeatMs = 1000;          // re-pin + trim cycle
+        int heartbeatMs = 1000;          
         ulong capBytes = (ulong)mb * 1024UL * 1024UL;
-        ulong overshoot = capBytes + (capBytes / 8);   // cap + 12.5% tolerance
+        ulong overshoot = capBytes + (capBytes / 8);   
 
         while (true)
         {
             try
             {
-                // 1. Build a fresh parent-PID map for the system once per cycle.
+                
                 parentMap.Clear();
                 Process[] procs = null;
                 try { procs = Process.GetProcesses(); } catch { procs = null; }
@@ -489,9 +489,9 @@ internal static class RobloxNative
                     }
                 }
 
-                // 2. Promote every descendant of the tracked set, regardless of
-                //    process name. Walk the parent chain so we catch
-                //    grandchildren and helpers, not just direct children.
+                
+                
+                
                 fresh.Clear();
                 foreach (var kv in parentMap)
                 {
@@ -514,9 +514,9 @@ internal static class RobloxNative
                         if (h == IntPtr.Zero) continue;
                         try
                         {
-                            // Assign is best-effort: AssignProcessToJobObject
-                            // returns false if the child already inherited
-                            // the job or if a prior Assign already pinned it.
+                            
+                            
+                            
                             AssignProcessToJobObject(hJob, h);
                             ApplyWorkingSetLimit(h, mb);
                             Console.Out.WriteLine("RAM_SET_CHILD:" + pid + ":" + mb);
@@ -527,11 +527,11 @@ internal static class RobloxNative
                     catch { }
                 }
 
-                // 3. Per-process heartbeat: re-pin the hard max and force-trim
-                //    any process whose working set has clearly crept above the
-                //    cap. We read WS from GetProcessMemoryInfo (the same
-                //    WorkingSet64 surfaced by Get-Process / Task Manager) so
-                //    what we see matches what the UI shows.
+                
+                
+                
+                
+                
                 dead.Clear();
                 foreach (var pid in tracked)
                 {
@@ -551,9 +551,9 @@ internal static class RobloxNative
                                 ulong ws = (ulong)mc.WorkingSetSize;
                                 if (ws > overshoot)
                                 {
-                                    // Drop the working set to the floor
-                                    // immediately so the trim cycle that the
-                                    // hard max promises actually happens.
+                                    
+                                    
+                                    
                                     try { EmptyWorkingSet64(h); }
                                     catch
                                     {
@@ -629,9 +629,9 @@ internal static class RobloxNative
                         startMs = (long)(bootstrap.StartTime.ToUniversalTime() - new DateTime(1970, 1, 1)).TotalMilliseconds;
                     }
                     catch { }
-                    // The PID came from our just-created child, but still reject
-                    // a theoretically reused PID if Windows recycles it while
-                    // the helper is waiting.
+                    
+                    
+                    
                     if (string.Equals(name, "RobloxPlayerBeta", StringComparison.OrdinalIgnoreCase) && startMs >= sinceMs - 2000)
                         return bootstrapPid;
                 }
@@ -722,9 +722,9 @@ internal static class RobloxNative
     [DllImport("psapi.dll", SetLastError = true)]
     static extern bool GetProcessMemoryInfo(IntPtr Process, out PROCESS_MEMORY_COUNTERS counters, uint size);
 
-    // Mirrors WinNT PROCESS_MEMORY_COUNTERS -- the same struct
-    // GetProcessMemoryInfo fills in. WorkingSetSize / WorkingSetSize64 are
-    // identical values on x64 builds, so we only need the 32-bit field.
+    
+    
+    
     [StructLayout(LayoutKind.Sequential)]
     struct PROCESS_MEMORY_COUNTERS
     {
@@ -789,7 +789,7 @@ internal static class RobloxNative
     static extern bool TerminateProcess(IntPtr hProcess, uint uExitCode);
 }
 
-// ── Roblox singleton handle isolation (ported from closehandles.ps1) ────────
+
 internal static class HandleCloser
 {
     [DllImport("ntdll.dll")] static extern int NtQuerySystemInformation(int cls, IntPtr buf, int size, out int ret);
@@ -835,13 +835,13 @@ internal static class HandleCloser
                 int status = NtQuerySystemInformation(SystemExtendedHandleInformation, buf, size, out needed);
                 if (status == 0) break;
                 Marshal.FreeHGlobal(buf); buf = IntPtr.Zero;
-                if (status == unchecked((int)0xC0000004)) { size *= 2; continue; } // STATUS_INFO_LENGTH_MISMATCH
+                if (status == unchecked((int)0xC0000004)) { size *= 2; continue; } 
                 return;
             }
 
             long count = Marshal.ReadInt64(buf);
             int entrySize = Marshal.SizeOf(typeof(SYSTEM_HANDLE_TABLE_ENTRY_INFO_EX));
-            IntPtr entries = buf + IntPtr.Size * 2; // skip NumberOfHandles + Reserved
+            IntPtr entries = buf + IntPtr.Size * 2; 
 
             IntPtr self = GetCurrentProcess();
 
@@ -870,7 +870,7 @@ internal static class HandleCloser
                         try
                         {
                             int nameRet;
-                            NtQueryObject(dupHandle, 1, nameBuf, nameBufSize, out nameRet); // ObjectNameInformation = 1
+                            NtQueryObject(dupHandle, 1, nameBuf, nameBufSize, out nameRet); 
                             short len = Marshal.ReadInt16(nameBuf);
                             if (len > 0)
                             {
@@ -898,7 +898,7 @@ internal static class HandleCloser
     }
 }
 
-// ── OS-level Roblox volume (ported from audiovol.ps1) ───────────────────────
+
 internal static class AudioControl
 {
     [ComImport, Guid("BCDE0395-E52F-467C-8E3D-C4579291692E")] class MMDeviceEnumerator { }
@@ -948,8 +948,8 @@ internal static class AudioControl
     [Guid("BFB7FF88-7239-4FC9-8FA2-07C950BE9C6D"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     interface IAudioSessionControl2
     {
-        // 9 inherited IAudioSessionControl methods (must be present so the
-        // derived methods land at the correct vtable slots).
+        
+        
         int R1(); int R2(); int R3(); int R4(); int R5();
         int R6(); int R7(); int R8(); int R9();
         int GetSessionIdentifier(out IntPtr id);
@@ -998,9 +998,9 @@ internal static class AudioControl
         public string szExeFile;
     }
 
-    // Roblox may create the process that owns the audio session underneath the
-    // launch PID. Expand only the supplied launch roots; the no-PID Mixer path
-    // still intentionally targets every Roblox audio session.
+    
+    
+    
     static int[] ExpandDescendants(int[] roots)
     {
         var ids = new HashSet<int>();
@@ -1064,12 +1064,12 @@ internal static class AudioControl
             if (!match) continue;
             var vol = ctl as ISimpleAudioVolume;
             if (vol == null) continue;
-            // Clear an explicit Windows mute flag as well as restoring the
-            // scalar volume. A muted group can otherwise leave the next normal
-            // Roblox session silent even after SetMasterVolume(1.0f).
-            // Clear mute independently from the scalar volume. Some Windows
-            // audio sessions reject one COM write while accepting the other;
-            // either way a normal launch must not inherit a group's mute flag.
+            
+            
+            
+            
+            
+            
             int volumeHr = vol.SetMasterVolume(level, ref empty);
             int muteHr = vol.SetMute(false, ref empty);
             if (volumeHr == 0 || muteHr == 0) changed++;
@@ -1078,15 +1078,15 @@ internal static class AudioControl
     }
 }
 
-// ── Anti-AFK input injection ────────────────────────────────────────────────
-// Roblox only registers input while its window is focused, so a background
-// PostMessage is ignored by unfocused instances. To keep EVERY instance alive,
-// each Roblox window is briefly foregrounded in turn (restoring it first if it
-// was minimised), given a real key tap via keybd_event, then put back. The
-// originally-focused window is restored after each pass. Per-instance timers
-// mean each account is tapped the moment IT reaches the deadline (instances
-// launched at different times have independent countdowns), and an instance
-// you're actively playing in the foreground is never tapped.
+
+
+
+
+
+
+
+
+
 internal static class AntiAfk
 {
     [DllImport("user32.dll")] static extern bool EnumWindows(EnumWindowsProc cb, IntPtr lParam);
@@ -1103,7 +1103,7 @@ internal static class AntiAfk
 
     static readonly Random _rng = new Random();
 
-    // pid -> main visible window, for every running Roblox client.
+    
     static System.Collections.Generic.Dictionary<uint, IntPtr> EnumRobloxWindows()
     {
         var robloxPids = new System.Collections.Generic.HashSet<uint>();
@@ -1116,7 +1116,7 @@ internal static class AntiAfk
         EnumWindows((hWnd, lp) =>
         {
             if (!IsWindowVisible(hWnd)) return true;
-            if (GetWindowTextLength(hWnd) == 0) return true; // main game window has a title
+            if (GetWindowTextLength(hWnd) == 0) return true; 
             uint pid; GetWindowThreadProcessId(hWnd, out pid);
             if (robloxPids.Contains(pid) && !map.ContainsKey(pid)) map[pid] = hWnd;
             return true;
@@ -1124,12 +1124,12 @@ internal static class AntiAfk
         return map;
     }
 
-    // Send a key tap to any Roblox window, foreground or background. For a
-    // background window: briefly attach it to the foreground (SetForegroundWindow
-    // + a short settle) so keybd_event's global tap reaches it, then restore the
-    // window the user was on. Total focus steal is <200ms — the same mechanism a
-    // user manually alt-tabbing would trigger. The previously-focused window is
-    // always restored, even on failure.
+    
+    
+    
+    
+    
+    
     [DllImport("user32.dll")] static extern bool SetForegroundWindow(IntPtr hWnd);
     [DllImport("user32.dll")] static extern bool IsIconic(IntPtr hWnd);
     [DllImport("user32.dll")] static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
@@ -1145,18 +1145,18 @@ internal static class AntiAfk
             {
                 if (IsIconic(hWnd)) ShowWindow(hWnd, SW_RESTORE);
                 SetForegroundWindow(hWnd);
-                Thread.Sleep(90 + _rng.Next(60)); // let the focus switch settle so the tap lands
+                Thread.Sleep(90 + _rng.Next(60)); 
             }
             Thread.Sleep(20 + _rng.Next(20));
-            keybd_event(bVk, bScan, 0, IntPtr.Zero); // key down
+            keybd_event(bVk, bScan, 0, IntPtr.Zero); 
             try
             {
                 Thread.Sleep(35 + _rng.Next(40));
             }
             finally
             {
-                // Never leave the synthetic key held if the tap is interrupted.
-                keybd_event(bVk, bScan, KEYEVENTF_KEYUP, IntPtr.Zero); // key up
+                
+                keybd_event(bVk, bScan, KEYEVENTF_KEYUP, IntPtr.Zero); 
             }
             return true;
         }
@@ -1167,27 +1167,27 @@ internal static class AntiAfk
         }
     }
 
-    // Per-instance anti-AFK loop. Each Roblox window gets its own countdown from
-    // when it launched or was last tapped. The instant an instance reaches the
-    // deadline it is tapped, including the one you're playing, then focus is
-    // handed straight back to whatever window you were on.
+    
+    
+    
+    
     public static void RunLoop(int deadlineSec, int vk)
     {
-        // Do not modify Windows' global foreground-lock timeout. Changing that
-        // user setting from a background helper can leak into normal mouse and
-        // keyboard behavior after group sessions close.
+        
+        
+        
         byte bVk = (byte)vk;
         byte bScan = (byte)MapVirtualKey((uint)vk, 0);
-        // pid -> UTC time its idle timer last reset (launch or our tap)
+        
         var lastReset = new System.Collections.Generic.Dictionary<uint, DateTime>();
 
         while (true)
         {
-            Thread.Sleep(15 * 1000); // fire within ~15s of the deadline
+            Thread.Sleep(15 * 1000); 
             DateTime now = DateTime.UtcNow;
 
-            // Capture the window you're on BEFORE touching anything, so we can
-            // always hand focus back exactly where it was.
+            
+            
             IntPtr originalFg = GetForegroundWindow();
 
             var windows = EnumRobloxWindows();
