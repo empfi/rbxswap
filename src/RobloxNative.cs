@@ -1124,15 +1124,29 @@ internal static class AntiAfk
         return map;
     }
 
-    // Send a key tap only to the Roblox window that is already in the
-    // foreground. Never focus, restore, minimize, or attach another window's
-    // input queue: those operations can steal the user's mouse/keyboard focus
-    // and leave input behavior altered after a group session.
+    // Send a key tap to any Roblox window, foreground or background. For a
+    // background window: briefly attach it to the foreground (SetForegroundWindow
+    // + a short settle) so keybd_event's global tap reaches it, then restore the
+    // window the user was on. Total focus steal is <200ms — the same mechanism a
+    // user manually alt-tabbing would trigger. The previously-focused window is
+    // always restored, even on failure.
+    [DllImport("user32.dll")] static extern bool SetForegroundWindow(IntPtr hWnd);
+    [DllImport("user32.dll")] static extern bool IsIconic(IntPtr hWnd);
+    [DllImport("user32.dll")] static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+    const int SW_RESTORE = 9;
+
     static bool TapWindow(IntPtr hWnd, byte bVk, byte bScan)
     {
-        if (GetForegroundWindow() != hWnd) return false;
+        IntPtr originalFg = GetForegroundWindow();
+        bool needRestore = originalFg != IntPtr.Zero && originalFg != hWnd;
         try
         {
+            if (originalFg != hWnd)
+            {
+                if (IsIconic(hWnd)) ShowWindow(hWnd, SW_RESTORE);
+                SetForegroundWindow(hWnd);
+                Thread.Sleep(90 + _rng.Next(60)); // let the focus switch settle so the tap lands
+            }
             Thread.Sleep(20 + _rng.Next(20));
             keybd_event(bVk, bScan, 0, IntPtr.Zero); // key down
             try
@@ -1147,6 +1161,10 @@ internal static class AntiAfk
             return true;
         }
         catch { return false; }
+        finally
+        {
+            if (needRestore) { try { SetForegroundWindow(originalFg); } catch { } }
+        }
     }
 
     // Per-instance anti-AFK loop. Each Roblox window gets its own countdown from
@@ -1186,18 +1204,17 @@ internal static class AntiAfk
             }
             if (due.Count == 0) continue;
 
+            int tapped = 0;
             foreach (var pid in due)
             {
-                if (TapWindow(windows[pid], bVk, bScan))
-                {
-                    Console.Out.WriteLine("ANTIAFK_TICK:" + pid);
-                    Console.Out.Flush();
-                }
+                if (TapWindow(windows[pid], bVk, bScan)) tapped++;
                 lastReset[pid] = DateTime.UtcNow;
             }
-
-            // No focus restoration is needed: TapWindow only ever targets the
-            // window that was already foreground when it was checked.
+            if (tapped > 0)
+            {
+                Console.Out.WriteLine("ANTIAFK_TICK:" + tapped);
+                Console.Out.Flush();
+            }
         }
     }
 

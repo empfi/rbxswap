@@ -209,7 +209,7 @@ async function startAntiAfk() {
       const lines = d.toString().trim().split('\n');
       for (const line of lines) {
         const t = line.trim(); if (!t) continue;
-        const mw = t.match(/tapped\s+(\d+)\s+window/i);
+        const mw = t.match(/^ANTIAFK_TICK:(\d+)$/);
         if (mw) sendLog('info', 'afk', `Anti-AFK: tapped ${mw[1]} Roblox window${mw[1]==='1'?'':'s'}`, { windows: parseInt(mw[1]) });
         else sendLog('info', 'afk', `Anti-AFK: ${t}`);
       }

@@ -428,6 +428,8 @@ function applySettings() {
   const streamer = document.getElementById('setting-streamer-mode');
   if (streamer) streamer.checked = !!settings.streamerMode;
   document.body.classList.toggle('streamer-mode', !!settings.streamerMode);
+  const rejoin = document.getElementById('setting-auto-rejoin');
+  if (rejoin) rejoin.checked = !!settings.autoRejoin;
 }
 
 let _acctQuery = '', _acctFilter = (() => { try { const f = localStorage.getItem('mr-acct-filter'); return (f && f !== 'running' && f !== 'idle') ? f : 'all'; } catch { return 'all'; } })(), _acctView = (() => { try { return localStorage.getItem('mr-acct-view') === 'list' ? 'list' : 'grid'; } catch { return 'grid'; } })();
@@ -495,6 +497,15 @@ function toggleAntiAfk(src) {
   const a = document.getElementById('set-antiafk'); if (a) a.checked = on;
   const b = document.getElementById('sb-antiafk'); if (b) b.checked = on;
   toast(on ? 'Anti-AFK on, accounts stay connected' : 'Anti-AFK off', on ? 'ok' : 'err');
+}
+
+function toggleAutoRejoin() {
+  const el = document.getElementById('setting-auto-rejoin');
+  const on = !!(el && el.checked);
+  settings.autoRejoin = on;
+  api.saveSettings({ autoRejoin: on });
+  if (!on) Object.values(_rejoinTimers).forEach(clearTimeout), _rejoinTimers = {}, _rejoinAttempts = {};
+  toast(on ? 'Auto-rejoin on — kicked accounts relaunch automatically' : 'Auto-rejoin off', on ? 'ok' : 'err');
 }
 
 function toggleCdd(name) {
@@ -701,6 +712,7 @@ function render() {
       : 'No accounts saved';
   }
   const list = visibleAccounts();
+  _visibleOrder = list.map(a => a.id);
   const temps = visibleTempSessions();
   grid.classList.toggle('list-view', _acctView === 'list');
   if (!list.length && !temps.length) {
@@ -712,7 +724,8 @@ function render() {
   }
   empty.style.display = 'none';
   grid.innerHTML = list.map((a, i) => `
-    <div class="card presence-${presenceClass(a)}${presenceOnline(a) ? ' is-live' : ''}${_cookieStatus[a.id] === 'dead' ? ' cookie-dead' : ''}" data-id="${a.id}">
+    <div class="card presence-${presenceClass(a)}${presenceOnline(a) ? ' is-live' : ''}${_cookieStatus[a.id] === 'dead' ? ' cookie-dead' : ''}${_bulkSelected.has(a.id) ? ' bulk-selected' : ''}" data-id="${a.id}">
+      <div class="bulk-check" data-bulk-check="${a.id}" title="Select for bulk actions" style="position:absolute;top:10px;right:10px;width:18px;height:18px;border:1.5px solid var(--bd2);border-radius:5px;background:${_bulkSelected.has(a.id) ? 'var(--ac)' : 'var(--s3)'};cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:2">${_bulkSelected.has(a.id) ? '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>' : ''}</div>
       <div class="card-dot${_launchedIds.has(a.id) ? ' launched' : ''}" title="${_launchedIds.has(a.id) ? 'Launched' : 'Not launched'}"></div>
       <svg class="drag-handle" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="5" r="1"/><circle cx="9" cy="12" r="1"/><circle cx="9" cy="19" r="1"/><circle cx="15" cy="5" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="19" r="1"/></svg>
       <div class="card-av presence-${presenceClass(a)}" id="av-${a.id}" title="${presenceClass(a) === 'starting' ? 'Checking Roblox presence…' : 'Roblox presence: ' + presenceClass(a)}">${(a.username || '?')[0].toUpperCase()}</div>
@@ -752,7 +765,110 @@ function render() {
   document.querySelectorAll('.card[data-id]:not([data-temp])').forEach(card => {
     card.addEventListener('contextmenu', e => { e.preventDefault(); showCardMenu(card.dataset.id, e.clientX, e.clientY); });
   });
+  document.querySelectorAll('[data-bulk-check]').forEach(el => {
+    el.addEventListener('click', e => { e.stopPropagation(); toggleBulkSelect(el.dataset.bulkCheck, e.shiftKey); });
+  });
+  updateBulkBar();
   initDrag();
+}
+
+// ---- Bulk selection & actions ----
+let _bulkSelected = new Set();
+let _bulkLastIndex = -1;
+let _visibleOrder = [];
+
+function toggleBulkSelect(id, rangeSelect) {
+  if (rangeSelect && _bulkLastIndex >= 0) {
+    const ids = _visibleOrder;
+    const from = Math.min(_bulkLastIndex, ids.indexOf(id));
+    const to = Math.max(_bulkLastIndex, ids.indexOf(id));
+    for (let i = from; i <= to; i++) if (ids[i]) _bulkSelected.add(ids[i]);
+  } else {
+    if (_bulkSelected.has(id)) _bulkSelected.delete(id); else _bulkSelected.add(id);
+    _bulkLastIndex = _visibleOrder.indexOf(id);
+  }
+  render();
+}
+
+function clearBulkSelection() { _bulkSelected.clear(); _bulkLastIndex = -1; render(); }
+
+function updateBulkBar() {
+  let bar = document.getElementById('bulk-bar');
+  const n = _bulkSelected.size;
+  if (n > 0 && !bar) {
+    bar = document.createElement('div');
+    bar.id = 'bulk-bar';
+    bar.style.cssText = 'position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 14px;margin-bottom:10px;background:var(--s2);border:1px solid var(--ac);border-radius:var(--r);box-shadow:0 6px 20px rgba(0,0,0,.35)';
+    document.querySelector('.grid-wrap').prepend(bar);
+  }
+  if (!bar) return;
+  if (n === 0) { bar.remove(); return; }
+  bar.innerHTML = `
+    <span style="font-size:12px;font-weight:700;color:var(--t1)">${n} selected</span>
+    <button class="btn btn-primary" style="font-size:11.5px;padding:6px 12px" onclick="bulkLaunch()">Launch all</button>
+    <button class="btn btn-ghost" style="font-size:11.5px;padding:6px 12px" onclick="bulkStop()">Stop all</button>
+    <select class="sr-input" id="bulk-group-sel" style="font-size:11.5px;padding:6px 10px;height:auto">${packages.map(p => `<option value="${esc(p.id)}">${esc(p.name)}</option>`).join('')}</select>
+    <button class="btn btn-ghost" style="font-size:11.5px;padding:6px 12px" onclick="bulkMoveToGroup()">Move to group</button>
+    <button class="btn btn-danger" style="font-size:11.5px;padding:6px 12px" onclick="bulkRemove()">Remove</button>
+    <button class="btn btn-ghost" style="font-size:11.5px;padding:6px 12px;margin-left:auto" onclick="clearBulkSelection()">Clear</button>
+  `;
+}
+
+function bulkLaunch() {
+  const ids = [..._bulkSelected];
+  if (!ids.length) return;
+  logEntry('info', 'launch', `Bulk launching ${ids.length} accounts…`);
+  ids.forEach((id, i) => {
+    setTimeout(() => {
+      const a = accounts.find(x => x.id === id);
+      if (!a) return;
+      launchAcc = a;
+      _launchGameOverride = null;
+      _selectedVersionHash = 'auto'; _launchRequiredVersionHash = null;
+      markLaunched(a.id);
+      api.launchRoblox(a.id, a.cookie, a.gameTarget || null, 'auto', {}).then(res => {
+        if (res && res.success) logEntry('ok', 'launch', `Launched ${a.username}`, { accountId: a.id });
+        else logEntry('err', 'launch', `Launch failed for ${a.username}: ${res?.error || 'unknown'}`, { accountId: a.id });
+      }).catch(() => {});
+    }, i * 3000); // stagger 3s between launches
+  });
+  toast(`Launching ${ids.length} accounts (staggered)…`, 'ok');
+}
+
+async function bulkStop() {
+  const ids = [..._bulkSelected];
+  for (const id of ids) await killOne(id);
+  toast(`Stopped ${ids.length} instance${ids.length === 1 ? '' : 's'}`, 'ok');
+}
+
+function bulkRemove() {
+  const ids = [..._bulkSelected];
+  if (!ids.length) return;
+  confirmAction(`Remove ${ids.length} selected account${ids.length === 1 ? '' : 's'}? This cannot be undone.`, async () => {
+    for (const id of ids) {
+      if (_rejoinTimers[id]) { clearTimeout(_rejoinTimers[id]); delete _rejoinTimers[id]; }
+      delete _lastInGamePlace[id]; delete _rejoinAttempts[id];
+      await api.removeAccount(id);
+    }
+    accounts = accounts.filter(x => !ids.includes(x.id));
+    packages.forEach(p => { p.accountIds = p.accountIds.filter(aid => !ids.includes(aid)); });
+    api.savePackages(packages);
+    _bulkSelected.clear();
+    render(); renderPackages();
+    toast(`Removed ${ids.length} account${ids.length === 1 ? '' : 's'}`, 'err');
+  });
+}
+
+function bulkMoveToGroup() {
+  const sel = document.getElementById('bulk-group-sel');
+  if (!sel || !sel.value) { toast('Create a group first', 'err'); return; }
+  const p = packages.find(x => x.id === sel.value);
+  if (!p) return;
+  p.accountIds = Array.from(new Set([...(p.accountIds || []), ..._bulkSelected]));
+  api.savePackages(packages);
+  toast(`Moved ${_bulkSelected.size} account${_bulkSelected.size === 1 ? '' : 's'} to "${p.name}"`, 'ok');
+  renderPackages();
+  clearBulkSelection();
 }
 
 function visibleTempSessions() {
@@ -950,6 +1066,35 @@ let _presenceRunning = false;
 let _lastPresenceAt = 0;
 const PRESENCE_TTL = 15_000;
 
+// ---- Auto-rejoin (kicked/disconnected accounts relaunch into last game) ----
+let _lastInGamePlace = {};   // accountId -> placeId of the game it was last in
+let _rejoinAttempts = {};    // accountId -> attempts used
+let _rejoinTimers = {};      // accountId -> pending timeout
+const REJOIN_MAX_ATTEMPTS = 3;
+const REJOIN_DELAY_MS = 15_000;   // wait 15s after detection before relaunch
+
+function scheduleAutoRejoin(a) {
+  const place = _lastInGamePlace[a.id];
+  if (!place) return;
+  const used = _rejoinAttempts[a.id] || 0;
+  if (used >= REJOIN_MAX_ATTEMPTS) return;
+  if (_rejoinTimers[a.id]) return; // already scheduled
+  _rejoinAttempts[a.id] = used + 1;
+  logEntry('warn', 'launch', `Auto-rejoin: ${a.username || a.id} dropped from the game — relaunching in 15s (attempt ${used + 1}/${REJOIN_MAX_ATTEMPTS})…`, { accountId: a.id });
+  _rejoinTimers[a.id] = setTimeout(() => {
+    delete _rejoinTimers[a.id];
+    // Re-check: if presence recovered on its own, skip the relaunch.
+    const cur = _presence[a.id];
+    if (cur && cur.type === 2) return;
+    _launchedIds.delete(a.id);
+    delete _presence[a.id];
+    delete _presenceResolved[a.id];
+    launchAcc = accounts.find(x => x.id === a.id) || a;
+    _launchGameOverride = { placeId: place };
+    doLaunch().finally(() => { _launchGameOverride = null; });
+  }, REJOIN_DELAY_MS);
+}
+
 function presenceOnline(a) {
   const p = _presence[a.id];
   // Only count as live (green border) if in-game
@@ -1003,10 +1148,21 @@ async function refreshPresence(force) {
             }
           }
         }
+        const prevType = _presence[a.id] ? _presence[a.id].type : null;
         const nextPresence = { type, lastLocation: lastLoc };
         _presence[a.id] = nextPresence;
         _presenceUnavailable[a.id] = nextPresence.type === -1;
         const waitingForLaunchPresence = _launchedIds.has(a.id) && _presenceResolved[a.id] !== true;
+
+        // Auto-rejoin: remember the last game each account was in, and when a
+        // launched, previously-in-game account drops offline/unknown, offer a
+        // relaunch into that place (bounded retries, setting-gated).
+        if (type === 2 && p && (p.placeId || p.gameId || p.rootPlaceId)) {
+          _lastInGamePlace[a.id] = String(p.placeId || p.gameId || p.rootPlaceId);
+          delete _rejoinAttempts[a.id];
+        } else if (settings.autoRejoin && prevType === 2 && type <= 0 && _launchedIds.has(a.id) && _presenceResolved[a.id] === true) {
+          scheduleAutoRejoin(a);
+        }
         const responseStartedAfterLaunch = requestStartedAt >= (_everLaunchedAt[a.id] || 0);
         const msSinceLaunch = now - (_everLaunchedAt[a.id] || 0);
         if (!waitingForLaunchPresence || (msSinceLaunch > 2000 && (nextPresence.type > 0 || (nextPresence.type === 0 && responseStartedAfterLaunch)))) _presenceResolved[a.id] = true;
@@ -1619,6 +1775,9 @@ function confirmAction(message, onConfirm) {
 async function removeAcc(id) {
   const a = accounts.find(x => x.id === id);
   if (!a) return;
+  // Clean up any pending auto-rejoin state for a removed account.
+  if (_rejoinTimers[id]) { clearTimeout(_rejoinTimers[id]); delete _rejoinTimers[id]; }
+  delete _lastInGamePlace[id]; delete _rejoinAttempts[id];
   confirmAction('Remove "' + a.username + '"? This cannot be undone.', async () => {
     await api.removeAccount(id); accounts = accounts.filter(x => x.id !== id); render();
     if (packages.some(p => p.accountIds.includes(id))) {
