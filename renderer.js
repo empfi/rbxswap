@@ -235,8 +235,8 @@ async function continueInit() {
       // Never accept the old `neverAppeared` payload: intentional closes and
       // slow starts must stay silent, and the lifecycle token is checked there.
       if (!data || !data.accountId || data.reason !== 'quick-crash') return;
-      toast('Roblox closed right after launch — check the account cookie (re-login if expired) and that the installed version is complete (RDD tab).', 'err');
-      logEntry('err', 'launch', `Roblox exited immediately after launch${data.username ? ' for ' + data.username : ''} — check the account cookie and that the installed version is complete.`, data);
+      toast('Roblox closed right after launch - check the account cookie (re-login if expired) and that the installed version is complete (RDD tab).', 'err');
+      logEntry('err', 'launch', `Roblox exited immediately after launch${data.username ? ' for ' + data.username : ''} - check the account cookie and that the installed version is complete.`, data);
     });
   }
 
@@ -595,7 +595,7 @@ function showCardMenu(id, x, y) {
 function closeCardMenu() { const m = document.getElementById('card-ctx-menu'); if (m) m.remove(); _ctxMenuId = null; }
 async function ctxKill(id) { closeCardMenu(); await killOne(id); }
 function ctxLaunch(id) { closeCardMenu(); const a = accounts.find(x => x.id === id); if (a) { launchAcc = a; openModal('m-launch'); } }
-// "Launch Game" — pick a game in a modal, cache the pick globally (shared by
+// "Launch Game" - pick a game in a modal, cache the pick globally (shared by
 // every account until changed) and launch this account into it immediately.
 function ctxLaunchGame(id) { closeCardMenu(); const a = accounts.find(x => x.id === id); if (a) { launchAcc = a; openGamePicker(); } }
 function ctxEdit(id) { closeCardMenu(); openEdit(id); }
@@ -911,7 +911,7 @@ async function checkCookieHealth(list) {
 }
 
 // ── Real account presence (online/offline/in-game) ──────────────────────────
-// Queried from Roblox's public presence API — no auth needed, keyed by userId.
+// Queried from Roblox's public presence API - no auth needed, keyed by userId.
 // userPresenceType: 0 Offline, 1 Online, 2 InGame, 3 InStudio. Refreshed on a
 // throttle, a periodic timer, and key events, so cards show where the account
 // actually is on Roblox rather than only what this app launched.
@@ -1750,7 +1750,7 @@ function onLaunchExploitFilterChange() {
 
   const items = [];
   _installedVersionsList.forEach(v => {
-    // Partial/interrupted installs can't launch — keep them out of the picker
+    // Partial/interrupted installs can't launch - keep them out of the picker
     // (they stay visible in the RDD Installed Versions list, badged).
     if (v.complete === false) return;
     const isCompat = (filterVal === 'all') || (requiredVersionHash ? normalizeVersionHash(v.hash) === requiredVersionHash : true);
@@ -2423,7 +2423,7 @@ async function applyPasswordChange(a, cookie, currentPw) {
   const newPw = genSecurePassword(a.username || '');
   const res = await api.changePassword(cookie, currentPw || '', newPw);
   if (!res || !res.ok) {
-    toast('Could not change password: ' + (res?.error || 'Unknown error') + (currentPw ? '' : ' — add this account once via "Sign in with Roblox" so the app can do it automatically'), 'err');
+    toast('Could not change password: ' + (res?.error || 'Unknown error') + (currentPw ? '' : ' - add this account once via "Sign in with Roblox" so the app can do it automatically'), 'err');
     return false;
   }
   a.password = newPw;
@@ -2433,9 +2433,9 @@ async function applyPasswordChange(a, cookie, currentPw) {
   delete _cookieStatus[a.id];
   applyCookieStatus(a.id);
   showPwRevealModal(newPw);
-  toast('Password changed — refreshing your cookie in the background…', 'ok');
+  toast('Password changed - refreshing your cookie in the background…', 'ok');
   logEntry('ok', 'cookie', `Password changed for ${a.username || a.id} (secure random generated)`, { accountId: a.id });
-  // Auto-refresh the cookie fully in the background — no window, no manual
+  // Auto-refresh the cookie fully in the background - no window, no manual
   // steps: log in headlessly with the new password and store the fresh cookie.
   refreshCookieInBackground(a);
   return true;
@@ -2449,11 +2449,11 @@ async function applyPasswordChange(a, cookie, currentPw) {
 let _backgroundRefreshBusy = false;
 async function refreshCookieInBackground(a, manual) {
   if (!a || !a.username || !a.password) {
-    if (manual) toast('No stored password for this account — add it once via "Sign in with Roblox" or paste a fresh cookie', 'warn');
+    if (manual) toast('No stored password for this account - add it once via "Sign in with Roblox" or paste a fresh cookie', 'warn');
     return false;
   }
   if (_backgroundRefreshBusy) {
-    if (manual) toast('A cookie refresh is already running — wait a moment', 'warn');
+    if (manual) toast('A cookie refresh is already running - wait a moment', 'warn');
     return false;
   }
   _backgroundRefreshBusy = true;
@@ -2466,7 +2466,7 @@ async function refreshCookieInBackground(a, manual) {
     ]);
     if (!res || !res.ok) {
       if (res && res.needs2fa) {
-        toast('This account has 2-step verification — complete the code once in a browser window to refresh the cookie', 'warn');
+        toast('This account has 2-step verification - complete the code once in a browser window to refresh the cookie', 'warn');
         logEntry('warn', 'cookie', `Cookie refresh blocked by 2-step verification for ${a.username || a.id}`, { accountId: a.id });
       } else if (res && res.captcha) {
         toast(res.error, 'warn');
@@ -2483,7 +2483,7 @@ async function refreshCookieInBackground(a, manual) {
     delete _cookieStatus[a.id];
     applyCookieStatus(a.id);
     render();
-    toast('Cookie refreshed automatically — account is live again', 'ok');
+    toast('Cookie refreshed automatically - account is live again', 'ok');
     logEntry('ok', 'cookie', `Automatically refreshed cookie for ${a.username || a.id}`, { accountId: a.id, userId: res.userId || null });
     return true;
   } catch (e) {
@@ -2519,7 +2519,7 @@ async function doChangeGenPassword() {
     acc.password = newPw;
     try { await api.updateAccount(acc.id, { password: newPw }); } catch {}
     try { navigator.clipboard.writeText(newPw); } catch {}
-    toast('Password changed and saved — copied to clipboard', 'ok');
+    toast('Password changed and saved - copied to clipboard', 'ok');
     logEntry('ok', 'cookie', `Password changed for generated account ${acc.username || acc.id}`, { accountId: acc.id });
   } catch (e) {
     toast('Password change failed: ' + (e?.message || 'Unknown error'), 'err');
@@ -2563,8 +2563,8 @@ function openAccountInfoModal(id) {
   if (robuxEl) { robuxEl.textContent = '0'; robuxEl.classList.remove('streamer-mask'); robuxEl.title = ''; }
   setStreamerText('ai-modal-added', dateStr);
   const aliasEl = document.getElementById('ai-modal-alias');
-  if (aliasEl) { aliasEl.textContent = nickname || '—'; aliasEl.classList.remove('streamer-mask'); aliasEl.title = ''; }
-  // Password is NOT displayed in the info modal — it's only shown in the
+  if (aliasEl) { aliasEl.textContent = nickname || '-'; aliasEl.classList.remove('streamer-mask'); aliasEl.title = ''; }
+  // Password is NOT displayed in the info modal - it's only shown in the
   // one-time reveal modal after a change.
 
   const avatarEl = document.getElementById('ai-modal-avatar');
@@ -3409,7 +3409,7 @@ async function pollRunningCount() {
   await fetchTempSessions();
 }
 // Adaptive polling: fast while instances run, back off to 8s when idle, and
-// pause entirely while the window is hidden — avoids spawning a tasklist every
+// pause entirely while the window is hidden - avoids spawning a tasklist every
 // few seconds for nothing.
 function scheduleRunningPoll() {
   if (_runningPoll) { clearTimeout(_runningPoll); _runningPoll = null; }
@@ -3483,7 +3483,7 @@ function mixGfxCommit() {
 
 // Volume mute toggle on the speaker icon. Muting remembers the level that was
 // set and silences every session live; unmuting restores exactly that level.
-// The muted state is per-session only — masterVolume (the slider value) is never
+// The muted state is per-session only - masterVolume (the slider value) is never
 // overwritten with 0, so new Roblox launches keep the level shown on the slider.
 let _volMuted = false;
 let _volPrevLevel = null;
@@ -3617,7 +3617,7 @@ async function mixSaveSettings() {
 
 
 // ═══════════════════════════════════════════════════════════════════════════
-// Swap page — Roblox trace cleaner + machine-identifier spoofer (from rblxswap)
+// Swap page - Roblox trace cleaner + machine-identifier spoofer (from rblxswap)
 // ═══════════════════════════════════════════════════════════════════════════
 let _swapCleaning = false;
 let _swapInited = false;
@@ -3718,7 +3718,7 @@ async function swapRefreshBackup() {
     if (info && info.exists) {
       const when = info.savedAt ? new Date(info.savedAt).toLocaleString() : 'unknown time';
       dot.style.background = 'var(--green)';
-      txt.textContent = `Spoofed — backup saved ${when}`;
+      txt.textContent = `Spoofed - backup saved ${when}`;
     } else {
       dot.style.background = 'var(--t3)';
       txt.textContent = 'No backup. Not currently spoofed.';
@@ -3762,7 +3762,7 @@ async function swapRunSpoof() {
   const doVol = document.getElementById('swap-t-vol').checked;
   if (!doMac && !doHwid && !doVol) { swapLog('Nothing selected to spoof. Pick at least one option.', 'err'); return; }
 
-  // Spoofing writes to HKLM and the raw boot sector — needs administrator rights.
+  // Spoofing writes to HKLM and the raw boot sector - needs administrator rights.
   // If we're not elevated, offer to relaunch as admin (UAC) instead of failing.
   try {
     const elevated = await api.hwidIsElevated();
@@ -3770,14 +3770,14 @@ async function swapRunSpoof() {
       if (confirm('Spoofing hardware IDs needs administrator rights.\n\nRelaunch rbxSWAP as administrator now?')) {
         await swapRelaunchAdmin();
       } else {
-        swapLog('Spoofing needs administrator rights — relaunch as admin to continue.', 'warn');
+        swapLog('Spoofing needs administrator rights - relaunch as admin to continue.', 'warn');
         toast('Admin rights required for spoofing', '');
       }
       return;
     }
   } catch {}
 
-  // Warn on live kernel anti-cheats — they can flag or interfere with id changes.
+  // Warn on live kernel anti-cheats - they can flag or interfere with id changes.
   try {
     const acs = await api.detectAnticheat();
     if (acs && acs.length > 0) {
@@ -3815,8 +3815,8 @@ async function swapPerformSpoof(doMac, doHwid, doVol) {
           try {
             const ok = await api.spoofMac(a.InterfaceDescription || '', mac);
             if (ok) { await api.restartAdapter(a.Name); swapLog(`Done [${a.Name}]`, 'ok'); }
-            else { swapLog(`Failed [${a.Name}] — run as administrator?`, 'err'); errs++; }
-          } catch (e) { swapLog(`Failed [${a.Name}] — ${e.message}`, 'err'); errs++; }
+            else { swapLog(`Failed [${a.Name}] - run as administrator?`, 'err'); errs++; }
+          } catch (e) { swapLog(`Failed [${a.Name}] - ${e.message}`, 'err'); errs++; }
         }
       }
     }
@@ -3828,13 +3828,13 @@ async function swapPerformSpoof(doMac, doHwid, doVol) {
         if (hw.success) {
           let needsReboot = false;
           for (const r of hw.results || []) {
-            swapLog(r.ok ? `Done [${r.name}] → ${r.value}` : `Failed [${r.name}] — ${r.error || 'run as admin?'}`, r.ok ? 'ok' : 'err');
+            swapLog(r.ok ? `Done [${r.name}] → ${r.value}` : `Failed [${r.name}] - ${r.error || 'run as admin?'}`, r.ok ? 'ok' : 'err');
             if (!r.ok) errs++;
             if (r.ok && r.reboot) needsReboot = true;
           }
           if (needsReboot) swapLog('Volume serial change applies after a reboot.', 'warn');
-        } else { swapLog(`HWID spoof failed${hw.message ? ' — ' + hw.message : ''}`, 'err'); errs++; }
-      } catch (e) { swapLog(`HWID spoof failed — ${e.message}`, 'err'); errs++; }
+        } else { swapLog(`HWID spoof failed${hw.message ? ' - ' + hw.message : ''}`, 'err'); errs++; }
+      } catch (e) { swapLog(`HWID spoof failed - ${e.message}`, 'err'); errs++; }
     }
 
     if (errs > 0) { swapLog(`Completed with ${errs} error(s).`, 'err'); toast('Spoof completed with errors', ''); }
@@ -3848,7 +3848,7 @@ async function swapPerformSpoof(doMac, doHwid, doVol) {
 
 async function swapRevert() {
   if (await api.hwidBackupExists()) { swapOpenRestore(); return; }
-  swapLog('No backup found — nothing to revert.', 'warn');
+  swapLog('No backup found - nothing to revert.', 'warn');
   toast('No spoof backup to revert', '');
 }
 
@@ -3892,7 +3892,7 @@ async function swapExecuteRestore() {
     else swapLog(res.ok ? 'Restore complete.' : 'Restore finished with errors (backup kept).', res.ok ? 'ok' : 'err');
     logEntry(res.ok ? 'ok' : 'warn', 'swap', res.ok ? 'Machine identity restored from backup' : 'Identity restore finished with errors');
   } catch (e) {
-    swapLog(`Restore failed — ${e.message}`, 'err');
+    swapLog(`Restore failed - ${e.message}`, 'err');
   }
   swapRefreshBackup();
 }
@@ -3960,7 +3960,7 @@ async function swapRunClean() {
   const btn = document.getElementById('swap-clean-btn');
   if (btn) btn.disabled = true;
   swapSetProgress(0, 'Starting…');
-  swapLog('Clean started — closing Roblox and wiping local traces…', 'info');
+  swapLog('Clean started - closing Roblox and wiping local traces…', 'info');
   logEntry('warn', 'swap', 'Roblox trace clean started', opts);
   await api.runSwap(opts);
 }
@@ -3994,7 +3994,7 @@ async function swapRunClean() {
 })();
 
 // ═══════════════════════════════════════════════════════════════════════════
-// RDD — Roblox Deployment Downloader (port of latte-soft/rdd for Electron)
+// RDD - Roblox Deployment Downloader (port of latte-soft/rdd for Electron)
 // Version hashes are resolved in the main process (no CORS); the deployment is
 // reassembled here with JSZip against the AWS CDN mirror (which sends CORS).
 // ═══════════════════════════════════════════════════════════════════════════
@@ -4075,7 +4075,7 @@ async function swapRunClean() {
 
   window.rddInit = function () {
     if (!el('rdd-arch').options.length) window.rddPopulateArch();
-    if (typeof JSZip === 'undefined') rddLog('[!] Warning: JSZip did not load — Windows downloads will be unavailable.');
+    if (typeof JSZip === 'undefined') rddLog('[!] Warning: JSZip did not load - Windows downloads will be unavailable.');
     if (!weaoVersionsLoaded) window.rddLoadWeaoVersions();
     window.rddLoadInstalledVersions();
   };
@@ -4134,7 +4134,7 @@ async function swapRunClean() {
         <img class="rdd-ver-icon" src="roblox_icon.png" alt=""/>
         <div class="rdd-ver-info">
           <div class="rdd-ver-hash">${esc(v.hash)}</div>
-          <div class="rdd-ver-loc">${v.complete === false ? '<span class="rdd-ver-incomplete">Incomplete — cannot launch</span>' : esc(v.location || 'Installed')}</div>
+          <div class="rdd-ver-loc">${v.complete === false ? '<span class="rdd-ver-incomplete">Incomplete - cannot launch</span>' : esc(v.location || 'Installed')}</div>
         </div>
         <div class="rdd-ver-actions">${openHtml}${btnHtml}</div>
       </div>`;
@@ -4159,7 +4159,7 @@ async function swapRunClean() {
     const r = await api.removeRobloxVersion(hash);
     if (r && r.ok) {
       delete _rddRemoveArmed[hash];
-      // Just drop the removed version from the local list — no full re-scan.
+      // Just drop the removed version from the local list - no full re-scan.
       _installedRddVersions = _installedRddVersions.filter(v => v.hash !== hash);
       toast(`Removed ${truncate(hash, 18)}`, 'ok');
       logEntry('ok', 'rdd', `Removed installed Roblox version ${hash}`);
@@ -4183,7 +4183,7 @@ async function swapRunClean() {
   function weaoGroup(label, res) {
     if (!res || !res.ok || !res.data) {
       const msg = res && res.error ? esc(res.error) : 'unavailable';
-      return `<div class="weao-group"><div class="weao-glabel">${label}</div><div class="weao-row"><span class="weao-plat">—</span><span class="weao-ver muted">${msg}</span><span class="weao-date"></span></div></div>`;
+      return `<div class="weao-group"><div class="weao-glabel">${label}</div><div class="weao-row"><span class="weao-plat">-</span><span class="weao-ver muted">${msg}</span><span class="weao-date"></span></div></div>`;
     }
     const d = res.data;
     let rows = '';
@@ -4200,7 +4200,7 @@ async function swapRunClean() {
     try {
       const cur = await api.weaoVersions('current');
       if (cur && cur.rateLimited) {
-        box.innerHTML = '<div class="weao-hint">Rate limited by WEAO — press Refresh again in a moment.</div>';
+        box.innerHTML = '<div class="weao-hint">Rate limited by WEAO - press Refresh again in a moment.</div>';
         return;
       }
       box.innerHTML = weaoGroup('Current', cur);
@@ -4392,7 +4392,7 @@ async function swapRunClean() {
         versionPath = `${channelPath}${blobDir}${version}-`;
         resp = await fetch(versionPath + 'rbxPkgManifest.txt');
       }
-      if (!resp.ok) { toast('Manifest fetch failed — check version hash', ''); return; }
+      if (!resp.ok) { toast('Manifest fetch failed - check version hash', ''); return; }
       const manifestBody = await resp.text();
 
       await reassembleWindows(channel, binaryType, version, versionPath, manifestBody);
@@ -4408,7 +4408,7 @@ async function swapRunClean() {
 })();
 
 // ═══════════════════════════════════════════════════════════════════════════
-// Executors — WEAO executor status, rendered as a vertical list on the
+// Executors - WEAO executor status, rendered as a vertical list on the
 // Executer page ("Your Executors"). Shows your selected (enabled) executors
 // with their version, platform, cost, update status, last-updated time,
 // banwave warning, Website/Discord links and feature-support stats.
@@ -4423,7 +4423,7 @@ async function swapRunClean() {
     if (!wired) {
       const list = el('exec-list');
       if (list) {
-        // Delegated open-link handler — keeps third-party URLs out of inline onclick.
+        // Delegated open-link handler - keeps third-party URLs out of inline onclick.
         list.addEventListener('click', (ev) => {
           const btn = ev.target.closest('.exec-link');
           if (btn && btn.dataset.url) api.openExternal(btn.dataset.url);
@@ -4442,7 +4442,7 @@ async function swapRunClean() {
     try {
       const res = await api.weaoExploits();
       if (!res || !res.ok) {
-        if (status) status.textContent = res && res.rateLimited ? 'Rate limited by WEAO — press Refresh shortly.' : `Failed to load: ${res?.error || 'unknown error'}`;
+        if (status) status.textContent = res && res.rateLimited ? 'Rate limited by WEAO - press Refresh shortly.' : `Failed to load: ${res?.error || 'unknown error'}`;
         return;
       }
       data = (res.data || []).filter((e) => !e.hidden);
@@ -4472,7 +4472,7 @@ async function swapRunClean() {
     const links = [];
     if (e.websitelink) links.push(`<button class="btn btn-ghost exec-link" data-url="${esc(e.websitelink)}" title="Website"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>Website</button>`);
     if (e.discordlink) links.push(`<button class="btn btn-ghost exec-link" data-url="${esc(e.discordlink)}" title="Discord"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-6-6 6 6 0 0 0-6 6c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>Discord</button>`);
-    // No Purchase button — user requested.
+    // No Purchase button - user requested.
 
     const stats = [];
     if (typeof e.suncPercentage === 'number') stats.push(`<span>sUNC: <b>${e.suncPercentage}%</b></span>`);
@@ -4508,11 +4508,11 @@ async function swapRunClean() {
     const visible = data.filter((e) => !_disabledExecutors.includes(e.title || e.name || e.exploit || 'Exploit'));
     if (!visible.length) {
       list.innerHTML = '';
-      if (status) { status.style.display = ''; status.textContent = 'All executors are hidden — enable some in “Default Executor &amp; Exclusions” below.'; }
+      if (status) { status.style.display = ''; status.textContent = 'All executors are hidden - enable some in “Default Executor &amp; Exclusions” below.'; }
       return;
     }
     if (status) {
-      status.textContent = `Showing ${visible.length} of ${data.length} enabled executors — manage which are enabled below.`;
+      status.textContent = `Showing ${visible.length} of ${data.length} enabled executors - manage which are enabled below.`;
       status.style.display = '';
     }
     list.innerHTML = visible.map(row).join('');
