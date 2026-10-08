@@ -1691,6 +1691,31 @@ let _disabledExecutors = [];
 try { _disabledExecutors = JSON.parse(localStorage.getItem('rblx_disabled_executors') || '[]'); } catch {}
 let _defaultExecutor = localStorage.getItem('rblx_default_executor') || '';
 
+// Executors the user has already seen. Anything new from the WEAO list is
+// auto-disabled on first appearance; the user opts in explicitly.
+let _seenExecutors = [];
+try { _seenExecutors = JSON.parse(localStorage.getItem('rblx_seen_executors') || '[]'); } catch {}
+let _seedSeenExecutors = !localStorage.getItem('rblx_seen_executors');
+
+// Register any new executors from the WEAO list and disable them by default.
+function _syncSeenExecutors() {
+  if (!Array.isArray(_weaoExploitsData)) return;
+  const seed = _seedSeenExecutors;
+  _seedSeenExecutors = false;
+  _weaoExploitsData.forEach(exp => {
+    const name = exp.title || exp.name || exp.exploit || 'Exploit';
+    if (!_seenExecutors.includes(name)) {
+      _seenExecutors.push(name);
+      // First run after this feature ships: keep existing executors enabled.
+      // Afterwards, any newly appearing executor is disabled by default.
+      if (!seed && !_disabledExecutors.includes(name)) _disabledExecutors.push(name);
+    }
+  });
+  localStorage.setItem('rblx_seen_executors', JSON.stringify(_seenExecutors));
+  localStorage.setItem('rblx_disabled_executors', JSON.stringify(_disabledExecutors));
+  api.saveSettings({ disabledExecutors: _disabledExecutors }).catch(() => {});
+}
+
 function populateLaunchExploitFilter() {
   const filterSel = document.getElementById('launch-exploit-filter');
   if (!filterSel) return;
@@ -1734,6 +1759,9 @@ window.renderExecutorSettings = function() {
     loadWeaoForLaunch();
     return;
   }
+
+  // New executors that appeared since the last check default to disabled.
+  _syncSeenExecutors();
 
   const opts = [];
   opts.push({ label: 'None (Select on launch)', value: '' });
@@ -1779,6 +1807,7 @@ window.toggleExecutorExclusion = function(name, enabled) {
   } else {
     if (!_disabledExecutors.includes(name)) _disabledExecutors.push(name);
   }
+  if (!_seenExecutors.includes(name)) { _seenExecutors.push(name); localStorage.setItem('rblx_seen_executors', JSON.stringify(_seenExecutors)); }
   localStorage.setItem('rblx_disabled_executors', JSON.stringify(_disabledExecutors));
   api.saveSettings({ disabledExecutors: _disabledExecutors }).catch(() => {});
   window.renderExecutorSettings();
