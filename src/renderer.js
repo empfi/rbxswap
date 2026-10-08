@@ -798,7 +798,7 @@ function updateBulkBar() {
   if (n > 0 && !bar) {
     bar = document.createElement('div');
     bar.id = 'bulk-bar';
-    bar.style.cssText = 'position:fixed;left:50%;transform:translateX(-50%);bottom:18px;z-index:900;display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--s2);border:1px solid var(--ac);border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.5);white-space:nowrap';
+    bar.style.cssText = 'position:fixed;right:0;top:auto;bottom:0;left:auto;transform:none;z-index:900;display:flex;align-items:center;gap:8px;padding:10px 16px;background:var(--s2);border:1px solid var(--bd);border-bottom:none;border-right:none;border-top-left-radius:10px;box-shadow:0 -6px 24px rgba(0,0,0,.45);white-space:nowrap';
     document.body.appendChild(bar);
   }
   if (!bar) return;
@@ -807,7 +807,7 @@ function updateBulkBar() {
     <span style="font-size:12px;font-weight:700;color:var(--t1)">${n} selected</span>
     <button class="btn btn-primary" style="font-size:11.5px;padding:6px 12px" onclick="bulkLaunch()">Launch all</button>
     <button class="btn btn-ghost" style="font-size:11.5px;padding:6px 12px" onclick="bulkStop()">Stop all</button>
-    <select id="bulk-group-sel" style="font-size:11.5px;padding:6px 10px;width:160px;height:30px;background:var(--s3);color:var(--t1);border:1px solid var(--bd);border-radius:7px;outline:none;cursor:pointer;appearance:auto">${packages.map(p => `<option value="${esc(p.id)}">${esc(p.name)}</option>`).join('')}</select>
+    <select id="bulk-group-sel" style="font-size:11.5px;padding:6px 10px;width:150px;height:30px;background:var(--s3);color:var(--t1);border:1px solid var(--bd);border-radius:7px;outline:none;cursor:pointer;appearance:auto;position:relative;z-index:2">${packages.map(p => `<option value="${esc(p.id)}">${esc(p.name)}</option>`).join('')}</select>
     <button class="btn btn-ghost" style="font-size:11.5px;padding:6px 12px" onclick="bulkMoveToGroup()">Move to group</button>
     <button class="btn btn-danger" style="font-size:11.5px;padding:6px 12px" onclick="bulkRemove()">Remove</button>
     <button class="btn btn-ghost" style="font-size:11.5px;padding:6px 12px" onclick="clearBulkSelection()">Clear</button>
