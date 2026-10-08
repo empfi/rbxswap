@@ -724,8 +724,7 @@ function render() {
   }
   empty.style.display = 'none';
   grid.innerHTML = list.map((a, i) => `
-    <div class="card presence-${presenceClass(a)}${presenceOnline(a) ? ' is-live' : ''}${_cookieStatus[a.id] === 'dead' ? ' cookie-dead' : ''}${_bulkSelected.has(a.id) ? ' bulk-selected' : ''}" data-id="${a.id}">
-      <div class="bulk-check" data-bulk-check="${a.id}" title="Select for bulk actions" style="position:absolute;top:10px;right:10px;width:18px;height:18px;border:1.5px solid var(--bd2);border-radius:5px;background:${_bulkSelected.has(a.id) ? 'var(--ac)' : 'var(--s3)'};cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:2">${_bulkSelected.has(a.id) ? '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>' : ''}</div>
+    <div class="card presence-${presenceClass(a)}${presenceOnline(a) ? ' is-live' : ''}${_cookieStatus[a.id] === 'dead' ? ' cookie-dead' : ''}${_bulkSelected.has(a.id) ? ' bulk-selected' : ''}" data-id="${a.id}" title="Ctrl+click to select, Shift+click for range">
       <div class="card-dot${_launchedIds.has(a.id) ? ' launched' : ''}" title="${_launchedIds.has(a.id) ? 'Launched' : 'Not launched'}"></div>
       <svg class="drag-handle" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="5" r="1"/><circle cx="9" cy="12" r="1"/><circle cx="9" cy="19" r="1"/><circle cx="15" cy="5" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="19" r="1"/></svg>
       <div class="card-av presence-${presenceClass(a)}" id="av-${a.id}" title="${presenceClass(a) === 'starting' ? 'Checking Roblox presence…' : 'Roblox presence: ' + presenceClass(a)}">${(a.username || '?')[0].toUpperCase()}</div>
@@ -765,8 +764,12 @@ function render() {
   document.querySelectorAll('.card[data-id]:not([data-temp])').forEach(card => {
     card.addEventListener('contextmenu', e => { e.preventDefault(); showCardMenu(card.dataset.id, e.clientX, e.clientY); });
   });
-  document.querySelectorAll('[data-bulk-check]').forEach(el => {
-    el.addEventListener('click', e => { e.stopPropagation(); toggleBulkSelect(el.dataset.bulkCheck, e.shiftKey); });
+  document.querySelectorAll('.card[data-id]:not([data-temp])').forEach(card => {
+    card.addEventListener('click', e => {
+      if (e.target.closest('button') || e.ctrlKey === false && e.shiftKey === false) return;
+      e.preventDefault();
+      toggleBulkSelect(card.dataset.id, e.shiftKey, e.ctrlKey);
+    });
   });
   updateBulkBar();
   initDrag();
@@ -777,14 +780,18 @@ let _bulkSelected = new Set();
 let _bulkLastIndex = -1;
 let _visibleOrder = [];
 
-function toggleBulkSelect(id, rangeSelect) {
+function toggleBulkSelect(id, rangeSelect, additive) {
   if (rangeSelect && _bulkLastIndex >= 0) {
     const ids = _visibleOrder;
     const from = Math.min(_bulkLastIndex, ids.indexOf(id));
     const to = Math.max(_bulkLastIndex, ids.indexOf(id));
     for (let i = from; i <= to; i++) if (ids[i]) _bulkSelected.add(ids[i]);
-  } else {
+  } else if (additive) {
     if (_bulkSelected.has(id)) _bulkSelected.delete(id); else _bulkSelected.add(id);
+    _bulkLastIndex = _visibleOrder.indexOf(id);
+  } else {
+    _bulkSelected.clear();
+    _bulkSelected.add(id);
     _bulkLastIndex = _visibleOrder.indexOf(id);
   }
   render();
@@ -798,7 +805,8 @@ function updateBulkBar() {
   if (n > 0 && !bar) {
     bar = document.createElement('div');
     bar.id = 'bulk-bar';
-    bar.style.cssText = 'position:fixed;right:0;top:auto;bottom:0;left:auto;transform:none;z-index:900;display:flex;align-items:center;gap:8px;padding:10px 16px;background:var(--s2);border:1px solid var(--bd);border-bottom:none;border-right:none;border-top-left-radius:10px;box-shadow:0 -6px 24px rgba(0,0,0,.45);white-space:nowrap';
+    bar.style.cssText = 'position:fixed;left:0;top:auto;bottom:0;right:auto;transform:none;z-index:900;display:flex;align-items:center;gap:8px;width:100%;box-sizing:border-box;padding:10px 16px;background:var(--s2);border:1px solid var(--bd);border-bottom:none;border-right:none;box-shadow:0 -6px 24px rgba(0,0,0,.45);white-space:nowrap';
+    bar.style.marginLeft = '0';
     document.body.appendChild(bar);
   }
   if (!bar) return;

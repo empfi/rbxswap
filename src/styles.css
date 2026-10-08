@@ -1394,3 +1394,5 @@ html.th-no-motion *,html.th-no-motion *::before,html.th-no-motion *::after{
 .tut-dot.on{width:18px;border-radius:3px;background:var(--ac)}
 .tut-modal .modal-actions{margin-top:18px;justify-content:center !important;gap:8px !important}
 .tut-modal .modal-actions #tut-skip{position:static !important}
+
+.card.bulk-selected{border-color:var(--ac);box-shadow:0 0 0 1px var(--ac)}
