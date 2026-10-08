@@ -51,8 +51,8 @@ jobs:
           body: |
             Automated build of master (${{ github.sha }}).
 
-            - `rbxSWAP.exe` — portable, no install needed
-            - `rbxSWAP-Setup-*.exe` — Windows installer
+            - `rbxSWAP.exe` - portable, no install needed
+            - `rbxSWAP-Setup-*.exe` - Windows installer
           draft: false
           prerelease: false
           files: release/*

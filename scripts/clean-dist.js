@@ -7,7 +7,7 @@ const path = require('path');
 
 const dist = path.join(__dirname, '..', 'dist');
 if (!fs.existsSync(dist)) {
-  console.log('dist/ not found — nothing to clean');
+  console.log('dist/ not found - nothing to clean');
   process.exit(0);
 }
 
