@@ -30,7 +30,7 @@ jobs:
         run: npm install --no-audit --no-fund
 
       - name: Build
-        run: npm run build
+        run: npx electron-builder --win --x64 --publish never
         env:
           # Skip code signing on CI (no certificate available)
           CSC_IDENTITY_AUTO_DISCOVERY: 'false'
