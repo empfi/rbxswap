@@ -805,12 +805,13 @@ function updateBulkBar() {
   if (n > 0 && !bar) {
     bar = document.createElement('div');
     bar.id = 'bulk-bar';
-    bar.style.cssText = 'position:fixed;left:0;top:auto;bottom:0;right:auto;transform:none;z-index:900;display:flex;align-items:center;gap:8px;width:100%;box-sizing:border-box;padding:10px 16px;background:var(--s2);border:1px solid var(--bd);border-bottom:none;border-right:none;box-shadow:0 -6px 24px rgba(0,0,0,.45);white-space:nowrap';
-    bar.style.marginLeft = '0';
+    bar.style.cssText = 'position:fixed;top:auto;bottom:0;right:0;transform:none;z-index:900;display:flex;align-items:center;gap:8px;box-sizing:border-box;padding:10px 16px;background:var(--s2);border:1px solid var(--bd);border-bottom:none;border-right:none;box-shadow:0 -6px 24px rgba(0,0,0,.45);white-space:nowrap';
     document.body.appendChild(bar);
   }
   if (!bar) return;
   if (n === 0) { bar.remove(); return; }
+  const mainEl = document.getElementById('main');
+  if (mainEl) bar.style.left = Math.max(0, mainEl.getBoundingClientRect().left) + 'px';
   bar.innerHTML = `
     <span style="font-size:12px;font-weight:700;color:var(--t1)">${n} selected</span>
     <button class="btn btn-primary" style="font-size:11.5px;padding:6px 12px" onclick="bulkLaunch()">Launch all</button>
