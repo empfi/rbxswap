@@ -1,0 +1,58 @@
+name: Build & Release
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Setup .NET (for native helper)
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.x
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+        env:
+          # Skip code signing on CI (no certificate available)
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+
+      - name: Prepare release artifacts
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Path release -Force | Out-Null
+          Copy-Item dist/rbxSWAP*.exe release/ -ErrorAction SilentlyContinue
+          Copy-Item dist/*.blockmap release/ -ErrorAction SilentlyContinue
+          Get-ChildItem release
+
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ github.run_number }}
+          name: Build ${{ github.run_number }}
+          body: |
+            Automated build of master (${{ github.sha }}).
+
+            - `rbxSWAP.exe` — portable, no install needed
+            - `rbxSWAP-Setup-*.exe` — Windows installer
+          draft: false
+          prerelease: false
+          files: release/*

@@ -1,4 +1,36 @@
+# Dependencies
 node_modules/
+
+# Build output
 dist/
+out/
+src/RobloxNative.exe
+src/RobloxNative.pdb
+
+# User data / secrets
 src/accounts.json
+*.cookie
+*.env
+.env
+.env.*
+
+# Logs
 *.log
+npm-debug.log*
+
+# OS junk
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE / editors
+.idea/
+.vscode/
+*.swp
+
+# Assistant/tooling state
+.claude/
+.freebuff/
+
+# Scratch files
+dummy-uri.txt
