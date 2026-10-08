@@ -72,8 +72,8 @@ function notifyOutdatedVersionBeforeLaunch(accName) {
   if (!info) return null;
   const executorName = _defaultExecutor || 'the selected executor';
   const msg = info.currentHash
-    ? `${accName}: installed Roblox ${truncate(info.currentHash, 16)} is not supported by ${executorName} — the latest supported version is fetched automatically.`
-    : `${accName}: no usable Roblox version installed — the latest supported version for ${executorName} is fetched automatically.`;
+    ? `${accName}: installed Roblox ${truncate(info.currentHash, 16)} is not supported by ${executorName} - the latest supported version is fetched automatically.`
+    : `${accName}: no usable Roblox version installed - the latest supported version for ${executorName} is fetched automatically.`;
   
   
   logEntry('warn', 'launch', msg);
@@ -309,8 +309,8 @@ async function continueInit() {
   if (typeof api.onLaunchVerifyFail === 'function') {
     api.onLaunchVerifyFail((data) => {
       if (!data || !data.accountId || data.reason !== 'quick-crash') return;
-      toast('Roblox closed right after launch — check the account cookie (re-login if expired) and that the installed version is complete (RDD tab).', 'err');
-      logEntry('err', 'launch', `Roblox exited immediately after launch${data.username ? ' for ' + data.username : ''} — check the account cookie and that the installed version is complete.`, data);
+      toast('Roblox closed right after launch - check the account cookie (re-login if expired) and that the installed version is complete (RDD tab).', 'err');
+      logEntry('err', 'launch', `Roblox exited immediately after launch${data.username ? ' for ' + data.username : ''} - check the account cookie and that the installed version is complete.`, data);
     });
   }
 
@@ -505,7 +505,7 @@ function toggleAutoRejoin() {
   settings.autoRejoin = on;
   api.saveSettings({ autoRejoin: on });
   if (!on) Object.values(_rejoinTimers).forEach(clearTimeout), _rejoinTimers = {}, _rejoinAttempts = {};
-  toast(on ? 'Auto-rejoin on — kicked accounts relaunch automatically' : 'Auto-rejoin off', on ? 'ok' : 'err');
+  toast(on ? 'Auto-rejoin on - kicked accounts relaunch automatically' : 'Auto-rejoin off', on ? 'ok' : 'err');
 }
 
 function toggleCdd(name) {
@@ -1032,7 +1032,7 @@ async function tryAutoRefreshCookie(a) {
 }
 function _flagCookieMaybeDead(id, error) {
   if (id && error && /cookie|expired|\b403\b/i.test(error)) {
-    // A post-password-change re-login is in flight — the dead cookie is expected,
+    // A post-password-change re-login is in flight - the dead cookie is expected,
     // so don't slap the expired badge on mid-refresh.
     if (_cookieStatus[id] === 'refreshing') return;
     _cookieStatus[id] = 'dead';
@@ -1088,7 +1088,7 @@ function scheduleAutoRejoin(a) {
   if (used >= REJOIN_MAX_ATTEMPTS) return;
   if (_rejoinTimers[a.id]) return; // already scheduled
   _rejoinAttempts[a.id] = used + 1;
-  logEntry('warn', 'launch', `Auto-rejoin: ${a.username || a.id} dropped from the game — relaunching in 15s (attempt ${used + 1}/${REJOIN_MAX_ATTEMPTS})…`, { accountId: a.id });
+  logEntry('warn', 'launch', `Auto-rejoin: ${a.username || a.id} dropped from the game - relaunching in 15s (attempt ${used + 1}/${REJOIN_MAX_ATTEMPTS})…`, { accountId: a.id });
   _rejoinTimers[a.id] = setTimeout(() => {
     delete _rejoinTimers[a.id];
     // Re-check: if presence recovered on its own, skip the relaunch.
@@ -1244,7 +1244,7 @@ async function recheckAllCookies(force) {
   const now = Date.now();
   for (const a of accounts) {
     if (!a.cookie) continue;
-    // A background re-login (e.g. right after a password change) is in flight —
+    // A background re-login (e.g. right after a password change) is in flight -
     // the stored cookie is the dead pre-change one, so skip it until that settles.
     if (_cookieStatus[a.id] === 'refreshing') continue;
     if (!force && _cookieStatus[a.id] === 'ok' && _cookieCheckedAt[a.id] && (now - _cookieCheckedAt[a.id]) < OK_RECHECK_MS) continue;
@@ -1691,15 +1691,15 @@ function editCookieStatusText(a) {
 
 function openEdit(id) {
   editAcc = accounts.find(a => a.id === id); if (!editAcc) return;
-  document.getElementById('edit-title').textContent = 'Account settings — ' + (editAcc.nickname || editAcc.username);
-  document.getElementById('edit-username').textContent = editAcc.username || '—';
-  document.getElementById('edit-userid').textContent = editAcc.userId || '—';
+  document.getElementById('edit-title').textContent = 'Account settings - ' + (editAcc.nickname || editAcc.username);
+  document.getElementById('edit-username').textContent = editAcc.username || '-';
+  document.getElementById('edit-userid').textContent = editAcc.userId || '-';
   document.getElementById('in-nickname').value = editAcc.nickname || '';
   document.getElementById('in-login-password').value = editAcc.password || '';
   document.getElementById('in-login-password').type = 'password';
   document.getElementById('edit-password-state').textContent = editAcc.password
     ? 'Saved securely for automatic cookie recovery.'
-    : 'No saved password — automatic recovery needs a browser login.';
+    : 'No saved password - automatic recovery needs a browser login.';
   document.getElementById('edit-cookie-status').textContent = editCookieStatusText(editAcc);
   openModal('m-edit');
   applyCookieStatus(editAcc.id);
@@ -1724,7 +1724,7 @@ async function saveEdit() {
       editAcc = updated;
       render();
       closeModal('m-edit');
-      toast(password ? 'Account settings saved' : 'Settings saved — automatic login password cleared', 'ok');
+      toast(password ? 'Account settings saved' : 'Settings saved - automatic login password cleared', 'ok');
       return true;
     }
     toast('Could not save account settings', 'err');
@@ -2812,14 +2812,14 @@ async function applyPasswordChange(a, cookie, currentPw, requestedPassword, opti
         applyCookieStatus(a.id);
         render();
         if (reveal) showPwRevealModal(newPw);
-        if (announce) toast('Password changed — session cookie kept active', 'ok');
+        if (announce) toast('Password changed - session cookie kept active', 'ok');
       } else {
         
         
         try { await api.updateAccount(a.id, { password: newPw }); } catch {}
         beginPostPasswordChangeRefresh(a);
         if (reveal) showPwRevealModal(newPw);
-        if (announce) toast('Password changed — refreshing your cookie in the background…', 'ok');
+        if (announce) toast('Password changed - refreshing your cookie in the background…', 'ok');
       }
       logEntry('ok', 'cookie', `Password changed for ${a.username || a.id} (secure random generated)`, { accountId: a.id });
       return true;
@@ -2835,7 +2835,7 @@ async function applyPasswordChange(a, cookie, currentPw, requestedPassword, opti
     }
     if (code === 'challenge') {
       toast(err, 'err');
-      logEntry('warn', 'cookie', `Password change for ${a.username || a.id} blocked by Roblox's security check — must be completed in a browser`, { accountId: a.id, username: a.username || null });
+      logEntry('warn', 'cookie', `Password change for ${a.username || a.id} blocked by Roblox's security check - must be completed in a browser`, { accountId: a.id, username: a.username || null });
     } else {
       toast('Could not change password: ' + err, 'err');
       logEntry('err', 'cookie', `Password change failed for ${a.username || a.id}: ${err}`, { accountId: a.id, username: a.username || null });
@@ -2915,14 +2915,14 @@ async function refreshAccountCookieForAction(a, { silent = false, validateCurren
 
 async function refreshCookieInBackground(a, manual, silent = false) {
   if (!a || !a.username || !a.password) {
-    if (manual) toast('No stored password for this account — add it once via "Sign in with Roblox" or paste a fresh cookie', 'warn');
+    if (manual) toast('No stored password for this account - add it once via "Sign in with Roblox" or paste a fresh cookie', 'warn');
     
     
     if (_cookieStatus[a.id] === 'refreshing') { _cookieStatus[a.id] = 'dead'; applyCookieStatus(a.id); }
     return false;
   }
   if (_backgroundRefreshBusy.has(a.id)) {
-    if (manual) toast('A cookie refresh is already running — wait a moment', 'warn');
+    if (manual) toast('A cookie refresh is already running - wait a moment', 'warn');
     return false;
   }
   _backgroundRefreshBusy.add(a.id);
@@ -2935,12 +2935,12 @@ async function refreshCookieInBackground(a, manual, silent = false) {
     ]);
     if (!res || !res.ok) {
       if (await adoptCookieFromStoreAfterRefresh(a)) {
-        if (!silent) toast('Cookie refreshed automatically — account is live again', 'ok');
+        if (!silent) toast('Cookie refreshed automatically - account is live again', 'ok');
         logEntry('ok', 'cookie', `Recovered fresh cookie from the Roblox session store for ${a.username || a.id}`, { accountId: a.id, userId: a.userId || null });
         return true;
       }
       if (res && res.needs2fa) {
-        if (!silent) toast('This account has 2-step verification — complete the code once in a browser window to refresh the cookie', 'warn');
+        if (!silent) toast('This account has 2-step verification - complete the code once in a browser window to refresh the cookie', 'warn');
         logEntry('warn', 'cookie', `Cookie refresh blocked by 2-step verification for ${a.username || a.id}`, { accountId: a.id });
       } else if (res && res.captcha) {
         if (!silent) toast(res.error, 'warn');
@@ -2960,13 +2960,13 @@ async function refreshCookieInBackground(a, manual, silent = false) {
     _cookieStatus[a.id] = 'ok'; 
     applyCookieStatus(a.id);
     render();
-    if (!silent) toast('Cookie refreshed automatically — account is live again', 'ok');
+    if (!silent) toast('Cookie refreshed automatically - account is live again', 'ok');
     logEntry('ok', 'cookie', `Automatically refreshed cookie for ${a.username || a.id}`, { accountId: a.id, userId: res.userId || null });
     return true;
   } catch (e) {
     console.error('background cookie refresh failed:', e);
     if (await adoptCookieFromStoreAfterRefresh(a)) {
-      if (!silent) toast('Cookie refreshed automatically — account is live again', 'ok');
+      if (!silent) toast('Cookie refreshed automatically - account is live again', 'ok');
       return true;
     }
     if (manual && !silent) toast('Cookie refresh failed: ' + (e?.message || 'unknown error'), 'err');
@@ -2988,7 +2988,7 @@ async function doChangeGenPassword() {
     const changed = await applyPasswordChange(acc, acc.cookie, oldPw, newPw, { reveal: false, announce: false });
     if (!changed) return;
     try { navigator.clipboard.writeText(newPw); } catch {}
-    toast('Password changed and saved — refreshing cookie in the background…', 'ok');
+    toast('Password changed and saved - refreshing cookie in the background…', 'ok');
     logEntry('ok', 'cookie', `Password changed for generated account ${acc.username || acc.id}`, { accountId: acc.id });
   } catch (e) {
     toast('Password change failed: ' + (e?.message || 'Unknown error'), 'err');
@@ -3031,7 +3031,7 @@ function openAccountInfoModal(id) {
   if (robuxEl) { robuxEl.textContent = '0'; robuxEl.classList.remove('streamer-mask'); robuxEl.title = ''; }
   setStreamerText('ai-modal-added', dateStr);
   const aliasEl = document.getElementById('ai-modal-alias');
-  if (aliasEl) { aliasEl.textContent = nickname || '—'; aliasEl.classList.remove('streamer-mask'); aliasEl.title = ''; }
+  if (aliasEl) { aliasEl.textContent = nickname || '-'; aliasEl.classList.remove('streamer-mask'); aliasEl.title = ''; }
   
   
 
@@ -3122,7 +3122,7 @@ async function aiChangePassword() {
   if (!_aiAccount || !_aiAccount.cookie) { toast('No cookie found', 'err'); return; }
   const account = _aiAccount;
   if (_cookieStatus[account.id] === 'refreshing') {
-    toast('A cookie refresh is already running for this account — wait a moment', 'warn');
+    toast('A cookie refresh is already running for this account - wait a moment', 'warn');
     return false;
   }
   return runAiAction('ai-btn-change-password', 'Changing password…', () =>
@@ -3158,7 +3158,7 @@ function editAliasFromInfo() {
   input.type = 'text';
   input.value = a.nickname || '';
   input.maxLength = 40;
-  input.placeholder = '—';
+  input.placeholder = '-';
   input.style.cssText = 'flex:1;min-width:0;font-size:13px;font-weight:600;color:var(--t1);background:transparent;border:none;outline:none;padding:0';
   el.replaceWith(input);
   input.focus();
@@ -3169,7 +3169,7 @@ function editAliasFromInfo() {
     div.setAttribute('onclick', 'editAliasFromInfo()');
     div.title = 'Click to edit alias';
     div.style.cssText = 'flex:1;min-width:0;font-size:13px;font-weight:600;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:text';
-    div.textContent = a.nickname || '—';
+    div.textContent = a.nickname || '-';
     input.replaceWith(div);
   };
   const finish = save => {
@@ -4414,7 +4414,7 @@ async function swapRefreshBackup() {
     if (info && info.exists) {
       const when = info.savedAt ? new Date(info.savedAt).toLocaleString() : 'unknown time';
       dot.style.background = 'var(--green)';
-      txt.textContent = `Spoofed — backup saved ${when}`;
+      txt.textContent = `Spoofed - backup saved ${when}`;
     } else {
       dot.style.background = 'var(--t3)';
       txt.textContent = 'No backup. Not currently spoofed.';
@@ -4468,7 +4468,7 @@ async function swapRunSpoof(macOnly) {
       if (confirm('Spoofing hardware IDs needs administrator rights.\n\nRelaunch rbxSWAP as administrator now?')) {
         await swapRelaunchAdmin();
       } else {
-        swapLog('Spoofing needs administrator rights — relaunch as admin to continue.', 'warn');
+        swapLog('Spoofing needs administrator rights - relaunch as admin to continue.', 'warn');
         toast('Admin rights required for spoofing', '');
       }
       return;
@@ -4513,8 +4513,8 @@ async function swapPerformSpoof(doMac, doHwid, doVol) {
           try {
             const ok = await api.spoofMac(a.InterfaceDescription || '', mac);
             if (ok) { await api.restartAdapter(a.Name); swapLog(`Done [${a.Name}]`, 'ok'); }
-            else { swapLog(`Failed [${a.Name}] — run as administrator?`, 'err'); errs++; }
-          } catch (e) { swapLog(`Failed [${a.Name}] — ${e.message}`, 'err'); errs++; }
+            else { swapLog(`Failed [${a.Name}] - run as administrator?`, 'err'); errs++; }
+          } catch (e) { swapLog(`Failed [${a.Name}] - ${e.message}`, 'err'); errs++; }
         }
       }
     }
@@ -4526,13 +4526,13 @@ async function swapPerformSpoof(doMac, doHwid, doVol) {
         if (hw.success) {
           let needsReboot = false;
           for (const r of hw.results || []) {
-            swapLog(r.ok ? `Done [${r.name}] → ${r.value}` : `Failed [${r.name}] — ${r.error || 'run as admin?'}`, r.ok ? 'ok' : 'err');
+            swapLog(r.ok ? `Done [${r.name}] → ${r.value}` : `Failed [${r.name}] - ${r.error || 'run as admin?'}`, r.ok ? 'ok' : 'err');
             if (!r.ok) errs++;
             if (r.ok && r.reboot) needsReboot = true;
           }
           if (needsReboot) swapLog('Volume serial change applies after a reboot.', 'warn');
-        } else { swapLog(`HWID spoof failed${hw.message ? ' — ' + hw.message : ''}`, 'err'); errs++; }
-      } catch (e) { swapLog(`HWID spoof failed — ${e.message}`, 'err'); errs++; }
+        } else { swapLog(`HWID spoof failed${hw.message ? ' - ' + hw.message : ''}`, 'err'); errs++; }
+      } catch (e) { swapLog(`HWID spoof failed - ${e.message}`, 'err'); errs++; }
     }
 
     if (errs > 0) { swapLog(`Completed with ${errs} error(s).`, 'err'); toast('Spoof completed with errors', ''); }
@@ -4546,7 +4546,7 @@ async function swapPerformSpoof(doMac, doHwid, doVol) {
 
 async function swapRevert() {
   if (await api.hwidBackupExists()) { swapOpenRestore(); return; }
-  swapLog('No backup found — nothing to revert.', 'warn');
+  swapLog('No backup found - nothing to revert.', 'warn');
   toast('No spoof backup to revert', '');
 }
 
@@ -4590,7 +4590,7 @@ async function swapExecuteRestore() {
     else swapLog(res.ok ? 'Restore complete.' : 'Restore finished with errors (backup kept).', res.ok ? 'ok' : 'err');
     logEntry(res.ok ? 'ok' : 'warn', 'swap', res.ok ? 'Machine identity restored from backup' : 'Identity restore finished with errors');
   } catch (e) {
-    swapLog(`Restore failed — ${e.message}`, 'err');
+    swapLog(`Restore failed - ${e.message}`, 'err');
   }
   swapRefreshBackup();
 }
@@ -4658,7 +4658,7 @@ async function swapRunClean() {
   const btn = document.getElementById('swap-clean-btn');
   if (btn) btn.disabled = true;
   swapSetProgress(0, 'Starting…');
-  swapLog('Clean started — closing Roblox and wiping local traces…', 'info');
+  swapLog('Clean started - closing Roblox and wiping local traces…', 'info');
   logEntry('warn', 'swap', 'Roblox trace clean started', opts);
   await api.runSwap(opts);
 }
@@ -4768,7 +4768,7 @@ async function swapRunClean() {
 
   window.rddInit = function () {
     if (!el('rdd-arch').options.length) window.rddPopulateArch();
-    if (typeof JSZip === 'undefined') rddLog('[!] Warning: JSZip did not load — Windows downloads will be unavailable.');
+    if (typeof JSZip === 'undefined') rddLog('[!] Warning: JSZip did not load - Windows downloads will be unavailable.');
     if (!weaoVersionsLoaded) window.rddLoadWeaoVersions();
     window.rddLoadInstalledVersions();
   };
@@ -4947,7 +4947,7 @@ async function swapRunClean() {
         <img class="rdd-ver-icon" src="roblox_icon.png" alt=""/>
         <div class="rdd-ver-info">
           <div class="rdd-ver-hash">${esc(v.hash)}</div>
-          <div class="rdd-ver-loc">${v.complete === false ? '<span class="rdd-ver-incomplete">Incomplete — cannot launch</span>' : esc(v.location || 'Installed') + sizeHtml}</div>
+          <div class="rdd-ver-loc">${v.complete === false ? '<span class="rdd-ver-incomplete">Incomplete - cannot launch</span>' : esc(v.location || 'Installed') + sizeHtml}</div>
         </div>
         <div class="rdd-ver-actions">${openHtml}${btnHtml}</div>
       </div>`;
@@ -4996,7 +4996,7 @@ async function swapRunClean() {
   function weaoGroup(label, res) {
     if (!res || !res.ok || !res.data) {
       const msg = res && res.error ? esc(res.error) : 'unavailable';
-      return `<div class="weao-group"><div class="weao-glabel">${label}</div><div class="weao-row"><span class="weao-plat">—</span><span class="weao-ver muted">${msg}</span><span class="weao-date"></span></div></div>`;
+      return `<div class="weao-group"><div class="weao-glabel">${label}</div><div class="weao-row"><span class="weao-plat">-</span><span class="weao-ver muted">${msg}</span><span class="weao-date"></span></div></div>`;
     }
     const d = res.data;
     let rows = '';
@@ -5013,7 +5013,7 @@ async function swapRunClean() {
     try {
       const cur = await api.weaoVersions('current');
       if (cur && cur.rateLimited) {
-        box.innerHTML = '<div class="weao-hint">Rate limited by WEAO — press Refresh again in a moment.</div>';
+        box.innerHTML = '<div class="weao-hint">Rate limited by WEAO - press Refresh again in a moment.</div>';
         return;
       }
       box.innerHTML = weaoGroup('Current', cur);
@@ -5219,7 +5219,7 @@ async function swapRunClean() {
         versionPath = `${channelPath}${blobDir}${version}-`;
         resp = await fetch(versionPath + 'rbxPkgManifest.txt');
       }
-      if (!resp.ok) { toast('Manifest fetch failed — check version hash', ''); return; }
+      if (!resp.ok) { toast('Manifest fetch failed - check version hash', ''); return; }
       const manifestBody = await resp.text();
 
       await reassembleWindows(channel, binaryType, version, versionPath, manifestBody);
@@ -5263,7 +5263,7 @@ async function swapRunClean() {
     try {
       const res = await api.weaoExploits();
       if (!res || !res.ok) {
-        if (status) status.textContent = res && res.rateLimited ? 'Rate limited by WEAO — press Refresh shortly.' : `Failed to load: ${res?.error || 'unknown error'}`;
+        if (status) status.textContent = res && res.rateLimited ? 'Rate limited by WEAO - press Refresh shortly.' : `Failed to load: ${res?.error || 'unknown error'}`;
         return;
       }
       data = (res.data || []).filter((e) => !e.hidden);
@@ -5334,11 +5334,11 @@ async function swapRunClean() {
     const visible = data.filter((e) => !_disabledExecutors.includes(e.title || e.name || e.exploit || 'Exploit'));
     if (!visible.length) {
       list.innerHTML = '';
-      if (status) { status.style.display = ''; status.textContent = 'All executors are hidden — enable some in “Default Executor &amp; Exclusions” below.'; }
+      if (status) { status.style.display = ''; status.textContent = 'All executors are hidden - enable some in “Default Executor &amp; Exclusions” below.'; }
       return;
     }
     if (status) {
-      status.textContent = `Showing ${visible.length} of ${data.length} enabled executors — manage which are enabled below.`;
+      status.textContent = `Showing ${visible.length} of ${data.length} enabled executors - manage which are enabled below.`;
       status.style.display = '';
     }
     list.innerHTML = visible.map(row).join('');
@@ -5470,9 +5470,9 @@ function initTheme() {
 
 const TUTORIAL_KEY = 'rblx_tutorial_done';
 const TUT_STEPS = [
-  { title: 'Welcome to rbxSWAP', text: 'Your multi-account Roblox launcher. Add accounts once, switch and launch them in seconds — sessions, spoofing and version management all live here.', icon: 'rocket' },
+  { title: 'Welcome to rbxSWAP', text: 'Your multi-account Roblox launcher. Add accounts once, switch and launch them in seconds - sessions, spoofing and version management all live here.', icon: 'rocket' },
   { title: 'Accounts', text: 'This is your home. Each card shows an account with live presence, RAM stats and quick actions. Use the search and filter to organize, right-click a card for per-account tools.', icon: 'users' },
-  { title: 'Launch & Swap', text: 'Launch any account into Roblox, or open the Swap tab to spoof MAC, HWID and volume identifiers before a session — with restore points when you need them.', icon: 'zap' },
+  { title: 'Launch & Swap', text: 'Launch any account into Roblox, or open the Swap tab to spoof MAC, HWID and volume identifiers before a session - with restore points when you need them.', icon: 'zap' },
   { title: 'RDD & Executors', text: 'The RDD tab downloads and manages Roblox versions on disk, cleaning old ones safely. The Executor tab picks which executor gets attached to launches.', icon: 'download' },
   { title: 'Make it yours', text: 'Under Settings → Appearance & Themes you can restyle everything: accent color, brightness, radius, interface scale and more. You can replay this tour anytime from Settings → Help.', icon: 'palette' },
 ];
@@ -5524,7 +5524,7 @@ function startTutorial() {
 function closeTutorial(finished) {
   closeModal('m-tutorial');
   try { localStorage.setItem(TUTORIAL_KEY, '1'); } catch {}
-  if (finished) toast('You are all set — enjoy rbxSWAP!', 'ok');
+  if (finished) toast('You are all set - enjoy rbxSWAP!', 'ok');
 }
 function maybeAutoTutorial() {
   let done = false;

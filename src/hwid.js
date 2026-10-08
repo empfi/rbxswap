@@ -278,7 +278,7 @@ async function spoofVolumeSerial(drive = SYSTEM_DRIVE) {
 	}
 }
 
-//? writes the original boot sector back — only after proving it survived storage intact
+//? writes the original boot sector back - only after proving it survived storage intact
 async function restoreVolumeSerial(entry) {
 	if (!entry || !entry.sector) return { drive: entry?.drive, restored: false, reason: 'no-sector' };
 	const buf = Buffer.from(String(entry.sector).replace(/\s+/g, ''), 'base64');
@@ -289,7 +289,7 @@ async function restoreVolumeSerial(entry) {
 	//! AND bytes must hash-match what we originally read
 	//! if it doesn't match, we do NOT write cuz umm... not good
 	if (entry.sectorHash && sha256(buf) !== entry.sectorHash) {
-		return { drive: entry.drive, restored: false, reason: 'integrity check failed — backup not written' };
+		return { drive: entry.drive, restored: false, reason: 'integrity check failed - backup not written' };
 	}
 
 	try {
@@ -300,7 +300,7 @@ async function restoreVolumeSerial(entry) {
 	}
 }
 
-//? Windows System Restore point — safety net for the registry spoofs. enables restore on
+//? Windows System Restore point - safety net for the registry spoofs. enables restore on
 //? the system drive and clears the 24h throttle so the checkpoint actually creates.
 async function createSystemRestorePoint(description = 'rblxswap pre-spoof') {
 	try {

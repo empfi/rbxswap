@@ -1120,7 +1120,7 @@ function createTray() {
   if (tray || !win) return;
   try {
     tray = new Tray(path.join(__dirname, 'icon.ico'));
-    tray.setToolTip('rbxSWAP — running in tray');
+    tray.setToolTip('rbxSWAP - running in tray');
     tray.setContextMenu(Menu.buildFromTemplate([
       { label: 'Show rbxSWAP', click: () => { if (win) { win.show(); win.focus(); } } },
       { type: 'separator' },
@@ -1277,7 +1277,7 @@ async function handleProtocolUrlAsync(url) {
   if (executorHash) {
     const upToDate = await ensureProtocolVersionUpToDate(executorHash);
     if (!upToDate) {
-      sendLog('warn', 'launch', 'Browser launch cancelled — the executor-synced Roblox version is not installed.');
+      sendLog('warn', 'launch', 'Browser launch cancelled - the executor-synced Roblox version is not installed.');
       return;
     }
     const installed = getInstalledRobloxVersions();
@@ -1919,10 +1919,10 @@ function classifyPasswordChangeError(body, status) {
   const text = robloxErrorText(body) || '';
   const t = text.toLowerCase();
   if (status === 401 || t.includes('not authenticated') || t.includes('authentication token')) {
-    return { code: 'not-authenticated', error: 'The account cookie is expired or no longer valid — use "Refresh cookie & profile" or complete a browser login, then try again.' };
+    return { code: 'not-authenticated', error: 'The account cookie is expired or no longer valid - use "Refresh cookie & profile" or complete a browser login, then try again.' };
   }
   if (status === 403 || /challenge/i.test(t)) {
-    return { code: 'challenge', error: 'Roblox now requires completing a security check (captcha) in a real browser before a password can be changed — open the account in the browser, change the password there, then refresh the account cookie.' };
+    return { code: 'challenge', error: 'Roblox now requires completing a security check (captcha) in a real browser before a password can be changed - open the account in the browser, change the password there, then refresh the account cookie.' };
   }
   return { code: null, error: text || `Roblox rejected the password change (HTTP ${status})` };
 }
@@ -1948,7 +1948,7 @@ ipcMain.handle('roblox:changePassword', async (_, accountId, cookie, currentPass
     if (!ck) return { ok: false, error: 'Missing cookie' };
 
     const csrf = await getCSRFToken(ck);
-    if (!csrf) return { ok: false, code: 'not-authenticated', error: 'Could not get a CSRF token — the account cookie is expired or no longer valid' };
+    if (!csrf) return { ok: false, code: 'not-authenticated', error: 'Could not get a CSRF token - the account cookie is expired or no longer valid' };
     const res = await Promise.race([
       postPasswordChange(ck, csrf, currentPassword || '', newPassword),
       new Promise(r => setTimeout(() => r({ status: 0, headers: {}, body: '', error: 'timeout' }), 15000)),
@@ -2485,8 +2485,8 @@ async function headlessRelogin(username, password) {
           clearInterval(poll); if (timer) clearTimeout(timer);
           await cleanup();
           _reloginBlockedAt.set(username, Date.now());
-          sendLog('warn', 'cookie', `Background re-login blocked by a captcha for ${username} — backing off`);
-          return finish({ ok: false, captcha: true, error: 'Roblox is asking for a captcha to verify this login. Complete one login in a normal browser to clear it — the app will back off and retry later.' });
+          sendLog('warn', 'cookie', `Background re-login blocked by a captcha for ${username} - backing off`);
+          return finish({ ok: false, captcha: true, error: 'Roblox is asking for a captcha to verify this login. Complete one login in a normal browser to clear it - the app will back off and retry later.' });
         }
         const ck = await getCookie();
         if (ck) {
@@ -2502,7 +2502,7 @@ async function headlessRelogin(username, password) {
           clearInterval(poll); if (timer) clearTimeout(timer);
           await cleanup();
           _reloginBlockedAt.set(username, Date.now());
-          sendLog('warn', 'cookie', `Background re-login needs a 2-step verification code for ${username} — backing off`);
+          sendLog('warn', 'cookie', `Background re-login needs a 2-step verification code for ${username} - backing off`);
           return finish({ ok: false, needs2fa: true, error: 'This account requires a 2-step verification code (Roblox security).' });
         }
       }, 1500);
@@ -2511,7 +2511,7 @@ async function headlessRelogin(username, password) {
         clearInterval(poll);
         await cleanup();
         sendLog('err', 'cookie', `Background re-login timed out for ${username}`);
-        finish({ ok: false, error: 'Timed out waiting for login. Roblox may be asking for extra verification (captcha/2FA) — try the "Re-login" button again, or add the account via browser login.' });
+        finish({ ok: false, error: 'Timed out waiting for login. Roblox may be asking for extra verification (captcha/2FA) - try the "Re-login" button again, or add the account via browser login.' });
       }, TIMEOUT);
 
       browser.on('disconnected', () => { clearInterval(poll); if (timer) clearTimeout(timer); if (!resolved) finish({ ok: false, error: 'Browser engine closed unexpectedly.' }); });
@@ -2539,7 +2539,7 @@ ipcMain.handle('roblox:reloginHeadless', async (_e, username, password) => {
     const remaining = _reloginBlockRemainingMs(username);
     if (remaining > 0) {
       const mins = Math.max(1, Math.ceil(remaining / 60000));
-      return { ok: false, blocked: true, error: `Roblox flagged this account's logins — waiting ${mins} min before retrying to avoid another captcha. Complete one login in a normal browser to clear it faster.` };
+      return { ok: false, blocked: true, error: `Roblox flagged this account's logins - waiting ${mins} min before retrying to avoid another captcha. Complete one login in a normal browser to clear it faster.` };
     }
     return await headlessRelogin(username, password);
   } catch (e) {
@@ -4250,7 +4250,7 @@ ipcMain.handle('rdd:getVersion', async (_e, channel, binaryType) => {
 ipcMain.handle('weao:versions', async (_e, which) => {
   const kind = ['current', 'future', 'past'].includes(which) ? which : 'current';
   const r = await weaoGet('/api/versions/' + kind);
-  if (r.status === 429) return { ok: false, rateLimited: true, error: 'Rate limited by WEAO — wait a moment.' };
+  if (r.status === 429) return { ok: false, rateLimited: true, error: 'Rate limited by WEAO - wait a moment.' };
   if (r.status !== 200) return { ok: false, error: r.error || `HTTP ${r.status}` };
   try { return { ok: true, kind, data: JSON.parse(r.body) }; }
   catch { return { ok: false, error: 'Failed to parse WEAO response' }; }
@@ -4258,7 +4258,7 @@ ipcMain.handle('weao:versions', async (_e, which) => {
 
 ipcMain.handle('weao:exploits', async () => {
   const r = await weaoGet('/api/status/exploits');
-  if (r.status === 429) return { ok: false, rateLimited: true, error: 'Rate limited by WEAO — wait a moment.' };
+  if (r.status === 429) return { ok: false, rateLimited: true, error: 'Rate limited by WEAO - wait a moment.' };
   if (r.status !== 200) return { ok: false, error: r.error || `HTTP ${r.status}` };
   try {
     const data = JSON.parse(r.body);

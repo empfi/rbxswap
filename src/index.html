@@ -348,7 +348,7 @@
               <label class="toggle"><input type="checkbox" id="swap-t-rp"/><span class="toggle-trk"></span></label>
             </div>
             <div style="display:flex;gap:8px;padding:2px 14px 14px">
-              <button class="btn btn-ghost" style="flex-shrink:0;justify-content:center" id="swap-mac-btn" onclick="swapRunSpoof(true)" title="Randomise every network adapter's hardware address only — ignores the toggles above">
+              <button class="btn btn-ghost" style="flex-shrink:0;justify-content:center" id="swap-mac-btn" onclick="swapRunSpoof(true)" title="Randomise every network adapter's hardware address only - ignores the toggles above">
                 <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 12h4"/><path d="M14 12h4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="M4.9 19.1 3 21"/><path d="M21 3l-1.9 1.9"/><path d="M19.1 19.1 21 21"/><path d="M3 3l1.9 1.9"/></svg>MAC only
               </button>
               <button class="btn btn-primary hold-btn" style="flex:1;justify-content:center;position:relative;overflow:hidden" id="swap-spoof-btn">
@@ -394,7 +394,7 @@
         <div class="ph" style="display:flex;align-items:center;justify-content:space-between;gap:10px">
           <div>
             <div class="ph-title">RDD</div>
-            <div class="ph-sub">Roblox Deployment Downloader — view live version hashes &amp; download client/studio builds</div>
+            <div class="ph-sub">Roblox Deployment Downloader - view live version hashes &amp; download client/studio builds</div>
           </div>
         </div>
         <div class="sw">
@@ -835,8 +835,8 @@
       <section class="account-settings-card">
         <div class="account-settings-card-title">Identity</div>
         <div class="account-settings-meta">
-          <div><span>Username</span><strong id="edit-username">—</strong></div>
-          <div><span>User ID</span><strong id="edit-userid">—</strong></div>
+          <div><span>Username</span><strong id="edit-username">-</strong></div>
+          <div><span>User ID</span><strong id="edit-userid">-</strong></div>
         </div>
         <div class="field" style="margin-bottom:0">
           <label>Alias</label>
@@ -857,7 +857,7 @@
           </div>
         </div>
         <div class="field-hint">This only updates the password rbxSWAP uses to recover a cookie. It does not change the Roblox password.</div>
-        <div class="account-settings-password-state" id="edit-password-state">No saved password — automatic recovery needs a browser login.</div>
+        <div class="account-settings-password-state" id="edit-password-state">No saved password - automatic recovery needs a browser login.</div>
       </section>
     </div>
 
@@ -933,7 +933,7 @@
 <div class="overlay" id="m-game-picker" data-backdrop-close="true">
   <div class="modal" onclick="event.stopPropagation()" style="width:520px">
     <div class="modal-title">Launch Game</div>
-    <div class="modal-sub" style="margin-bottom:12px">Search by game name or enter a place ID — your pick is remembered and shared by every account until you change it.</div>
+    <div class="modal-sub" style="margin-bottom:12px">Search by game name or enter a place ID - your pick is remembered and shared by every account until you change it.</div>
     <div id="gp-cached" style="display:none;align-items:center;gap:10px;background:var(--s2);border:1px solid var(--bd);border-radius:10px;padding:8px 12px;margin-bottom:12px"></div>
     <div id="gp-outdated" style="display:none;align-items:center;gap:8px;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.3);border-radius:8px;padding:7px 11px;margin-bottom:12px;font-size:11.5px;color:#fbbf24">
       <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
@@ -1026,14 +1026,14 @@
       </div>      <div style="background:var(--s2);border:1px solid var(--bd);border-radius:10px;padding:10px 12px">
         <div style="font-size:9.5px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">ALIAS</div>
         <div style="display:flex;align-items:center;gap:6px">
-          <div id="ai-modal-alias" onclick="editAliasFromInfo()" title="Click to edit alias" style="flex:1;min-width:0;font-size:13px;font-weight:600;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:text">—</div>
+          <div id="ai-modal-alias" onclick="editAliasFromInfo()" title="Click to edit alias" style="flex:1;min-width:0;font-size:13px;font-weight:600;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:text">-</div>
           <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;cursor:pointer" onclick="editAliasFromInfo()"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
         </div>
       </div>
       <div id="ai-modal-pw-box" style="display:none;background:var(--s2);border:1px solid var(--bd);border-radius:10px;padding:10px 12px">
         <div style="font-size:9.5px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">PASSWORD</div>
         <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
-          <div id="ai-modal-password" style="font-size:12.5px;font-weight:600;color:var(--t1);font-family:'JetBrains Mono',monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="Click to copy">—</div>
+          <div id="ai-modal-password" style="font-size:12.5px;font-weight:600;color:var(--t1);font-family:'JetBrains Mono',monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="Click to copy">-</div>
           <button class="btn btn-ghost" style="padding:3px 8px;font-size:10.5px;flex-shrink:0" onclick="copyAccountPassword()">Copy</button>
         </div>
       </div>
@@ -1107,13 +1107,13 @@
     </div>
 
     <div style="margin-bottom:16px">
-      <div style="font-size:12px; color:var(--t2); margin-bottom:8px">Your new password (copy it now — this won't be shown again):</div>
+      <div style="font-size:12px; color:var(--t2); margin-bottom:8px">Your new password (copy it now - this won't be shown again):</div>
       <div style="display:flex; gap:6px; align-items:center">
         <div id="pw-reveal-value" class="pw-hover-reveal" title="Hover to reveal" style="font-family:'JetBrains Mono',monospace; font-size:14px; font-weight:600; color:var(--t1); background:var(--s3); padding:10px 12px; border-radius:8px; flex:1; word-break:break-all; user-select:all"></div>
       </div>
       <div style="font-size:11px; color:var(--t2); margin-top:8px; display:flex; align-items:center; gap:4px">
         <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-        Roblox invalidated your session — the app is now refreshing your cookie in the background. If it needs a captcha or a 2-step code, you'll be told what to do.
+        Roblox invalidated your session - the app is now refreshing your cookie in the background. If it needs a captcha or a 2-step code, you'll be told what to do.
       </div>
     </div>
 
@@ -1128,7 +1128,7 @@
 <div class="overlay" id="m-anticheat" data-backdrop-close="true">
   <div class="modal" onclick="event.stopPropagation()" style="width:420px">
     <div class="modal-title" id="ac-title">Anti-cheat detected</div>
-    <div class="modal-sub" style="margin-bottom:12px">Close it before spoofing — kernel anti-cheats can flag or interfere with identifier changes.</div>
+    <div class="modal-sub" style="margin-bottom:12px">Close it before spoofing - kernel anti-cheats can flag or interfere with identifier changes.</div>
     <div id="ac-steps" style="display:flex;flex-direction:column;gap:8px;max-height:280px;overflow-y:auto"></div>
     <div class="modal-actions">
       <button class="btn btn-ghost" onclick="closeModal('m-anticheat')">Cancel</button>

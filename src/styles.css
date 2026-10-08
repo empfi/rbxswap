@@ -674,7 +674,7 @@ body.theme-graphite{--bg:#0d0e10;--s1:#131418;--s2:#1a1c21;--s3:#23262d;--s4:#2e
 .exec-links{display:flex;gap:6px;flex-shrink:0}
 .exec-empty{font-size:12.5px;color:var(--t3);padding:16px 2px;text-align:center}
 
-/* Executer page — vertical "Your Executors" list rows */
+/* Executer page - vertical "Your Executors" list rows */
 .exec-row{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);padding:14px 16px;display:flex;flex-direction:column;gap:8px;transition:border-color var(--dur) var(--smooth),background var(--dur) var(--smooth)}
 .exec-row.excluded{opacity:.55}
 .exec-row-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap}
@@ -695,7 +695,7 @@ body.theme-graphite{--bg:#0d0e10;--s1:#131418;--s2:#1a1c21;--s3:#23262d;--s4:#2e
    overrides the base rules above without any markup changes.
    ═══════════════════════════════════════════════════════════════════════════ */
 
-/* 1 — Tokens: deeper, calmer surfaces + a consistent radius scale */
+/* 1 - Tokens: deeper, calmer surfaces + a consistent radius scale */
 :root{
   --bg:#0b0b0d;--s1:#131316;--s2:#17171b;--s3:#1e1e23;--s4:#2b2b33;
   --bd:rgba(255,255,255,.06);--bd2:rgba(255,255,255,.11);
@@ -720,7 +720,7 @@ body.light{
   --sh-lg:0 16px 40px -12px rgba(0,0,0,.18);
 }
 
-/* 2 — Strip the gloss: flat fills everywhere. Hover/press motion is handled by
+/* 2 - Strip the gloss: flat fills everywhere. Hover/press motion is handled by
    the motion pass further down, so the old transform:none kill-lists are gone. */
 .btn,.btn-primary,.btn-launch,.btn-ghost,.btn-edit,.btn-del,.btn-sm,.btn-danger,
 .btn-out,.filter-menu button,.nav-item,.nav-item.active,.vt,.vt.active,
@@ -730,13 +730,13 @@ body.light{
 .btn-out:active,.nav-item:active,.nav-item.active:active,
 .filter-menu button:active{opacity:.75}
 
-/* 3 — Titlebar */
+/* 3 - Titlebar */
 #titlebar{border-bottom:1px solid var(--bd);background:var(--bg)}
 .tb-name{font-size:14px;font-weight:650;letter-spacing:-.01em}
 .tb-version{background:var(--s2);border:1px solid var(--bd);border-radius:var(--r3);font-size:10.5px;padding:3px 8px}
 .tb-btn{border-radius:var(--r3)}
 
-/* 4 — Sidebar: quieter, tighter rhythm */
+/* 4 - Sidebar: quieter, tighter rhythm */
 #sidebar{background:var(--bg);padding:12px 10px;gap:0}
 .nav-item{padding:9px 11px;border-radius:var(--r2);font-size:13px;font-weight:500;color:var(--t2);border-color:transparent;box-shadow:none;gap:11px}
 .nav-item .material-icons-round{font-size:18px;color:var(--t3);transition:color var(--dur) var(--smooth)}
@@ -754,13 +754,13 @@ body.light{
 .sb-afk{padding:8px 11px;margin-bottom:6px}
 .sb-afk-label{font-size:12px}
 
-/* 5 — Page header: smaller, calmer */
+/* 5 - Page header: smaller, calmer */
 .ph{padding:20px 24px 16px;border-bottom:1px solid var(--bd)}
 .ph-title{font-size:21px;font-weight:650;letter-spacing:-.02em;gap:9px}
 .ph-sub{font-size:12.5px;margin-top:3px;color:var(--t3)}
 .ph-badge{font-size:11.5px;height:21px;border-radius:var(--r3);font-weight:600}
 
-/* 6 — Inputs & controls: flat, no inset shadows */
+/* 6 - Inputs & controls: flat, no inset shadows */
 .search{height:36px;border-radius:var(--r2);background:var(--s2);box-shadow:none;padding:0 12px}
 .search .material-icons-round{font-size:17px}
 .search input{font-size:12.5px}
@@ -776,7 +776,7 @@ body.light{
 .cdd-trigger{background:var(--s2);border-radius:var(--r2)}
 .cdd-trigger:hover{background:var(--s3);border-color:var(--bd2)}
 
-/* 7 — Buttons: flat fills, clear hierarchy */
+/* 7 - Buttons: flat fills, clear hierarchy */
 .btn{border-radius:var(--r2);font-weight:550;box-shadow:none}
 .btn-primary,.btn-launch{background-color:var(--ac);color:#fff;border:1px solid transparent;box-shadow:none}
 .btn-primary:hover,.btn-launch:hover{background-color:var(--ac-h);box-shadow:none}
@@ -787,7 +787,7 @@ body.light{
 .btn-danger:hover{background-color:var(--red);color:#fff;box-shadow:none}
 .btn-launch{padding:9px 0;font-size:12.5px}
 
-/* 8 — Cards & panels: flat surfaces, border-only emphasis */
+/* 8 - Cards & panels: flat surfaces, border-only emphasis */
 .card{background:var(--s1);border-radius:var(--r);padding:16px;box-shadow:none}
 .card-av{box-shadow:0 0 0 2px var(--s1),0 0 0 3px var(--s4)}
 .card.is-live .card-av{box-shadow:0 0 0 2px var(--s1),0 0 0 3px var(--green)}
@@ -804,7 +804,7 @@ body.light{
 .sr-desc{font-size:11.5px;line-height:1.55;color:var(--t3)}
 .badge{border-radius:var(--r3);font-size:10px;padding:3px 8px}
 
-/* 10 — Modals & menus: soft, single shadow */
+/* 10 - Modals & menus: soft, single shadow */
 .overlay{background:rgba(0,0,0,.6);backdrop-filter:blur(6px)}
 .modal{border-radius:var(--r);border:1px solid var(--bd2);box-shadow:var(--sh-lg);padding:20px}
 .modal-title{font-size:16px;font-weight:650;letter-spacing:-.02em}
@@ -814,18 +814,18 @@ body.light{
 .filter-menu button:hover{background:var(--s3);color:var(--t1);border-color:transparent;box-shadow:none}
 .filter-menu button.active{background:var(--ac);color:#fff;border-color:transparent;box-shadow:none}
 
-/* 11 — Toggles: flat track */
+/* 11 - Toggles: flat track */
 .toggle-trk{background:var(--s4);border:1px solid transparent;box-shadow:none}
 .toggle-trk::before{background:#fff;background-image:none;box-shadow:var(--sh)}
 .toggle input:checked+.toggle-trk{background-color:var(--ac);border-color:transparent;box-shadow:none}
 
-/* 12 — Scrollbars */
+/* 12 - Scrollbars */
 ::-webkit-scrollbar{width:8px;height:8px}
 ::-webkit-scrollbar-thumb{background:var(--s4);border-radius:8px;border:2px solid transparent;background-clip:content-box}
 ::-webkit-scrollbar-thumb:hover{background:var(--t3);background-clip:content-box}
 ::-webkit-scrollbar-track{background:transparent}
 
-/* 13 — Feature panels added later (swap / rdd / executors) */
+/* 13 - Feature panels added later (swap / rdd / executors) */
 .swap-log,.exec-card,.weao-versions{border-radius:var(--r2)}
 .exec-card{background:var(--s1);border-radius:var(--r)}
 .exec-card:hover{border-color:var(--bd2)}
@@ -837,7 +837,7 @@ body.light{
 .weao-glabel{color:var(--t3)}
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   FILES — macOS Finder-style browser (self-contained light look)
+   FILES - macOS Finder-style browser (self-contained light look)
    ═══════════════════════════════════════════════════════════════════════════ */
 #page-files{padding:16px;overflow:hidden}
 .finder{
@@ -914,7 +914,7 @@ body:not(.platform-win) .platform-note{display:flex}
 .platform-note .material-icons-round{font-size:18px;color:var(--t3);flex-shrink:0;margin-top:1px}
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   APPLE DARK — full macOS-style dark restyle. Loaded last, so it wins over all
+   APPLE DARK - full macOS-style dark restyle. Loaded last, so it wins over all
    earlier rules without touching any markup (aside from the boot loader +
    traffic-light controls added in index.html).
    ═══════════════════════════════════════════════════════════════════════════ */
@@ -933,7 +933,7 @@ body{
   letter-spacing:-.01em;background:var(--bg);color:var(--t1);
 }
 
-/* Titlebar — custom Windows topbar */
+/* Titlebar - custom Windows topbar */
 #titlebar{background:var(--bg);border-bottom:1px solid var(--bd);height:var(--tb);padding:0}
 .tb-brand{padding:0 16px;gap:12px}
 .tb-name{font-size:13.5px;font-weight:600}
@@ -954,7 +954,7 @@ body{
 .nav-item.active .material-icons-round{color:#fff}
 .sb-afk{background:var(--s1);border:1px solid var(--bd);border-radius:9px}
 
-/* Buttons — premium purple: light top highlight melting into a deep purple
+/* Buttons - premium purple: light top highlight melting into a deep purple
    base, white text, soft glow. Same treatment the launch/Add buttons use. */
 .btn{border-radius:7px;font-weight:500}
 .btn-primary,.btn-launch{
@@ -986,7 +986,7 @@ body{
 .exec-card:hover{border-color:var(--bd2)}
 .card-add{border:1px dashed var(--bd2);border-radius:12px}
 
-/* Toggle — macOS switch (green when on) */
+/* Toggle - macOS switch (green when on) */
 .toggle{width:38px;height:22px}
 .toggle-trk{border-radius:22px;background:rgba(120,120,128,.34);border:none;box-shadow:none}
 .toggle-trk::before{width:18px;height:18px;top:2px;left:2px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.4)}
@@ -996,7 +996,7 @@ body{
 .toggle.sm .toggle-trk::before{width:15px;height:15px}
 .toggle.sm input:checked+.toggle-trk::before{transform:translateX(13px)}
 
-/* Modals — macOS sheet */
+/* Modals - macOS sheet */
 .overlay{background:rgba(0,0,0,.45);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px)}
 .modal{background:var(--s1);border:1px solid var(--bd2);border-radius:14px;box-shadow:var(--sh-lg)}
 .filter-menu{background:var(--s1);border:1px solid var(--bd2);border-radius:10px;box-shadow:var(--sh-lg)}
@@ -1024,7 +1024,7 @@ body{
 .ff-btn:hover{background:rgba(255,255,255,.13)}
 .ff-btn.primary{background:var(--f-blue);color:#fff}
 
-/* Apple activity spinner — replaces the old border spinner (.spin) */
+/* Apple activity spinner - replaces the old border spinner (.spin) */
 .spin{
   border:none !important;border-radius:50%;
   background:conic-gradient(from 90deg,rgba(255,255,255,0),currentColor);
@@ -1225,7 +1225,7 @@ body{
   transition: background var(--dur) var(--smooth), color var(--dur) var(--smooth);
 }
 
-/* Pages: soft fade + rise when switching. NOTE: no animation here — an
+/* Pages: soft fade + rise when switching. NOTE: no animation here - an
    `animation-fill-mode: both` on .page pins opacity:1 on EVERY page, which
    overrides the base opacity:0 that hides inactive pages and stacks all pages
    on top of each other. The base .page opacity/transform transition already
@@ -1261,14 +1261,14 @@ body{
 .toggle:hover .toggle-trk::before { scale: 1.08; }
 .toggle:active .toggle-trk::before { scale: .94; }
 
-/* NOTE: no blanket reduced-motion kill-list here — a broad animation:none
+/* NOTE: no blanket reduced-motion kill-list here - a broad animation:none
    block disabled every entrance/hover/press animation on machines where
    Windows "Animation effects" is turned off (prefers-reduced-motion: reduce).
    Infinite loops (spinners, dot-rings) still respect reduced motion via the
    narrow rules defined earlier in the sheet. */
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   UI CLEANUP — final consistency pass. No new components; just tighter rhythm,
+   UI CLEANUP - final consistency pass. No new components; just tighter rhythm,
    unified radii, subtler placeholders and a clean text-selection color.
    ═══════════════════════════════════════════════════════════════════════════ */
 ::selection{background:var(--ac3);color:#fff}
@@ -1362,7 +1362,7 @@ html.th-no-motion *,html.th-no-motion *::before,html.th-no-motion *::after{
   transition-duration:0ms !important;animation-duration:0ms !important;
 }
 /* Base: sidebar & titlebar share the page background so they never look
-   like a separate black column — glass only adds frost/tint on top. */
+   like a separate black column - glass only adds frost/tint on top. */
 #sidebar,#titlebar{background:var(--bg)}
 
 /* theme preset swatches */
@@ -1378,7 +1378,7 @@ html.th-no-motion *,html.th-no-motion *::before,html.th-no-motion *::after{
    ONBOARDING TUTORIAL
    ═════════════════════════════════════════════════════════════════════════ */
 /* Container-less tutorial: text floats directly on the blurred backdrop.
-   No card, no orbs, no decoration — just content, buttons centered at the bottom. */
+   No card, no orbs, no decoration - just content, buttons centered at the bottom. */
 .tut-overlay{background:rgba(6,6,9,.66);backdrop-filter:blur(22px) saturate(1.3);z-index:400}
 .tut-modal{position:relative;width:480px;padding:0;background:transparent !important;border:none !important;box-shadow:none !important;backdrop-filter:none !important;overflow:visible;border-radius:0 !important}
 .tut-visual,.tut-glow,.tut-orb{display:none !important}
