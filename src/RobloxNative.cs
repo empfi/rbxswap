@@ -1135,10 +1135,15 @@ internal static class AntiAfk
     [DllImport("user32.dll")] static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
     const int SW_RESTORE = 9;
 
+    [DllImport("user32.dll")] static extern IntPtr SendMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
+    const uint WM_KEYDOWN = 0x0100;
+    const uint WM_KEYUP = 0x0101;
+
     static bool TapWindow(IntPtr hWnd, byte bVk, byte bScan)
     {
         IntPtr originalFg = GetForegroundWindow();
         bool needRestore = originalFg != IntPtr.Zero && originalFg != hWnd;
+        bool couldFocus = true;
         try
         {
             if (originalFg != hWnd)
@@ -1146,24 +1151,36 @@ internal static class AntiAfk
                 if (IsIconic(hWnd)) ShowWindow(hWnd, SW_RESTORE);
                 SetForegroundWindow(hWnd);
                 Thread.Sleep(90 + _rng.Next(60)); 
+                couldFocus = GetForegroundWindow() == hWnd;
             }
-            Thread.Sleep(20 + _rng.Next(20));
-            keybd_event(bVk, bScan, 0, IntPtr.Zero); 
-            try
+            if (couldFocus)
             {
+                Thread.Sleep(20 + _rng.Next(20));
+                keybd_event(bVk, bScan, 0, IntPtr.Zero); 
+                try
+                {
+                    Thread.Sleep(35 + _rng.Next(40));
+                }
+                finally
+                {
+                    
+                    keybd_event(bVk, bScan, KEYEVENTF_KEYUP, IntPtr.Zero); 
+                }
+            }
+            else
+            {
+                IntPtr kdLp = (IntPtr)(int)((uint)bScan << 16 | 1u);
+                IntPtr kuLp = (IntPtr)(int)((uint)bScan << 16 | 0xC0000001u);
+                SendMessage(hWnd, WM_KEYDOWN, (IntPtr)bVk, kdLp);
                 Thread.Sleep(35 + _rng.Next(40));
-            }
-            finally
-            {
-                
-                keybd_event(bVk, bScan, KEYEVENTF_KEYUP, IntPtr.Zero); 
+                SendMessage(hWnd, WM_KEYUP, (IntPtr)bVk, kuLp);
             }
             return true;
         }
         catch { return false; }
         finally
         {
-            if (needRestore) { try { SetForegroundWindow(originalFg); } catch { } }
+            if (needRestore && GetForegroundWindow() == hWnd) { try { SetForegroundWindow(originalFg); } catch { } }
         }
     }
 
