@@ -1663,23 +1663,24 @@ async function loadWeaoForLaunch() {
     _installedVersionsList = [];
   }
 
-  if (!_weaoExploitsData) {
-    if (filterSel) filterSel.innerHTML = '<option value="all">Loading WEAO exploits…</option>';
-    try {
-      const [expRes, verRes] = await Promise.all([
-        api.weaoExploits(),
-        api.weaoVersions('current')
-      ]);
-      if (expRes && expRes.ok && Array.isArray(expRes.data)) {
-        _weaoExploitsData = expRes.data;
-      }
-      if (verRes && verRes.ok && verRes.data) {
-        _weaoVersionsData = verRes.data;
-      }
-      if (statusEl) statusEl.textContent = _weaoExploitsData ? 'WEAO Live' : 'Offline';
-    } catch {
-      if (statusEl) statusEl.textContent = 'Offline';
+  if (filterSel && !_weaoExploitsData) filterSel.innerHTML = '<option value="all">Loading WEAO exploits…</option>';
+  try {
+    // Always re-fetch so the launch modal (and the Executors tab, which
+    // renders from the same data) shows the latest WEAO list, never a
+    // session-stale cache.
+    const [expRes, verRes] = await Promise.all([
+      api.weaoExploits(),
+      api.weaoVersions('current')
+    ]);
+    if (expRes && expRes.ok && Array.isArray(expRes.data)) {
+      _weaoExploitsData = expRes.data;
     }
+    if (verRes && verRes.ok && verRes.data) {
+      _weaoVersionsData = verRes.data;
+    }
+    if (statusEl) statusEl.textContent = _weaoExploitsData ? 'WEAO Live' : 'Offline';
+  } catch {
+    if (statusEl) statusEl.textContent = _weaoExploitsData ? 'WEAO Live' : 'Offline';
   }
 
   populateLaunchExploitFilter();
@@ -5100,6 +5101,11 @@ async function swapRunClean() {
       }
       data = (res.data || []).filter((e) => !e.hidden);
       loaded = true;
+      // Keep the shared WEAO cache in sync so the launch modal's exploit
+      // filter and the Settings executor list always match this latest data.
+      _weaoExploitsData = res.data;
+      populateLaunchExploitFilter();
+      if (typeof window.renderExecutorSettings === 'function') window.renderExecutorSettings();
       window.executorsRender();
     } catch (e) {
       if (status) status.textContent = 'Failed to load: ' + e.message;
