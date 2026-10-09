@@ -3107,8 +3107,123 @@ ipcMain.handle('roblox:cleanOldVersions', async (_e, keepHashes) => {
   }
 });
 
+// ── Executor auto-boot ───────────────────────────────────────────────────────
+// When the "Boot executor" toggle on the Accounts page is on, start the user's
+// default executor alongside an account launch - but only if it isn't already
+// running. The program path is set per executor on the Executer page.
+function isProcessRunningByName(name) {
+  return new Promise((resolve) => {
+    try {
+      const isWin = process.platform === 'win32';
+      // tasklist is queried without a filter (the /FI quoting is unreliable
+      // through child_process) and matched by exact image name instead.
+      const proc = isWin
+        ? spawn('tasklist', ['/NH'], { windowsHide: true })
+        : spawn('pgrep', ['-x', name], { windowsHide: true });
+      let out = '';
+      proc.stdout.on('data', (d) => { out += d.toString(); });
+      proc.on('close', () => {
+        if (!isWin) return resolve(out.trim().length > 0);
+        const target = name.toLowerCase();
+        const firstCol = (line) => (line.trim().split(' ').filter(Boolean)[0] || '').toLowerCase();
+        resolve(out.split(String.fromCharCode(10)).some((line) => firstCol(line) === target));
+      });
+      proc.on('error', () => resolve(false));
+    } catch { resolve(false); }
+  });
+}
+
+let _executorBootPromise = null;
+function maybeBootExecutor() {
+  let s;
+  try { s = loadSettings(); } catch { return; }
+  if (!s.bootExecutorWithAccount) return;
+  const name = s.defaultExecutor || '';
+  const exePath = (s.executorPaths && name && s.executorPaths[name]) || '';
+  if (!name) {
+    sendLog('warn', 'executor', 'Boot executor is on, but no default executor is selected (Executer page).');
+    return;
+  }
+  if (!exePath) {
+    sendLog('warn', 'executor', `Boot executor is on, but no program is set for ${name} (Executer page).`);
+    return;
+  }
+  if (!fs.existsSync(exePath)) {
+    sendLog('warn', 'executor', `The program set for ${name} is not there anymore: ${exePath} - fix the path on the Executer page.`);
+    return;
+  }
+  if (_executorBootPromise) return; // a boot is already in flight
+  _executorBootPromise = (async () => {
+    try {
+      const base = path.basename(exePath);
+      if (await isProcessRunningByName(base)) {
+        sendLog('info', 'executor', `${name} is already running - not launching it again.`);
+        return;
+      }
+      let child = null;
+      let spawnError = null;
+      try {
+        child = spawn(exePath, [], {
+          cwd: path.dirname(exePath),
+          detached: true,
+          stdio: 'ignore',
+          windowsHide: false,
+          shell: exePath.toLowerCase().endsWith('.bat') || exePath.toLowerCase().endsWith('.cmd'),
+        });
+        // libuv reports a bad image synchronously, other failures arrive as an
+        // 'error' event; wait briefly for either.
+        spawnError = await new Promise((resolve) => {
+          let settled = false;
+          const finish = (err) => { if (!settled) { settled = true; resolve(err); } };
+          child.once('error', finish);
+          child.once('spawn', () => finish(null));
+          setTimeout(() => finish(null), 2500);
+        });
+      } catch (e) {
+        spawnError = e;
+      }
+      // An executor that requires administrator rights cannot be created as a
+      // child process (CreateProcess fails with ERROR_ELEVATION_REQUIRED), so
+      // fall back to ShellExecute, which raises the usual UAC prompt.
+      if (spawnError) {
+        const shellErr = await shell.openPath(exePath);
+        if (shellErr) throw new Error(`${spawnError.message}; elevated launch failed: ${shellErr}`);
+        sendLog('ok', 'executor', `Booted ${name} with administrator rights (UAC) at launch.`);
+        return;
+      }
+      child.unref();
+      sendLog('ok', 'executor', `Booted ${name} with the account launch.`);
+    } catch (e) {
+      sendLog('warn', 'executor', `Could not boot ${name}: ${e.message}`);
+    } finally {
+      setTimeout(() => { _executorBootPromise = null; }, 15000);
+    }
+  })();
+}
+
+ipcMain.handle('executor:pick', async () => {
+  try {
+    const opts = {
+      title: 'Select your executor program',
+      properties: ['openFile'],
+      filters: [
+        { name: 'Executables', extensions: ['exe', 'bat', 'cmd'] },
+        { name: 'All files', extensions: ['*'] },
+      ],
+    };
+    const res = (win && !win.isDestroyed())
+      ? await dialog.showOpenDialog(win, opts)
+      : await dialog.showOpenDialog(opts);
+    if (!res || res.canceled || !res.filePaths || !res.filePaths.length) return { ok: false, cancelled: true };
+    return { ok: true, path: res.filePaths[0] };
+  } catch (e) {
+    return { ok: false, error: e.message };
+  }
+});
+
 ipcMain.handle('roblox:launch', async (_, accountId, cookie, target, versionHash, options) => {
   const result = await (_launchQueue = _launchQueue.then(() => _doLaunch(accountId, cookie, target, versionHash, options)));
+  if (result && result.success) { try { maybeBootExecutor(); } catch {} }
   return result;
 });
 

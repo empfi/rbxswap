@@ -86,6 +86,7 @@ contextBridge.exposeInMainWorld('api', {
 
   weaoVersions: (which) => ipcRenderer.invoke('weao:versions', which),
   weaoExploits: () => ipcRenderer.invoke('weao:exploits'),
+  pickExecutor: () => ipcRenderer.invoke('executor:pick'),
 
   getProtocolStatus: () => ipcRenderer.invoke('protocol:status'),
   registerProtocol: () => ipcRenderer.invoke('protocol:register'),

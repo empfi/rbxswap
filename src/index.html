@@ -105,6 +105,7 @@
                 <button data-f="invalid-first" onclick="setAcctFilter('invalid-first')">Invalid first</button>
               </div>
             </div>
+            <button class="btn-out acct-exec-btn" id="acct-boot-exec" aria-pressed="false" aria-label="Boot executor with accounts" onclick="toggleBootExecutor()"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" x2="20" y1="19" y2="19"/></svg></button>
             <div class="view-toggle">
               <button class="vt active" id="vt-grid" onclick="setAcctView('grid')" title="Grid view"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></button>
               <button class="vt" id="vt-list" onclick="setAcctView('list')" title="List view"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></button>
@@ -664,6 +665,13 @@
             <div class="sr" style="flex-direction:column;align-items:flex-start;gap:8px">
               <div class="sr-left"><div class="sr-label">Default Executor</div><div class="sr-desc">Pick your default executor for account launches. Shown as a green badge in the list above.</div></div>
               <select class="sr-input" id="setting-default-executor" style="width:100%; font-size:12px" onchange="saveExecutorSettings()"></select>
+            </div>
+            <div class="sr" style="flex-direction:column;align-items:flex-start;gap:8px">
+              <div class="sr-left"><div class="sr-label">Executor Program</div><div class="sr-desc" id="setting-executor-path-hint">Path to the default executor's .exe. Used by the &ldquo;Boot executor&rdquo; toggle on the Accounts page to start it with your launches.</div></div>
+              <div style="display:flex;gap:8px;width:100%">
+                <input class="sr-input" id="setting-executor-path" style="flex:1;min-width:0;font-size:12px" placeholder="Pick a default executor first" onchange="saveExecutorPath(this.value)" spellcheck="false" autocomplete="off"/>
+                <button class="btn btn-ghost" style="font-size:11.5px;padding:6px 12px;flex-shrink:0" onclick="pickExecutorPath()">Browse…</button>
+              </div>
             </div>
             <div class="sr" style="flex-direction:column;align-items:flex-start;gap:10px">
               <div class="sr-left"><div class="sr-label">Managed Exploits &amp; Exclusions</div><div class="sr-desc">Uncheck any exploit to hide it from the list above and the launch filters.</div></div>

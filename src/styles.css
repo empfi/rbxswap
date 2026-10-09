@@ -1396,3 +1396,10 @@ html.th-no-motion *,html.th-no-motion *::before,html.th-no-motion *::after{
 .tut-modal .modal-actions #tut-skip{position:static !important}
 
 .card.bulk-selected{border-color:var(--ac);box-shadow:0 0 0 1px var(--ac)}
+
+/* Compact "boot executor with accounts" toggle in the accounts toolbar.
+   Icon-only so the controls row keeps its space; the accent fill and title
+   carry the state. */
+.acct-exec-btn{width:40px;min-width:40px;padding:0;justify-content:center;flex-shrink:0;color:var(--t3)}
+.acct-exec-btn:hover{color:var(--t2)}
+.acct-exec-btn.on,.acct-exec-btn.on:hover{border-color:var(--ac);color:var(--ac);background-color:var(--ac2)}

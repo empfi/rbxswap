@@ -123,7 +123,7 @@
     "buildDependenciesFromSource": false
   },
   "devDependencies": {
-    "electron": "^43.3.0",
+    "electron": "^43.7.9",
     "electron-builder": "^26.15.3"
   },
   "dependencies": {

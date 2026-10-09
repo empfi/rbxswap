@@ -14,6 +14,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          # Full history + tags so the changelog can diff against the previous
+          # release tag.
+          fetch-depth: 0
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -43,16 +47,32 @@ jobs:
           Copy-Item dist/*.blockmap release/ -ErrorAction SilentlyContinue
           Get-ChildItem release
 
+      - name: Generate changelog
+        shell: pwsh
+        run: |
+          $prev = git tag --sort=-creatordate | Select-Object -First 1
+          if ($prev) { $range = "$prev..HEAD" } else { $range = 'HEAD' }
+          $commits = git log $range --no-merges --pretty=format:'- %s (%h)'
+          if (-not $commits) { $commits = '- No new commits since the last build.' }
+          $lines = @()
+          $lines += "Automated build of master (${{ github.sha }})."
+          $lines += ''
+          if ($prev) { $lines += "### Changes since $prev" } else { $lines += '### Changes' }
+          $lines += ''
+          $lines += $commits
+          if ($prev) {
+            $lines += ''
+            $lines += "**Full changelog**: https://github.com/${{ github.repository }}/compare/$prev...${{ github.sha }}"
+          }
+          $lines -join "`n" | Set-Content -Path changelog.md -Encoding utf8
+          Get-Content changelog.md
+
       - name: Create release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ github.run_number }}
           name: Build ${{ github.run_number }}
-          body: |
-            Automated build of master (${{ github.sha }}).
-
-            - `rbxSWAP.exe` - portable, no install needed
-            - `rbxSWAP-Setup-*.exe` - Windows installer
+          body_path: changelog.md
           draft: false
           prerelease: false
           files: release/*

@@ -430,6 +430,15 @@ function applySettings() {
   document.body.classList.toggle('streamer-mode', !!settings.streamerMode);
   const rejoin = document.getElementById('setting-auto-rejoin');
   if (rejoin) rejoin.checked = !!settings.autoRejoin;
+  if (settings.executorPaths && typeof settings.executorPaths === 'object') _executorPaths = { ..._executorPaths, ...settings.executorPaths };
+  // The default executor also lives in localStorage, where it can predate it
+  // being persisted to the main-process settings (which the launch flow reads).
+  // Push it along whenever main has a missing or stale copy.
+  if (_defaultExecutor && settings.defaultExecutor !== _defaultExecutor) {
+    settings.defaultExecutor = _defaultExecutor;
+    api.saveSettings({ defaultExecutor: _defaultExecutor }).catch(() => {});
+  }
+  renderBootExecutorButton();
 }
 
 let _acctQuery = '', _acctFilter = (() => { try { const f = localStorage.getItem('mr-acct-filter'); return (f && f !== 'running' && f !== 'idle') ? f : 'all'; } catch { return 'all'; } })(), _acctView = (() => { try { return localStorage.getItem('mr-acct-view') === 'list' ? 'list' : 'grid'; } catch { return 'grid'; } })();
@@ -633,7 +642,7 @@ function showCardMenu(id, x, y) {
     <div class="ctx-header${settings.streamerMode ? ' streamer-mask' : ''}" title="${settings.streamerMode ? 'Hover to reveal' : ''}">${esc(a ? (a.nickname || a.username || 'Unknown') : id)}</div>
     <button class="ctx-item" onclick="openAccountInfoModal('${id}')"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>Account info</button>
     ${isLive ? `<button class="ctx-item ctx-danger" onclick="ctxKill('${id}')"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/></svg>Kill instance</button>` : ''}
-    <button class="ctx-item" onclick="ctxLaunch('${id}')"><svg class="launch-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polygon points="10,8 16,12 10,16 10,8" fill="currentColor" stroke="none"/></svg>${isLive ? 'Relaunch' : 'Launch'}</button>
+    ${isLive ? '' : `<button class="ctx-item" onclick="ctxLaunch('${id}')"><svg class="launch-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polygon points="10,8 16,12 10,16 10,8" fill="currentColor" stroke="none"/></svg>Launch</button>`}
     <button class="ctx-item" onclick="ctxLaunchGame('${id}')"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" x2="10" y1="12" y2="12"/><line x1="8" x2="8" y1="10" y2="14"/><line x1="15" x2="15.01" y1="13" y2="13"/><line x1="18" x2="18.01" y1="11" y2="11"/><path d="M6 8h12a4 4 0 0 1 3.86 5l-1.5 6A2 2 0 0 1 18.42 20H17a2 2 0 0 1-1.79-1.11L14.5 17h-5l-.71 1.89A2 2 0 0 1 7 20H5.58a2 2 0 0 1-1.94-1.52l-1.5-6A4 4 0 0 1 6 8Z"/></svg>Launch Game</button>
     <button class="ctx-item" onclick="ctxEdit('${id}')"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>Edit account</button>
     <div class="ctx-sep"></div>
@@ -1859,6 +1868,9 @@ async function loadWeaoForLaunch() {
 let _disabledExecutors = [];
 try { _disabledExecutors = JSON.parse(localStorage.getItem('rblx_disabled_executors') || '[]'); } catch {}
 let _defaultExecutor = localStorage.getItem('rblx_default_executor') || '';
+// Per-executor path to its program (.exe), set on the Executer page. The
+// "Boot executor" toggle on the Accounts page launches the default one.
+let _executorPaths = (() => { try { return JSON.parse(localStorage.getItem('rblx_executor_paths') || '{}') || {}; } catch { return {}; } })();
 
 
 
@@ -1917,6 +1929,63 @@ function populateLaunchExploitFilter() {
   }
 }
 
+function renderExecutorPathField() {
+  const inp = document.getElementById('setting-executor-path');
+  if (!inp) return;
+  const name = _defaultExecutor;
+  inp.disabled = !name;
+  inp.value = name ? (_executorPaths[name] || '') : '';
+  inp.placeholder = name ? `e.g. C:\\Tools\\${name}.exe` : 'Pick a default executor first';
+}
+window.renderExecutorPathField = renderExecutorPathField;
+
+window.saveExecutorPath = function(value) {
+  if (!_defaultExecutor) { toast('Pick a default executor first', 'err'); renderExecutorPathField(); return; }
+  const v = String(value || '').trim();
+  if (v) _executorPaths[_defaultExecutor] = v; else delete _executorPaths[_defaultExecutor];
+  try { localStorage.setItem('rblx_executor_paths', JSON.stringify(_executorPaths)); } catch {}
+  api.saveSettings({ executorPaths: _executorPaths }).catch(() => {});
+  toast(v ? `Executor program saved for ${_defaultExecutor}` : 'Executor program cleared', 'ok');
+};
+
+window.pickExecutorPath = async function() {
+  if (!_defaultExecutor) { toast('Pick a default executor first', 'err'); return; }
+  let res;
+  try { res = await api.pickExecutor(); } catch (e) { res = { ok: false, error: e?.message }; }
+  if (!res || res.cancelled) return;
+  if (!res.ok) { toast('Could not open the file picker: ' + (res.error || 'unknown error'), 'err'); return; }
+  const inp = document.getElementById('setting-executor-path');
+  if (inp) inp.value = res.path;
+  window.saveExecutorPath(res.path);
+};
+
+function renderBootExecutorButton() {
+  const btn = document.getElementById('acct-boot-exec');
+  if (!btn) return;
+  const on = !!settings.bootExecutorWithAccount;
+  const program = !on || (_defaultExecutor && _executorPaths[_defaultExecutor])
+    ? ''
+    : ' No program is set for the default executor yet - add one on the Executer page.';
+  btn.classList.toggle('on', on);
+  btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+  btn.title = (on ? 'Boot executor: ON' : 'Boot executor: OFF')
+    + ' - starts your default executor with each account launch, but only if it is not already running.' + program;
+}
+window.renderBootExecutorButton = renderBootExecutorButton;
+
+window.toggleBootExecutor = function() {
+  const on = !settings.bootExecutorWithAccount;
+  settings.bootExecutorWithAccount = on;
+  api.saveSettings({ bootExecutorWithAccount: on }).catch(() => {});
+  renderBootExecutorButton();
+  const noPath = on && !(_defaultExecutor && _executorPaths[_defaultExecutor]);
+  if (noPath) toast('Set the default executor and its program on the Executer page first', 'err');
+  else toast(on ? 'Executor will boot with account launches' : 'Executor auto-boot disabled', 'ok');
+  logEntry('info', 'executor', on
+    ? `Boot executor enabled - ${_defaultExecutor || 'the default executor'} starts with account launches when it is not already running.`
+    : 'Boot executor disabled.');
+};
+
 window.renderExecutorSettings = function() {
   const defSel = document.getElementById('setting-default-executor');
   const listEl = document.getElementById('setting-executors-list');
@@ -1955,6 +2024,8 @@ window.renderExecutorSettings = function() {
       </div>
     `;
   }).join('');
+
+  renderExecutorPathField();
 };
 
 window.saveExecutorSettings = function() {
@@ -1966,6 +2037,7 @@ window.saveExecutorSettings = function() {
     
     api.saveSettings({ defaultExecutor: _defaultExecutor }).catch(() => {});
   }
+  renderExecutorPathField();
   populateLaunchExploitFilter();
   if (typeof window.executorsRender === 'function') window.executorsRender();
 };
