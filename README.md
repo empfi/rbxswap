@@ -64,4 +64,7 @@ The Electron app looks for the compiled exe next to the sources in dev, and in `
 
 - The app encrypts your account data on disk. Losing your encryption key means losing the stored sessions - there is no recovery.
 - Executor/Roblox version matching is powered by the WEAO API; it needs internet access on launch.
+
+## Credits
+- Website: https://luaprotect.dev
 - This is a personal tool, not affiliated with Roblox. Use it at your own discretion.
